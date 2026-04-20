@@ -16,19 +16,26 @@
     <a href="/" class="back-link">← Amanda Cowell</a>
 
     <header class="project-header">
-      <svg class="project-header-hex" viewBox="0 0 110 128" width="80" height="93" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <polygon points="55,4 106,31 106,97 55,124 4,97 4,31" fill="#2f7a4b" opacity="0.08"/><polygon points="55,4 106,31 106,97 55,124 4,97 4,31" fill="none" stroke="#2f7a4b" stroke-width="2.5" opacity="0.18"/>
-        <polygon points="55,20 90,40 90,88 55,108 20,88 20,40" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.12"/>
-      </svg>
-      <h1 class="project-title">ChalkboardAI</h1>
-      <p class="project-subtitle">Local-first AI math tutoring grounded in lecture-specific context. In development.</p>
-      <span class="status-badge">In development</span>
-      <div class="project-meta">
-        <span class="meta-chip">Self-directed</span>
-        <span class="meta-chip">2024–present</span>
-        <span class="meta-chip accent">Local-first · FERPA-compliant</span>
+      <div class="project-header-main">
+        <div class="project-header-text">
+          <h1 class="project-title">ChalkboardAI</h1>
+          <p class="project-subtitle">Local-first AI math tutoring grounded in lecture-specific context.</p>
+          <span class="status-badge">In development</span>
+          <div class="project-meta">
+            <span class="meta-chip">Self-directed</span>
+            <span class="meta-chip">2024–present</span>
+            <span class="meta-chip accent">Local-first · FERPA-compliant</span>
+          </div>
+        </div>
+        <div class="project-header-emblem" aria-hidden="true">
+          <svg viewBox="0 0 110 128" width="110" height="127" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="55,4 106,31 106,97 55,124 4,97 4,31" fill="#2f7a4b" opacity="0.10"/>
+            <polygon points="55,4 106,31 106,97 55,124 4,97 4,31" fill="none" stroke="#2f7a4b" stroke-width="2.5" opacity="0.25"/>
+            <polygon points="55,22 88,41 88,87 55,106 22,87 22,41" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.15"/>
+          </svg>
+        </div>
       </div>
-      <div class="tech-chips header-tech-chips">
+      <div class="project-header-stack">
         <span class="tech-chip built-with">Built with Claude Code</span>
         <span class="tech-chip">React</span>
         <span class="tech-chip">TypeScript</span>
@@ -86,7 +93,6 @@
       <h2>Product decisions worth calling out</h2>
       <p>Four calls from the build process that meaningfully shaped the product. Each was documented in a commit or a persistent decision file at the time so the scope stays defensible.</p>
 
-      <br>
 
       <div class="decision-block">
         <h3>Socratic enforcement: accept leakage, fix the UX instead</h3>
