@@ -1,15 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #CDDACF;
-  --surface: #F6FAF7;
+  --bg: #B0C9B6;
+  --surface: #FFFFFF;
   --text: #1A2420;
   --accent: #2f7a4b;
   --accent2: #4a55a8;
   --muted: #536860;
   --border: #D4E0D8;
-  --card-bg: #ECF2EE;
+  --card-bg: #F0F6F2;
   --max-w: 960px;
+  --card-radius: 16px;
+  --card-shadow: 0 2px 28px rgba(26,36,32,0.09);
+  --card-pad: 3rem;
 }
 
 *, *::before, *::after {
@@ -29,13 +32,29 @@ body {
   padding: 2rem 1.5rem 4rem;
 }
 
+/* =====================
+   LAYOUT — cards on background
+   ===================== */
+
 .container {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Every major block is a card */
+.hero,
+.section,
+.site-footer,
+.project-header-card,
+.project-section,
+.tech-stack-wrap {
   background: var(--surface);
-  border-radius: 14px;
-  box-shadow: 0 4px 48px rgba(26,36,32,0.09);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: var(--card-pad);
 }
 
 /* --- Project metadata chips --- */
@@ -69,15 +88,14 @@ body {
 }
 
 .tech-stack-wrap {
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 0 3rem;
-  font-size: 0.85rem;
-  color: var(--muted);
+  padding: 2rem var(--card-pad);
 }
 
 .tech-stack-label {
   margin-bottom: 0.6rem;
   font-style: italic;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .tech-chips {
@@ -160,9 +178,11 @@ a:hover { color: var(--accent2); }
    ===================== */
 
 .hero {
-  padding: 5rem 0 3.5rem;
+  padding: 4.5rem var(--card-pad) 3.5rem;
   position: relative;
   overflow: hidden;
+  /* light green tint to differentiate from plain sections */
+  background: #F2F8F4;
 }
 
 .hero-decor {
@@ -172,18 +192,19 @@ a:hover { color: var(--accent2); }
   z-index: 0;
 }
 
+/* The coordinate-system scribble — large, right side */
 .hero-scribble {
   position: absolute;
-  right: -20px;
+  right: -30px;
   top: 50%;
-  transform: translateY(-50%);
-  opacity: 1;
+  transform: translateY(-52%);
 }
 
+/* The hex — top right corner */
 .hero-hex {
   position: absolute;
-  right: 18px;
-  top: 28px;
+  right: 24px;
+  top: 24px;
 }
 
 .hero > *:not(.hero-decor) {
@@ -236,12 +257,11 @@ a:hover { color: var(--accent2); }
 }
 
 /* =====================
-   SECTIONS
+   SECTIONS (homepage cards)
    ===================== */
 
 .section {
-  padding: 3.5rem 0;
-  border-top: 1px solid var(--border);
+  /* no border-top — cards are separated by gap */
 }
 
 .section-heading-wrap {
@@ -269,7 +289,7 @@ a:hover { color: var(--accent2); }
 }
 
 /* =====================
-   PROJECT CARDS
+   PROJECT CARDS (homepage grid)
    ===================== */
 
 .projects-grid {
@@ -417,9 +437,7 @@ a:hover { color: var(--accent2); }
    ===================== */
 
 .site-footer {
-  border-top: 1px solid var(--border);
-  padding: 2.5rem 0 3.5rem;
-  margin-top: 1rem;
+  padding: 2.5rem var(--card-pad);
 }
 
 .footer-text {
@@ -440,6 +458,12 @@ a:hover { color: var(--accent2); }
   border-color: var(--accent);
 }
 
+.dot-divider {
+  display: block;
+  overflow: visible;
+  margin-bottom: 1.2rem;
+}
+
 /* =====================
    PROJECT PAGES
    ===================== */
@@ -449,29 +473,32 @@ a:hover { color: var(--accent2); }
   align-items: center;
   gap: 0.3rem;
   font-size: 0.88rem;
-  color: var(--muted);
+  color: var(--text);
   text-decoration: none;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
+  padding: 0.4rem 0;
   transition: color 0.15s;
+  font-weight: 500;
 }
 
 .back-link:hover { color: var(--accent); }
 
+/* Project header is its own card */
 .project-header {
+  background: var(--surface);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: var(--card-pad);
   position: relative;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  padding-left: 1.2rem;
-  margin-left: -1.2rem;
   overflow: hidden;
+  border-left: 5px solid var(--accent);
+  /* slight green tint like the hero */
+  background: #F2F8F4;
 }
 
 .project-header-hex {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 20px;
+  top: 20px;
   pointer-events: none;
 }
 
@@ -504,19 +531,18 @@ a:hover { color: var(--accent2); }
 
 .project-hero-img {
   width: 100%;
-  border-radius: 8px;
-  margin: 2rem 0;
+  border-radius: var(--card-radius);
   display: block;
-  border: 1px solid var(--border);
+  border: none;
+  box-shadow: var(--card-shadow);
 }
 
 /* =====================
-   PROJECT SECTIONS
+   PROJECT SECTIONS (each is a card)
    ===================== */
 
 .project-section {
-  padding: 2.5rem 0;
-  border-top: 1px solid var(--border);
+  /* inherits card styles from group selector above */
 }
 
 .project-section h2 {
@@ -550,7 +576,7 @@ a:hover { color: var(--accent2); }
 
 .screenshot {
   width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   display: block;
   margin: 1.5rem 0;
@@ -569,23 +595,9 @@ a:hover { color: var(--accent2); }
 
 .screenshot-pair .screenshot { margin: 0; }
 
-.project-footer-note {
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 0 3rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-  font-style: italic;
-}
-
 /* =====================
    HAND-DRAWN DETAILS
    ===================== */
-
-.wavy-underline {
-  display: block;
-  overflow: visible;
-  margin-bottom: 0.8rem;
-}
 
 .heading-underline {
   display: block;
@@ -599,12 +611,6 @@ a:hover { color: var(--accent2); }
   flex-shrink: 0;
 }
 
-.dot-divider {
-  display: block;
-  overflow: visible;
-  margin-bottom: 1.2rem;
-}
-
 /* =====================
    MOBILE
    ===================== */
@@ -615,44 +621,24 @@ a:hover { color: var(--accent2); }
     font-size: 16px;
   }
 
-  .container {
+  .hero,
+  .section,
+  .site-footer,
+  .project-header,
+  .project-section,
+  .tech-stack-wrap {
     border-radius: 0;
     box-shadow: none;
-    padding: 0 1.25rem;
+    padding: 2rem 1.25rem;
   }
 
-  .hero {
-    padding: 3rem 0 2rem;
+  .container {
+    gap: 0.75rem;
   }
 
+  .hero { padding-top: 3rem; }
   .hero-decor { display: none; }
-
   .hero-name { font-size: 2.4rem; }
-
-  .section { padding: 2.5rem 0; }
-
-  .project-header {
-    padding-bottom: 1.5rem;
-    border-left: none;
-    padding-left: 0;
-    margin-left: 0;
-    overflow: visible;
-  }
-
   .project-header-hex { display: none; }
-
-  .project-section { padding: 1.8rem 0; }
-
-  .back-link {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .project-hero-img { margin: 1.5rem 0; }
-
-  .experience-item {
-    grid-template-columns: 1fr;
-  }
-
-  .experience-item::before { display: none; }
+  .project-header { border-left: none; }
 }
