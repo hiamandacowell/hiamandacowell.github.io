@@ -59,6 +59,10 @@ body {
 
 /* --- Tech stack --- */
 
+.header-tech-chips {
+  margin-top: 0.75rem;
+}
+
 .tech-stack-wrap {
   border-top: 1px solid var(--border);
   padding: 1.5rem 0 3rem;
