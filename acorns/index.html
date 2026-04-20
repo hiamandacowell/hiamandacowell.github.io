@@ -7,67 +7,254 @@
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Epilogue:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#e4e9ec",
+            "primary-fixed": "#b9ebf2",
+            "on-surface": "#171c1f",
+            "on-secondary-fixed-variant": "#384b3c",
+            "outline-variant": "#c0c8c9",
+            "on-secondary-container": "#546757",
+            "surface-container-low": "#f0f4f8",
+            "on-secondary-fixed": "#0d1f12",
+            "primary": "#26585d",
+            "surface-container": "#eaeef2",
+            "on-primary-container": "#c0f2f8",
+            "on-primary": "#ffffff",
+            "secondary": "#4f6353",
+            "primary-container": "#407076",
+            "surface": "#f6fafe",
+            "primary-fixed-dim": "#9ecfd5",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#d2e8d3",
+            "surface-container-highest": "#dfe3e7",
+            "secondary-container": "#cfe5d0",
+            "on-primary-fixed": "#001f23",
+            "secondary-fixed-dim": "#b6ccb8",
+            "on-surface-variant": "#404849",
+            "tertiary": "#554d65",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#6d657e",
+            "on-primary-fixed-variant": "#1a4e53",
+            "inverse-primary": "#9ecfd5",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#70797a",
+            "surface-dim": "#d6dbde"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          fontFamily: {
+            "headline": ["Fraunces", "Georgia", "serif"],
+            "body": ["Epilogue", "system-ui", "sans-serif"],
+            "label": ["Epilogue", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { font-family: 'Epilogue', system-ui, sans-serif; }
+  </style>
 </head>
-<body>
-  <div class="container">
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
 
-    <a href="/" class="back-link">← Amanda Cowell</a>
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-xl font-bold font-headline text-primary tracking-tight">Amanda Cowell</a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors text-sm tracking-wide">Home</a>
+        <a href="/#projects" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm tracking-wide">Projects</a>
+        <a href="mailto:hiamandacowell@gmail.com" class="bg-primary text-on-primary px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">Contact</a>
+      </div>
+      <span class="md:hidden material-symbols-outlined text-primary cursor-pointer">menu</span>
+    </div>
+  </nav>
 
-    <header class="project-header project-header--teal">
-      <div class="project-header-main">
-        <div class="project-header-text">
-          <h1 class="project-title">Acorns of Wisdom</h1>
-          <p class="project-subtitle">Team health check web app. Shipped and in use.</p>
-          <div class="project-meta">
-            <span class="meta-chip">Self-directed</span>
-            <span class="meta-chip">2024</span>
-            <span class="meta-chip accent">Shipped · In use</span>
+  <main class="pt-24 pb-20">
+
+    <!-- Hero -->
+    <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+        <div class="lg:col-span-8">
+          <span class="inline-block px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-bold tracking-widest uppercase mb-6">Case Study</span>
+          <h1 class="font-headline text-6xl md:text-8xl font-bold text-primary tracking-tighter leading-none mb-8">
+            Acorns of Wisdom
+          </h1>
+          <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed">
+            Team health check web app. Shipped and in use.
+          </p>
+        </div>
+        <div class="lg:col-span-4">
+          <div class="w-full rounded-xl overflow-hidden bg-primary-container shadow-2xl">
+            <img class="w-full h-64 object-cover" src="/assets/acorns-hero.svg" alt="Acorns of Wisdom dashboard with team ratings">
           </div>
         </div>
       </div>
-      <div class="project-header-stack">
-        <span class="tech-chip built-with">Built with Claude Code</span>
-        <span class="tech-chip">React</span>
-        <span class="tech-chip">Firebase</span>
-        <span class="tech-chip">Firestore</span>
-        <span class="tech-chip">Vercel</span>
-      </div>
     </header>
 
-    <img class="project-hero-img" src="/assets/acorns-hero.svg" alt="Acorns of Wisdom dashboard with team ratings" width="720" height="405">
+    <!-- Meta strip -->
+    <div class="bg-surface-container-low py-8 mb-24">
+      <div class="max-w-7xl mx-auto px-6 flex flex-wrap gap-6">
+        <div>
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-1">Role</span>
+          <p class="font-medium text-on-surface">Self-directed</p>
+        </div>
+        <div class="w-px bg-outline-variant hidden md:block"></div>
+        <div>
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-1">Timeline</span>
+          <p class="font-medium text-on-surface">2024</p>
+        </div>
+        <div class="w-px bg-outline-variant hidden md:block"></div>
+        <div>
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-1">Status</span>
+          <p class="font-medium text-on-surface">Shipped · In use</p>
+        </div>
+        <div class="w-px bg-outline-variant hidden md:block"></div>
+        <div>
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-1">Stack</span>
+          <div class="flex flex-wrap gap-1.5 mt-0.5">
+            <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono italic">Built with Claude Code</span>
+            <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">React</span>
+            <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Firebase</span>
+            <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Firestore</span>
+            <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Vercel</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <section class="project-section">
-      <h2>The problem</h2>
-      <p>My team didn't have a consistent way to surface concerns about psychological safety, and generic engagement surveys didn't fit our cadence. I wanted something specific to how we worked: anonymous, low-ceremony, and structured enough to turn conversation into action.</p>
+    <!-- The Problem -->
+    <section class="bg-surface-container-low py-24 mb-24 overflow-hidden">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+          <div class="relative">
+            <div class="absolute -top-8 -left-4 text-[12rem] font-bold font-headline text-surface-container-high leading-none z-0 select-none">01</div>
+            <div class="relative z-10 pt-8">
+              <h2 class="font-headline text-4xl font-bold text-primary mb-8 tracking-tight">The problem</h2>
+              <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to surface concerns about psychological safety, and generic engagement surveys didn't fit our cadence. I wanted something specific to how we worked: anonymous, low-ceremony, and structured enough to turn conversation into action.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mt-8 md:mt-16">
+            <div class="bg-surface-container-lowest p-8 rounded-xl space-y-4">
+              <span class="material-symbols-outlined text-tertiary text-3xl">visibility_off</span>
+              <p class="text-sm font-semibold text-outline uppercase tracking-wider">Concerns stay unsurfaced</p>
+            </div>
+            <div class="bg-surface-container-lowest p-8 rounded-xl space-y-4 mt-8">
+              <span class="material-symbols-outlined text-secondary text-3xl">chat_bubble_outline</span>
+              <p class="text-sm font-semibold text-outline uppercase tracking-wider">Generic surveys don't fit</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="project-section">
-      <h2>What I built</h2>
-      <p>A structured team health check tool, built with Claude Code from prototype to deployed product.</p>
-      <ul>
-        <li>Multi-user anonymous ratings so people can rate dimensions of team health honestly</li>
-        <li>Passcode protection so only the team sees its own results</li>
-        <li>Drag-and-drop action items that turn discussion into follow-ups</li>
-        <li>Light and dark themes because every tool deserves one</li>
-        <li>An animated squirrel mascot because serious work can still be delightful</li>
-      </ul>
-
-      <div class="screenshot-pair">
-        <img class="screenshot" src="/assets/acorns-ratings.svg" alt="Anonymous team ratings view" width="350" height="350">
-        <img class="screenshot" src="/assets/acorns-actions.svg" alt="Drag and drop action items" width="350" height="350">
+    <!-- What I Built -->
+    <section class="max-w-7xl mx-auto px-6 mb-24">
+      <div class="mb-16">
+        <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">The solution</span>
+        <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tight">What I built</h2>
+        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">A structured team health check tool, built with Claude Code from prototype to deployed product.</p>
       </div>
 
-      <img class="screenshot" src="/assets/acorns-themes.svg" alt="Light and dark mode comparison" width="720" height="405">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <!-- Anonymous Ratings -->
+        <div class="bg-surface-container-lowest p-10 rounded-xl transition-all hover:bg-surface-container relative group">
+          <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+            <span class="material-symbols-outlined text-8xl">shield_person</span>
+          </div>
+          <h4 class="font-headline text-2xl font-bold text-primary mb-4">Anonymous ratings</h4>
+          <p class="text-on-surface-variant leading-relaxed">Multi-user anonymous ratings so people can rate dimensions of team health honestly.</p>
+        </div>
+        <!-- Passcode Protection -->
+        <div class="bg-primary-container p-10 rounded-xl text-on-primary-container relative">
+          <h4 class="font-headline text-2xl font-bold mb-4">Passcode protection</h4>
+          <p class="leading-relaxed opacity-90">Passcode protection so only the team sees its own results. Team dynamics stay within the circle of trust.</p>
+          <div class="mt-8 flex gap-2">
+            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
+            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
+            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
+            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
+          </div>
+        </div>
+        <!-- Action Items -->
+        <div class="bg-surface-container-lowest p-10 rounded-xl hover:bg-surface-container transition-all group">
+          <h4 class="font-headline text-2xl font-bold text-primary mb-4">Action item management</h4>
+          <p class="text-on-surface-variant leading-relaxed mb-8">Drag-and-drop action items that turn discussion into follow-ups.</p>
+          <div class="space-y-3">
+            <div class="bg-secondary-container p-3 rounded flex items-center gap-3">
+              <span class="material-symbols-outlined text-secondary text-sm">drag_indicator</span>
+              <span class="text-xs font-medium text-on-secondary-container">Improve sprint retro format</span>
+            </div>
+            <div class="bg-surface-container p-3 rounded flex items-center gap-3 opacity-50">
+              <span class="material-symbols-outlined text-outline text-sm">drag_indicator</span>
+              <span class="text-xs font-medium">Schedule 1:1 check-ins</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshots -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="p-2 bg-surface-container-high rounded-xl">
+          <img class="rounded-xl w-full" src="/assets/acorns-ratings.svg" alt="Anonymous team ratings view">
+        </div>
+        <div class="p-2 bg-surface-container-high rounded-xl">
+          <img class="rounded-xl w-full" src="/assets/acorns-actions.svg" alt="Drag and drop action items">
+        </div>
+      </div>
+      <div class="p-2 bg-surface-container-high rounded-xl">
+        <img class="rounded-xl w-full" src="/assets/acorns-themes.svg" alt="Light and dark mode comparison">
+      </div>
+      <p class="text-sm text-on-surface-variant mt-4 text-center italic">Light and dark themes because every tool deserves one. Animated squirrel mascot because serious work can still be delightful.</p>
     </section>
 
-    <section class="project-section">
-      <h2>What I learned</h2>
-      <p>The real byproduct of building this wasn't the tool itself. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's prototypable quickly and what isn't, and that changes how I scope and validate ideas with engineering teams in my day job. A PM who has built something under constraint talks differently to engineering teams than one who hasn't.</p>
+    <!-- What I Learned -->
+    <section class="bg-primary py-24 px-6">
+      <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-24 items-start">
+        <div class="lg:w-1/2">
+          <span class="text-secondary-fixed-dim font-bold uppercase text-xs tracking-widest mb-4 block">Takeaway</span>
+          <h2 class="font-headline text-4xl md:text-5xl font-bold text-on-primary tracking-tight mb-8">What I learned</h2>
+          <p class="text-lg text-primary-fixed leading-relaxed">The real byproduct of building this wasn't the tool itself. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's prototypable quickly and what isn't, and that changes how I scope and validate ideas with engineering teams in my day job. A PM who has built something under constraint talks differently to engineering teams than one who hasn't.</p>
+        </div>
+        <div class="lg:w-1/2 flex flex-col gap-6">
+          <div class="p-8 bg-white/10 rounded-xl border border-white/10">
+            <h4 class="font-bold text-primary-fixed mb-2">Prototype fluency changes how you scope</h4>
+            <p class="text-primary-fixed/80 text-sm leading-relaxed">Knowing what's fast to build vs. what isn't is hard to develop without building. This project gave me that.</p>
+          </div>
+          <div class="p-8 bg-white/10 rounded-xl border border-white/10">
+            <h4 class="font-bold text-primary-fixed mb-2">A PM who builds talks differently</h4>
+            <p class="text-primary-fixed/80 text-sm leading-relaxed">The conversations I have with engineering teams are different now. I can estimate, I can scope, I can say "that's actually a two-line change" with conviction.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
+  </main>
 
-  </div>
+  <!-- Footer -->
+  <footer class="bg-teal-900 w-full py-12">
+    <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <a href="/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">← Amanda Cowell</a>
+      <div class="flex gap-8">
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
+        <a href="mailto:hiamandacowell@gmail.com" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">Email</a>
+        <a href="/resume.pdf" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">Resume</a>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>

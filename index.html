@@ -7,174 +7,270 @@
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Epilogue:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#e4e9ec",
+            "primary-fixed": "#b9ebf2",
+            "on-surface": "#171c1f",
+            "on-secondary-fixed-variant": "#384b3c",
+            "outline-variant": "#c0c8c9",
+            "on-secondary-container": "#546757",
+            "surface-container-low": "#f0f4f8",
+            "on-secondary-fixed": "#0d1f12",
+            "primary": "#26585d",
+            "surface-container": "#eaeef2",
+            "on-primary-container": "#c0f2f8",
+            "on-primary": "#ffffff",
+            "secondary": "#4f6353",
+            "primary-container": "#407076",
+            "surface": "#f6fafe",
+            "primary-fixed-dim": "#9ecfd5",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#d2e8d3",
+            "surface-container-highest": "#dfe3e7",
+            "secondary-container": "#cfe5d0",
+            "on-primary-fixed": "#001f23",
+            "secondary-fixed-dim": "#b6ccb8",
+            "on-surface-variant": "#404849",
+            "tertiary": "#554d65",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#6d657e",
+            "on-primary-fixed-variant": "#1a4e53",
+            "inverse-primary": "#9ecfd5",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#70797a",
+            "surface-dim": "#d6dbde"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          fontFamily: {
+            "headline": ["Fraunces", "Georgia", "serif"],
+            "body": ["Epilogue", "system-ui", "sans-serif"],
+            "label": ["Epilogue", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { font-family: 'Epilogue', system-ui, sans-serif; }
+  </style>
 </head>
-<body>
-  <div class="container">
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-decor" aria-hidden="true">
-        <!-- coordinate system + upward parabola: axes 2px, curve 3px, all at 0.22 -->
-        <svg class="hero-scribble" viewBox="0 0 420 310" width="420" height="310" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 18 182 L 402 182" stroke="#2f7a4b" stroke-width="2" stroke-linecap="round" opacity="0.22"/>
-          <path d="M 394 178 L 404 182 L 394 186" stroke="#2f7a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.22"/>
-          <path d="M 210 294 L 210 16" stroke="#2f7a4b" stroke-width="2" stroke-linecap="round" opacity="0.22"/>
-          <path d="M 206 25 L 210 14 L 214 25" stroke="#2f7a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.22"/>
-          <path d="M 50 280 C 90 72, 330 72, 370 280" stroke="#2f7a4b" stroke-width="3" stroke-linecap="round" opacity="0.22"/>
-          <circle cx="210" cy="114" r="4.5" fill="#2f7a4b" opacity="0.25"/>
-          <circle cx="210" cy="182" r="3" fill="#2f7a4b" opacity="0.22"/>
-        </svg>
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-xl font-bold font-headline text-primary tracking-tight">Amanda Cowell</a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm tracking-wide">Home</a>
+        <a href="/#projects" class="text-on-surface-variant hover:text-primary transition-colors text-sm tracking-wide">Projects</a>
+        <a href="mailto:hiamandacowell@gmail.com" class="bg-primary text-on-primary px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">Contact</a>
       </div>
-      <h1 class="hero-name">Amanda L. Cowell</h1>
-      <svg class="wavy-underline" viewBox="0 0 260 8" width="260" height="8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M1,5 C20,1.5 40,7 64,4.5 C86,2 108,7.5 132,4.5 C154,1.5 176,7 200,4.5 C218,2.5 238,6 258,4.5"
-              stroke="#2f7a4b" stroke-width="1.9" fill="none" stroke-linecap="round"/>
-      </svg>
-      <p class="hero-tagline">Product manager, technologist, and math teacher.</p>
-      <ul class="contact-strip">
-        <li><a href="mailto:hiamandacowell@gmail.com">hiamandacowell@gmail.com</a></li>
-        <li><a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-        <li><a href="/resume.pdf">Resume</a></li>
-      </ul>
+      <span class="md:hidden material-symbols-outlined text-primary cursor-pointer">menu</span>
+    </div>
+  </nav>
+
+  <main class="pt-24">
+
+    <!-- Hero -->
+    <section class="max-w-7xl mx-auto px-6 py-20 md:py-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-8">
+        <h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter text-primary leading-none mb-6">
+          Amanda L. Cowell
+        </h1>
+        <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed mb-10">
+          Product manager, technologist, and math teacher.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="mailto:hiamandacowell@gmail.com" class="text-sm text-primary border border-outline-variant rounded-full px-5 py-2 hover:bg-surface-container transition-colors">hiamandacowell@gmail.com</a>
+          <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-sm text-primary border border-outline-variant rounded-full px-5 py-2 hover:bg-surface-container transition-colors">LinkedIn</a>
+          <a href="/resume.pdf" class="text-sm text-primary border border-outline-variant rounded-full px-5 py-2 hover:bg-surface-container transition-colors">Resume</a>
+        </div>
+      </div>
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        <div class="p-6 bg-surface-container-low rounded-xl">
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Currently</span>
+          <p class="font-medium text-on-surface">Product Manager, Experiential Technologies</p>
+          <p class="text-sm text-on-surface-variant mt-1">University of Michigan, Center for Academic Innovation</p>
+        </div>
+        <div class="p-6 bg-surface-container-low rounded-xl">
+          <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Also</span>
+          <p class="font-medium text-on-surface">Mathematics Instructor</p>
+          <p class="text-sm text-on-surface-variant mt-1">Washtenaw Community College</p>
+        </div>
+      </div>
     </section>
 
-    <!-- ABOUT -->
-    <section class="section">
-      <div class="section-heading-wrap">
-        <h2 class="section-heading">About</h2>
-        <svg class="heading-underline" viewBox="0 0 80 7" width="80" height="7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M1,4 C12,1.5 24,6 38,4 C52,2 64,6 79,4"
-                stroke="#2f7a4b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="about-text">
-        <p>I'm a product manager with five years leading cross-functional teams into ambiguous territory across a startup and innovation centers. I love the puzzle of tradeoffs: a client brings a thing they want built, and every week becomes a series of decisions about scope, sequencing, and where user reality should shape the plan. Getting those calls right takes digging in until you understand both sides.</p>
-        <p>I come to product from mathematics, which turns out to be a real asset. I can hold a technical conversation with engineers and translate complexity for non-technical clients, sharpened by teaching calculus and statistics on the side. I'm also a PM who builds. I prototype my own tools with Claude Code because being hands-on keeps me honest about what's realistic to ask of a team.</p>
+    <!-- About -->
+    <section class="bg-surface-container-low py-24">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+        <div>
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">About</span>
+          <h2 class="font-headline text-4xl font-bold text-primary mb-8">Cross-functional by design.</h2>
+          <div class="space-y-6 text-on-surface-variant text-lg leading-relaxed">
+            <p>I'm a product manager with five years leading cross-functional teams into ambiguous territory across a startup and innovation centers. I love the puzzle of tradeoffs: a client brings a thing they want built, and every week becomes a series of decisions about scope, sequencing, and where user reality should shape the plan. Getting those calls right takes digging in until you understand both sides.</p>
+            <p>I come to product from mathematics, which turns out to be a real asset. I can hold a technical conversation with engineers and translate complexity for non-technical clients, sharpened by teaching calculus and statistics on the side. I'm also a PM who builds. I prototype my own tools with Claude Code because being hands-on keeps me honest about what's realistic to ask of a team.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-8 md:mt-16">
+          <div class="bg-surface-container-lowest p-8 rounded-xl">
+            <span class="material-symbols-outlined text-tertiary text-4xl mb-4 block">functions</span>
+            <h3 class="font-bold text-lg mb-2">Mathematically grounded</h3>
+            <p class="text-sm text-on-surface-variant">Fluent in engineering conversations and non-technical translation, both.</p>
+          </div>
+          <div class="bg-surface-container-lowest p-8 rounded-xl mt-8">
+            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">build</span>
+            <h3 class="font-bold text-lg mb-2">PM who builds</h3>
+            <p class="text-sm text-on-surface-variant">Prototypes with Claude Code to stay honest about what's realistic to ask.</p>
+          </div>
+          <div class="bg-surface-container-lowest p-8 rounded-xl">
+            <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">groups</span>
+            <h3 class="font-bold text-lg mb-2">Cross-functional</h3>
+            <p class="text-sm text-on-surface-variant">Five years across a startup, Ford, and university innovation centers.</p>
+          </div>
+          <div class="bg-surface-container-lowest p-8 rounded-xl mt-8">
+            <span class="material-symbols-outlined text-tertiary text-4xl mb-4 block">swap_horiz</span>
+            <h3 class="font-bold text-lg mb-2">Tradeoff-focused</h3>
+            <p class="text-sm text-on-surface-variant">Scope, sequencing, user reality — the calls that matter.</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- PROJECTS -->
-    <section class="section">
-      <div class="section-heading-wrap">
-        <h2 class="section-heading">Selected projects</h2>
-        <svg class="heading-underline" viewBox="0 0 140 7" width="140" height="7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M1,4 C18,1.5 36,6.5 56,4 C76,1.5 96,6 116,4 C126,3 134,5 139,3.5"
-                stroke="#2f7a4b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        </svg>
+    <!-- Projects -->
+    <section id="projects" class="max-w-7xl mx-auto px-6 py-32">
+      <div class="mb-16">
+        <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">Work</span>
+        <h2 class="font-headline text-4xl font-bold text-primary">Selected Projects</h2>
       </div>
-      <div class="projects-grid">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
 
         <!-- ChalkboardAI -->
-        <article class="project-card project-card--indigo">
-          <img class="project-card-img" src="/assets/chalkboardai-hero.svg" alt="ChalkboardAI interface showing the infinite canvas with a math problem and AI tutor chat panel" width="600" height="338">
-          <div class="project-card-body">
-            <h3 class="project-card-title">ChalkboardAI</h3>
-            <p class="project-card-subtitle">Local-first AI math tutoring grounded in lecture-specific context. In development.</p>
-            <p class="project-card-teaser">A self-hosted prototype solving a specific problem: generic AI tutors don't know how a given instructor actually taught a topic. ChalkboardAI grounds every tutor response in the specific lecture a student is studying, running entirely offline for FERPA and FOIA compliance.</p>
-            <a href="/chalkboardai/" class="read-more">
-              Read more
-              <svg class="arrow-svg" viewBox="0 0 22 10" width="22" height="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M1,5 C7,4.5 14,5.5 19,5 M15.5,2 C17,3.5 19.5,4.5 20,5 C19,5.8 17,7.2 15.5,8.5"
-                      stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          </div>
-        </article>
+        <div class="md:col-span-8 group">
+          <a href="/chalkboardai/">
+            <div class="relative overflow-hidden rounded-xl bg-surface-container-highest aspect-[16/9] mb-5">
+              <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="/assets/chalkboardai-hero.svg" alt="ChalkboardAI interface showing the infinite canvas with a math problem and AI tutor chat panel">
+              <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
+                <p class="text-primary-fixed text-sm max-w-sm">A self-hosted prototype grounding every tutor response in the specific lecture a student is studying — entirely offline for FERPA and FOIA compliance.</p>
+              </div>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="font-headline text-2xl font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">ChalkboardAI</h3>
+                <p class="text-sm text-on-surface-variant">Local-first AI math tutoring grounded in lecture-specific context. In development.</p>
+              </div>
+              <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all mt-1 flex-shrink-0">north_east</span>
+            </div>
+          </a>
+        </div>
 
         <!-- Acorns of Wisdom -->
-        <article class="project-card project-card--teal">
-          <img class="project-card-img" src="/assets/acorns-hero.svg" alt="Acorns of Wisdom dashboard with team ratings" width="600" height="338">
-          <div class="project-card-body">
-            <h3 class="project-card-title">Acorns of Wisdom</h3>
-            <p class="project-card-subtitle">Team health check web app. Shipped and in use.</p>
-            <p class="project-card-teaser">A structured team health check tool built with Claude Code. Multi-user anonymous ratings, passcode protection for team privacy, drag-and-drop action items, light and dark themes, and an animated squirrel mascot.</p>
-            <a href="/acorns/" class="read-more">
-              Read more
-              <svg class="arrow-svg" viewBox="0 0 22 10" width="22" height="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M1,5 C7,4.5 14,5.5 19,5 M15.5,2 C17,3.5 19.5,4.5 20,5 C19,5.8 17,7.2 15.5,8.5"
-                      stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          </div>
-        </article>
+        <div class="md:col-span-4 group">
+          <a href="/acorns/">
+            <div class="relative overflow-hidden rounded-xl bg-surface-container-highest min-h-[260px] mb-5">
+              <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="/assets/acorns-hero.svg" alt="Acorns of Wisdom dashboard with team ratings">
+              <div class="absolute inset-0 bg-gradient-to-t from-secondary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+                <p class="text-secondary-fixed text-sm">Multi-user anonymous ratings, passcode protection, drag-and-drop action items.</p>
+              </div>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="font-headline text-2xl font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Acorns of Wisdom</h3>
+                <p class="text-sm text-on-surface-variant">Team health check web app. Shipped and in use.</p>
+              </div>
+              <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all mt-1 flex-shrink-0">north_east</span>
+            </div>
+          </a>
+        </div>
 
         <!-- Piano Lab Pro -->
-        <article class="project-card project-card--terra">
-          <img class="project-card-img" src="/assets/piano-lab-pro-hero.svg" alt="Piano Lab Pro in mixed reality with a musician performing in a virtual concert hall" width="600" height="338">
-          <div class="project-card-body">
-            <h3 class="project-card-title">Piano Lab Pro</h3>
-            <p class="project-card-subtitle">Mixed reality performance preparation on Apple Vision Pro. Built at U-M CAI.</p>
-            <p class="project-card-teaser">A mixed reality app that lets music students rehearse under authentic performance conditions. As product owner, I scoped three competing faculty concepts to one differentiated value proposition and originated a biometric research partnership with U-M's Institute for Social Research.</p>
-            <a href="/piano-lab-pro/" class="read-more">
-              Read more
-              <svg class="arrow-svg" viewBox="0 0 22 10" width="22" height="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M1,5 C7,4.5 14,5.5 19,5 M15.5,2 C17,3.5 19.5,4.5 20,5 C19,5.8 17,7.2 15.5,8.5"
-                      stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          </div>
-        </article>
+        <div class="md:col-span-12 group">
+          <a href="/piano-lab-pro/">
+            <div class="relative overflow-hidden rounded-xl bg-primary aspect-[21/9]">
+              <img class="w-full h-full object-cover opacity-30 transition-transform duration-700 group-hover:scale-105" src="/assets/piano-lab-pro-hero.svg" alt="Piano Lab Pro in mixed reality with a musician performing in a virtual concert hall">
+              <div class="absolute inset-0 flex flex-col justify-center px-12">
+                <span class="text-xs font-bold text-primary-fixed uppercase tracking-widest mb-4">Spatial Computing · EdTech · U-M CAI</span>
+                <h3 class="font-headline text-on-primary text-4xl md:text-5xl font-bold mb-4">Piano Lab Pro</h3>
+                <p class="text-primary-fixed max-w-xl text-lg font-light">Mixed reality performance preparation on Apple Vision Pro. Built at the University of Michigan's Center for Academic Innovation.</p>
+                <div class="flex items-center gap-2 mt-6 text-primary-fixed text-sm font-medium group-hover:gap-4 transition-all">
+                  Read the case study
+                  <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
 
       </div>
     </section>
 
-    <!-- EXPERIENCE -->
-    <section class="section">
-      <div class="section-heading-wrap">
-        <h2 class="section-heading">Experience</h2>
-        <svg class="heading-underline" viewBox="0 0 100 7" width="100" height="7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M1,5 C14,2 28,6.5 46,4 C64,1.5 80,6 96,3.5"
-                stroke="#2f7a4b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        </svg>
+    <!-- Experience -->
+    <section class="bg-surface-container-lowest py-24">
+      <div class="max-w-4xl mx-auto px-6">
+        <h2 class="font-headline text-4xl font-bold text-primary mb-16">Experience</h2>
+        <div class="space-y-10">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-8 items-baseline border-b border-outline-variant/40 pb-10">
+            <div class="text-xs font-bold text-secondary uppercase tracking-widest">Sep 2024 — Present</div>
+            <div class="md:col-span-3">
+              <h3 class="text-lg font-bold text-on-surface">Product Manager, Experiential Technologies</h3>
+              <p class="text-on-surface-variant text-sm mt-1">University of Michigan, Center for Academic Innovation</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-8 items-baseline border-b border-outline-variant/40 pb-10">
+            <div class="text-xs font-bold text-secondary/60 uppercase tracking-widest">May 2023 — Oct 2024</div>
+            <div class="md:col-span-3">
+              <h3 class="text-lg font-bold text-on-surface">Product Manager</h3>
+              <p class="text-on-surface-variant text-sm mt-1">Ford Motor Company, FordLabs</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-8 items-baseline border-b border-outline-variant/40 pb-10">
+            <div class="text-xs font-bold text-secondary/60 uppercase tracking-widest">Jun 2021 — Apr 2023</div>
+            <div class="md:col-span-3">
+              <h3 class="text-lg font-bold text-on-surface">Product Manager</h3>
+              <p class="text-on-surface-variant text-sm mt-1">Interplai, AI SaaS Startup</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-8 items-baseline">
+            <div class="text-xs font-bold text-secondary/60 uppercase tracking-widest">Aug 2021 — Present</div>
+            <div class="md:col-span-3">
+              <h3 class="text-lg font-bold text-on-surface">Mathematics Instructor</h3>
+              <p class="text-on-surface-variant text-sm mt-1">Washtenaw Community College</p>
+            </div>
+          </div>
+        </div>
+        <p class="mt-12 text-sm text-on-surface-variant italic">
+          <a href="/resume.pdf" class="text-primary hover:underline underline-offset-4">See full resume for detail (PDF)</a>
+        </p>
       </div>
-      <ul class="experience-list">
-        <li class="experience-item">
-          <div class="exp-content">
-            <div class="exp-role">Product Manager, Experiential Technologies</div>
-            <div class="exp-org">University of Michigan, Center for Academic Innovation — Sep 2024 to present</div>
-          </div>
-        </li>
-        <li class="experience-item">
-          <div class="exp-content">
-            <div class="exp-role">Product Manager</div>
-            <div class="exp-org">Ford Motor Company, FordLabs — May 2023 to Oct 2024</div>
-          </div>
-        </li>
-        <li class="experience-item">
-          <div class="exp-content">
-            <div class="exp-role">Product Manager</div>
-            <div class="exp-org">Interplai, AI SaaS Startup — Jun 2021 to Apr 2023</div>
-          </div>
-        </li>
-        <li class="experience-item">
-          <div class="exp-content">
-            <div class="exp-role">Mathematics Instructor</div>
-            <div class="exp-org">Washtenaw Community College — Aug 2021 to present</div>
-          </div>
-        </li>
-      </ul>
-      <p class="resume-cta"><a href="/resume.pdf">See full resume for detail (PDF)</a></p>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-      <svg class="dot-divider" viewBox="0 0 90 10" width="90" height="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="8"  cy="5" r="2.2" fill="#2f7a4b" opacity="0.35"/>
-        <circle cx="20" cy="5" r="1.4" fill="#2f7a4b" opacity="0.22"/>
-        <circle cx="30" cy="5" r="3"   fill="#2f7a4b" opacity="0.45"/>
-        <circle cx="40" cy="5" r="1.6" fill="#2f7a4b" opacity="0.25"/>
-        <circle cx="50" cy="5" r="2.5" fill="#2f7a4b" opacity="0.38"/>
-        <circle cx="60" cy="5" r="1.2" fill="#2f7a4b" opacity="0.2"/>
-        <circle cx="70" cy="5" r="1.9" fill="#2f7a4b" opacity="0.3"/>
-        <circle cx="80" cy="5" r="1.1" fill="#2f7a4b" opacity="0.18"/>
-      </svg>
-      <p class="footer-text">
-        Currently teaching calculus and stats during the week, and building on the weekends. Reach me at <a href="mailto:hiamandacowell@gmail.com">hiamandacowell@gmail.com</a> or on <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
-      </p>
-    </footer>
+  </main>
 
-  </div>
+  <!-- Footer -->
+  <footer class="bg-teal-900 w-full py-12">
+    <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <span class="text-lg font-bold font-headline text-teal-50">Amanda Cowell</span>
+      <p class="text-teal-100/50 text-sm">Currently teaching calculus and stats during the week, and building on the weekends.</p>
+      <div class="flex gap-8">
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
+        <a href="mailto:hiamandacowell@gmail.com" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">Email</a>
+        <a href="/resume.pdf" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">Resume</a>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
