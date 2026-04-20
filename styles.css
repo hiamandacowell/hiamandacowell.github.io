@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #FAF8F4;
-  --text: #2B2420;
-  --accent: #B8563C;
-  --accent2: #2D4A3E;
+  --bg: #F7F8F5;
+  --text: #1C2420;
+  --accent: #2f7a4b;
+  --accent2: #4a55a8;
   --muted: #7A6E68;
   --border: #E8E2DB;
   --card-bg: #F3EFE9;
