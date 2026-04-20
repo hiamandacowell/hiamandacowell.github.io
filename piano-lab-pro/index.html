@@ -60,16 +60,16 @@
     </section>
 
     <section class="project-section">
-      <h2>Discovery: what we learned before we built anything</h2>
-      <p>We started with several months of research before touching the AVP. Key activities:</p>
+      <h2>Discovery: what I needed to understand before we could scope anything</h2>
+      <p>I coordinated several months of research before any development began. I needed to understand the problem well enough to scope it — and to push back when the scope started to drift. Key activities I drove:</p>
       <ul>
-        <li><strong>Student interviews</strong> across experience levels — from students currently enrolled in the courses we were building for, to seasoned performers. We asked specifically about what happens in the hours and minutes before a high-stakes performance: the mental and physical experience of anxiety, the coping strategies they'd tried, what made it worse.</li>
-        <li><strong>Faculty consultations</strong> with Aya and Anıl to understand pedagogical goals, course structure, and what success would look like for their students.</li>
-        <li><strong>Literature review</strong> on MPA and flow state — grounding the design in what the research says actually helps.</li>
-        <li><strong>Site visits</strong> to Britton Recital Hall, Hill Auditorium, and the SMTD piano lab classrooms — understanding the physical spaces and piano types students would encounter.</li>
+        <li><strong>Student interviews</strong> across experience levels — I structured interviews with students enrolled in Aya's courses and with experienced performers, focused specifically on what happens in the hours and minutes before a high-stakes performance: the anxiety triggers, the coping strategies they'd tried, and what made it worse.</li>
+        <li><strong>Faculty consultations</strong> with Aya and Anıl to understand pedagogical goals, course structure, and what success would actually look like for their students — not just what they wanted to build.</li>
+        <li><strong>Literature review</strong> on MPA and flow state — I brought this research into early scoping conversations to ground design decisions in evidence rather than intuition.</li>
+        <li><strong>Site visits</strong> to Britton Recital Hall, Hill Auditorium, and SMTD classrooms — I organized access to the actual spaces so the team understood the physical environment before designing for it.</li>
         <li><strong>Design Jams</strong> to develop learner personas and surface the assumptions we'd need to validate before building.</li>
       </ul>
-      <p>One finding shaped almost every subsequent decision: the anxiety trigger students identified most consistently wasn't the performance itself. It was the moment when the audience lights dim, the stage lights come up, and the room goes quiet — the "all eyes on me" moment. That moment was the thing the product needed to simulate.</p>
+      <p>One finding shaped almost every subsequent decision: the anxiety trigger students identified most consistently wasn't the performance itself. It was the moment when the audience lights dim, the stage lights come up, and the room goes quiet — the "all eyes on me" moment. That finding became the product's core design requirement.</p>
     </section>
 
     <section class="project-section">
@@ -93,15 +93,15 @@
     </section>
 
     <section class="project-section">
-      <h2>Building the venues</h2>
-      <p>Capturing Britton Recital Hall and Hill Auditorium at the fidelity the experience required was an operational undertaking, not just a technical one. Some specifics:</p>
+      <h2>What venue fidelity actually required</h2>
+      <p>Capturing Britton Recital Hall and Hill Auditorium at the fidelity the experience required was an operational and coordination problem as much as a technical one — and coordinating it was my job. Some of what the XR team executed:</p>
       <ul>
-        <li>Hill Auditorium capture took a full team day: 6,000+ photos, 4,200 aligned, 2.3 rolls of tape to mark scan positions, and 20 balloons popped at specific locations to capture the acoustic impulse response for the reverb model.</li>
+        <li>Hill Auditorium capture was a full team day: 6,000+ photos, 4,200 aligned, 2.3 rolls of tape to mark scan positions, and 20 balloons popped at specific locations to capture acoustic impulse response for the reverb model.</li>
         <li>Britton required multiple visits at different lighting conditions to determine which combination read as most realistic inside the headset.</li>
-        <li>42 audience members were filmed in green screen on the XR Stage — 2.7 TB of footage — to populate the virtual seats with real human motion.</li>
-        <li>The grand piano mesh was reduced from 125,000 polygons to a target of 15,000 to hit acceptable performance on the headset without visual degradation.</li>
+        <li>42 audience members filmed on green screen on the XR Stage — 2.7 TB of footage — to populate virtual seats with real human motion.</li>
+        <li>The grand piano mesh required reduction from 125,000 polygons to ~15,000 to hit acceptable performance on the headset.</li>
       </ul>
-      <p>Coordinating access across two auditoriums, a green screen stage, and SMTD classrooms while keeping the project on a timeline was a logistics problem as much as a design one.</p>
+      <p>Scheduling access across two auditoriums, a green screen stage, and SMTD piano classrooms — coordinating faculty, facilities, and the XR team across a semester — was a stakeholder management problem that sat on my plate.</p>
     </section>
 
     <section class="project-section">
@@ -124,7 +124,7 @@
 
       <div class="decision-block">
         <h3>Piano alignment: rejecting the first solution, A/B testing the second</h3>
-        <p>Getting the virtual piano to align with the real piano keys — so the student's hands appear to play the real instrument — was harder than it looked. The first solution (manipulate a virtual cutout to match the real keys) violated standard XR interaction patterns and consistently failed in usability testing. Rather than iterate on a broken pattern, we built a second approach (a transparent "cuboid" overlaid on the real keys) and ran an A/B test. Results were mixed enough that neither approach won outright, and we're now designing a hybrid. The lesson: sometimes the first workable solution isn't the right one to ship.</p>
+        <p>Getting the virtual piano to align with the real piano keys — so the student's hands appear to play the real instrument — was harder than it looked. The first solution (manipulate a virtual cutout to match the real keys) violated standard XR interaction patterns and consistently failed in usability testing. Rather than push the team to iterate on a broken pattern, I made the call to prototype a second approach: a transparent "cuboid" overlaid on the real keys. We ran an A/B test on both. Results were mixed enough that neither won outright, and the team is now designing a hybrid. The lesson: sometimes the first workable solution isn't the right one to ship.</p>
       </div>
     </section>
 
