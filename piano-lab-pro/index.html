@@ -29,11 +29,11 @@
 
     <header class="project-header">
       <h1 class="project-title">Piano Lab Pro</h1>
-      <p class="project-subtitle">Mixed reality performance preparation on Apple Vision Pro. Built at the University of Michigan's Center for Academic Innovation.</p>
+      <p class="project-subtitle">Mixed reality performance preparation on Apple Vision Pro. Built at the University of Michigan's Center for Academic Innovation in partnership with the School of Music, Theatre & Dance.</p>
       <div class="project-meta">
-        <span class="meta-chip">Product Owner</span>
+        <span class="meta-chip">Product Manager</span>
         <span class="meta-chip">U-M Center for Academic Innovation</span>
-        <span class="meta-chip">2024–present</span>
+        <span class="meta-chip">Feb 2025–present</span>
         <span class="meta-chip accent">Apple Vision Pro</span>
       </div>
     </header>
@@ -42,37 +42,103 @@
 
     <section class="project-section">
       <h2>The problem</h2>
-      <p>Music students rehearse in practice rooms but perform in concert halls. The acoustic and psychological gap between the two is large, and traditional practice doesn't close it. Students arrive at recitals underprepared for the specific conditions they'll face: the venue acoustics, the audience presence, the stakes.</p>
+      <p>Music performance anxiety (MPA) is well-documented and widespread, and it's structurally built into how musicians train. Students rehearse alone in small practice rooms, then perform in front of live audiences in large concert halls. The gap between those two environments — the acoustics, the spatial scale, the audience presence, the social stakes — isn't something repetition in a practice room closes.</p>
+      <p>Piano students are particularly exposed. Their instrument is fixed: you can't carry your home environment with you. What you <em>can</em> do is make the practice environment more like the performance environment before the performance happens. That's the thesis behind Piano Lab Pro.</p>
     </section>
 
     <section class="project-section">
-      <h2>What I built</h2>
-      <p>A mixed reality app on Apple Vision Pro that lets music students rehearse under authentic performance conditions:</p>
+      <h2>The collaboration</h2>
+      <p>Piano Lab Pro is a partnership between CAI's XR team and two SMTD faculty members with complementary expertise:</p>
       <ul>
-        <li>3D-modeled U-M concert venues so students practice in the actual spaces they'll perform in</li>
-        <li>Simulated audience distractions varied across randomized conditions</li>
-        <li>A perception-based self-scoring system that captures anxiety, experience level, performance perception, and coping reflection</li>
+        <li><strong>Aya Hagelthorn</strong> — Lecturer of Piano Pedagogy, Director of Collegiate Class Piano. The pedagogical anchor. Aya knows what her students experience before performances and what she wishes they had access to.</li>
+        <li><strong>Anıl Çamcı</strong> — Associate Professor and Director of Graduate Studies, Department of Performing Arts Technology. The audio and spatial computing expert who shaped the acoustic design of the experience.</li>
       </ul>
+      <p>On the CAI side: a cross-functional team of XR developers, UX designers, learning experience designers, behavioral scientists, student fellows, and me as PM — fifteen contributors across two years, from proposal through prototype.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>Discovery: what we learned before we built anything</h2>
+      <p>We started with several months of research before touching the AVP. Key activities:</p>
+      <ul>
+        <li><strong>Student interviews</strong> across experience levels — from students currently enrolled in the courses we were building for, to seasoned performers. We asked specifically about what happens in the hours and minutes before a high-stakes performance: the mental and physical experience of anxiety, the coping strategies they'd tried, what made it worse.</li>
+        <li><strong>Faculty consultations</strong> with Aya and Anıl to understand pedagogical goals, course structure, and what success would look like for their students.</li>
+        <li><strong>Literature review</strong> on MPA and flow state — grounding the design in what the research says actually helps.</li>
+        <li><strong>Site visits</strong> to Britton Recital Hall, Hill Auditorium, and the SMTD piano lab classrooms — understanding the physical spaces and piano types students would encounter.</li>
+        <li><strong>Design Jams</strong> to develop learner personas and surface the assumptions we'd need to validate before building.</li>
+      </ul>
+      <p>One finding shaped almost every subsequent decision: the anxiety trigger students identified most consistently wasn't the performance itself. It was the moment when the audience lights dim, the stage lights come up, and the room goes quiet — the "all eyes on me" moment. That moment was the thing the product needed to simulate.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>What the product does</h2>
+      <p>Piano Lab Pro is a mixed reality experience: the student wears an Apple Vision Pro headset while sitting at a real piano. The headset places them inside a 3D-modeled U-M concert venue. They can see their real hands and real keys through passthrough; everything else — the hall, the seats, the audience — is virtual.</p>
 
       <div class="screenshot-pair">
         <img class="screenshot" src="/assets/piano-lab-pro-venue.svg" alt="Virtual U-M concert venue in mixed reality" width="350" height="350">
         <img class="screenshot" src="/assets/piano-lab-pro-scoring.svg" alt="Self-scoring interface" width="350" height="350">
       </div>
+
+      <p>The experience has two phases that flow into each other without a menu in between:</p>
+      <ul>
+        <li><strong>Pre-performance (Default Play):</strong> The student enters the venue with the house lights up and the audience audibly chatting. They can get acquainted with the space, adjust their setup, and mentally prepare at their own pace.</li>
+        <li><strong>Performance Mode:</strong> When the student is ready, they trigger the transition themselves. The audience lights dim, the crowd quiets, and the stage lights feel brighter — isolating the student in that exact "all eyes on me" moment the research identified. The distractions that follow are randomized across conditions.</li>
+      </ul>
+
+      <p>Audio runs through Bluetooth MIDI: the student's piano audio routes directly into the AVP's spatial audio system. The venue acoustics — reverb, room size, early reflections — are applied using convolution algorithms calibrated to each real space.</p>
+
+      <p>At the end of a performance, a Summary screen appears in passthrough so the student can see the space without removing the headset. It shows time in performance and the number of audio and visual distractions encountered, with positive reinforcement messaging grounded in the MPA research.</p>
     </section>
 
     <section class="project-section">
-      <h2>The decision I'm proudest of</h2>
-      <p>It wasn't a feature. It was identifying a capability gap early.</p>
-      <p>Our team at CAI didn't have objective impact measurement expertise in-house, and self-reported anxiety scores weren't going to be enough to validate whether the app actually worked. I sought out a partnership with U-M's Institute for Social Research to bring biometric validation into the project. That partnership reshaped how we'd eventually measure success at scale, and it came from a read on what the team couldn't do alone, not from a feature spec.</p>
+      <h2>Building the venues</h2>
+      <p>Capturing Britton Recital Hall and Hill Auditorium at the fidelity the experience required was an operational undertaking, not just a technical one. Some specifics:</p>
+      <ul>
+        <li>Hill Auditorium capture took a full team day: 6,000+ photos, 4,200 aligned, 2.3 rolls of tape to mark scan positions, and 20 balloons popped at specific locations to capture the acoustic impulse response for the reverb model.</li>
+        <li>Britton required multiple visits at different lighting conditions to determine which combination read as most realistic inside the headset.</li>
+        <li>42 audience members were filmed in green screen on the XR Stage — 2.7 TB of footage — to populate the virtual seats with real human motion.</li>
+        <li>The grand piano mesh was reduced from 125,000 polygons to a target of 15,000 to hit acceptable performance on the headset without visual degradation.</li>
+      </ul>
+      <p>Coordinating access across two auditoriums, a green screen stage, and SMTD classrooms while keeping the project on a timeline was a logistics problem as much as a design one.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>Product decisions worth calling out</h2>
+
+      <div class="decision-block">
+        <h3>ISR partnership: identifying the capability gap early</h3>
+        <p>Self-reported anxiety scores weren't going to be enough to validate whether the app actually worked. Our team didn't have objective impact measurement expertise in-house, and I knew that gap would become a credibility problem at scale. I sought out a partnership with U-M's Institute for Social Research early in the project to bring biometric validation into the study design. That partnership shaped how we'd eventually measure success, and it came from reading what the team couldn't do alone — not from a feature spec. ISR received IRB approval, conducted pilot testing, and the collaboration has since opened a potential connection with the Berlin Philharmonic.</p>
+      </div>
+
+      <div class="decision-block">
+        <h3>Scoping three faculty concepts to one value proposition</h3>
+        <p>When the project began, three competing faculty concepts were on the table. Each was defensible on its own. Getting to one required a lot of saying no to good ideas — narrowing not because ideas were bad but because a single differentiated thesis is more buildable, more evaluable, and more honest with stakeholders than a product trying to be everything. The hardest part was holding that line through faculty enthusiasm for their own concepts.</p>
+      </div>
+
+      <div class="decision-block">
+        <h3>Merging Default Play and Performance Mode into one flow</h3>
+        <p>An early version of the product offered Default Play and Performance Mode as separate menu options — two distinct things a user could choose to do. Usability testing surfaced that this was wrong: the separation made the "all eyes on me" moment optional and opt-in, which undermined the whole point. The redesign merged them into a single continuous flow. A user picks a venue, enters pre-performance automatically, and triggers performance themselves when ready. The anxiety-inducing transition is now built in, not choosable.</p>
+      </div>
+
+      <div class="decision-block">
+        <h3>Piano alignment: rejecting the first solution, A/B testing the second</h3>
+        <p>Getting the virtual piano to align with the real piano keys — so the student's hands appear to play the real instrument — was harder than it looked. The first solution (manipulate a virtual cutout to match the real keys) violated standard XR interaction patterns and consistently failed in usability testing. Rather than iterate on a broken pattern, we built a second approach (a transparent "cuboid" overlaid on the real keys) and ran an A/B test. Results were mixed enough that neither approach won outright, and we're now designing a hybrid. The lesson: sometimes the first workable solution isn't the right one to ship.</p>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Where it stands</h2>
+      <p>As of April 2026, the project is building toward an MVP target of June 2026. The working prototype runs on the Apple Vision Pro and includes Britton Recital Hall and Hill Auditorium environments, a live audience, Bluetooth MIDI audio routing, the pre-performance to performance flow, and a summary screen. ISR's IRB approval is in place and pilot testing has been conducted.</p>
+      <p>Outstanding work includes completing the alignment UX, the onboarding sequence, and the summary screen content. The student-facing preparation guide has been built and deployed as a standalone Google Site. The instructor-side tooling — the half of the product that's upstream of the student experience — is planned but not yet built.</p>
     </section>
 
     <section class="project-section">
       <h2>What I learned</h2>
-      <p>Scoping three competing faculty concepts down to one differentiated value proposition is a PM decision that looks like a writing exercise until you've tried it. The hardest part is saying no to ideas that are good on their own when you're narrowing for the strongest product thesis. That skill translates directly to client work.</p>
+      <p>Scoping three competing faculty concepts down to one differentiated value proposition is a PM decision that looks like a writing exercise until you've tried it with real faculty who have real enthusiasm for their own ideas. Holding that line matters.</p>
+      <p>The other thing: a PM who shows up to a biometric research conversation having already identified the gap and already found the right people is doing something different than one who waits to be told what the product needs. The ISR partnership happened because I read what the team couldn't do, not because someone handed me a research spec.</p>
     </section>
 
     <div class="tech-stack-wrap">
-      <p class="tech-stack-label">Product Owner. Built with a cross-functional team at U-M CAI.</p>
+      <p class="tech-stack-label">Product Manager. Built with a cross-functional team at U-M CAI in partnership with SMTD.</p>
     </div>
 
   </div>
