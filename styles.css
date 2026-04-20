@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #F5F8F6;
+  --bg: #CDDACF;
+  --surface: #F6FAF7;
   --text: #1A2420;
   --accent: #2f7a4b;
   --accent2: #4a55a8;
@@ -25,12 +26,16 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.7;
+  padding: 2rem 1.5rem 4rem;
 }
 
 .container {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: 0 4px 48px rgba(26,36,32,0.09);
 }
 
 /* --- Project metadata chips --- */
@@ -91,6 +96,12 @@ body {
   background: var(--card-bg);
 }
 
+.tech-chip.built-with {
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
 /* --- Callout box --- */
 
 .callout {
@@ -145,50 +156,39 @@ a {
 a:hover { color: var(--accent2); }
 
 /* =====================
-   MATH BACKGROUND
-   ===================== */
-
-.math-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.math-bg svg {
-  width: 100%;
-  height: 100%;
-}
-
-.container {
-  position: relative;
-  z-index: 1;
-}
-
-/* =====================
    HOMEPAGE HERO
    ===================== */
 
 .hero {
   padding: 5rem 0 3.5rem;
   position: relative;
+  overflow: hidden;
 }
 
-/* Faint decorative circle behind the name */
-.hero::before {
-  content: '';
+.hero-decor {
   position: absolute;
-  top: 2rem;
-  right: -2rem;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(47,122,75,0.07) 0%, transparent 70%);
+  inset: 0;
   pointer-events: none;
+  z-index: 0;
+}
+
+.hero-scribble {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+.hero-hex {
+  position: absolute;
+  right: 18px;
+  top: 28px;
+}
+
+.hero > *:not(.hero-decor) {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-name {
@@ -440,20 +440,6 @@ a:hover { color: var(--accent2); }
   border-color: var(--accent);
 }
 
-.footer-math {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.82rem;
-  color: var(--border);
-  transition: color 0.4s ease;
-  cursor: default;
-  display: inline-block;
-  margin-top: 1.2rem;
-  letter-spacing: 0.03em;
-  user-select: none;
-}
-
-.footer-math:hover { color: var(--accent); }
-
 /* =====================
    PROJECT PAGES
    ===================== */
@@ -473,11 +459,20 @@ a:hover { color: var(--accent2); }
 .back-link:hover { color: var(--accent); }
 
 .project-header {
+  position: relative;
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding-left: 1.2rem;
   margin-left: -1.2rem;
+  overflow: hidden;
+}
+
+.project-header-hex {
+  position: absolute;
+  right: 0;
+  top: 0;
+  pointer-events: none;
 }
 
 .project-title {
@@ -614,14 +609,23 @@ a:hover { color: var(--accent2); }
    MOBILE
    ===================== */
 
-@media (max-width: 500px) {
-  body { font-size: 16px; }
+@media (max-width: 600px) {
+  body {
+    padding: 0;
+    font-size: 16px;
+  }
+
+  .container {
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 1.25rem;
+  }
 
   .hero {
     padding: 3rem 0 2rem;
   }
 
-  .hero::before { display: none; }
+  .hero-decor { display: none; }
 
   .hero-name { font-size: 2.4rem; }
 
@@ -632,7 +636,10 @@ a:hover { color: var(--accent2); }
     border-left: none;
     padding-left: 0;
     margin-left: 0;
+    overflow: visible;
   }
+
+  .project-header-hex { display: none; }
 
   .project-section { padding: 1.8rem 0; }
 

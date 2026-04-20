@@ -11,25 +11,27 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div class="math-bg" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;">
-    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="1340" cy="-60" r="420" fill="none" stroke="#2f7a4b" stroke-width="2.5" opacity="0.07"/>
-      <circle cx="1340" cy="-60" r="290" fill="none" stroke="#2f7a4b" stroke-width="1.8" opacity="0.05"/>
-      <circle cx="-60" cy="940" r="300" fill="none" stroke="#4a55a8" stroke-width="2" opacity="0.06"/>
-      <path d="M 100 880 Q 720 240 1340 880" fill="none" stroke="#2f7a4b" stroke-width="1.8" opacity="0.05"/>
-      <line x1="940" y1="700" x2="1160" y2="700" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <line x1="1060" y1="800" x2="1060" y2="590" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <path d="M 1152 696 L 1160 700 L 1152 704" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <path d="M 1056 598 L 1060 590 L 1064 598" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <circle cx="1060" cy="700" r="3" fill="#4a55a8" opacity="0.09"/>
-      <circle cx="200" cy="200" r="3.5" fill="#2f7a4b" opacity="0.09"/>
-      <circle cx="80" cy="740" r="2.5" fill="#4a55a8" opacity="0.08"/>
-    </svg>
-  </div>
   <div class="container">
 
     <!-- HERO -->
     <section class="hero">
+      <div class="hero-decor" aria-hidden="true">
+        <!-- hand-drawn coordinate system with parabola -->
+        <svg class="hero-scribble" viewBox="0 0 320 250" width="320" height="250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 14 148 C 50 147, 120 149, 200 148 L 310 148" stroke="#2f7a4b" stroke-width="1.8" stroke-linecap="round" opacity="0.12"/>
+          <path d="M 302 144 L 312 148 L 302 152" stroke="#2f7a4b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.12"/>
+          <path d="M 163 234 C 164 188, 162 76, 163 12" stroke="#2f7a4b" stroke-width="1.8" stroke-linecap="round" opacity="0.12"/>
+          <path d="M 159 20 L 163 10 L 167 20" stroke="#2f7a4b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.12"/>
+          <path d="M 22 228 C 68 72, 258 72, 306 228" stroke="#2f7a4b" stroke-width="2.4" stroke-linecap="round" opacity="0.12"/>
+          <circle cx="163" cy="107" r="3" fill="#2f7a4b" opacity="0.15"/>
+          <circle cx="163" cy="148" r="2" fill="#2f7a4b" opacity="0.12"/>
+        </svg>
+        <!-- nested hexagon outline -->
+        <svg class="hero-hex" viewBox="0 0 110 128" width="96" height="112" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="55,4 106,31 106,97 55,124 4,97 4,31" stroke="#4a55a8" stroke-width="2" opacity="0.1"/>
+          <polygon points="55,20 90,40 90,88 55,108 20,88 20,40" stroke="#4a55a8" stroke-width="1.2" opacity="0.07"/>
+        </svg>
+      </div>
       <h1 class="hero-name">Amanda L. Cowell</h1>
       <svg class="wavy-underline" viewBox="0 0 260 8" width="260" height="8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M1,5 C20,1.5 40,7 64,4.5 C86,2 108,7.5 132,4.5 C154,1.5 176,7 200,4.5 C218,2.5 238,6 258,4.5"

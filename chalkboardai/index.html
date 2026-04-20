@@ -11,31 +11,15 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div class="math-bg" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;">
-    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <!-- Concentric circles, top-right — dominant anchor -->
-      <circle cx="1340" cy="-60" r="420" fill="none" stroke="#2f7a4b" stroke-width="2.5" opacity="0.07"/>
-      <circle cx="1340" cy="-60" r="290" fill="none" stroke="#2f7a4b" stroke-width="1.8" opacity="0.05"/>
-      <!-- Single circle, bottom-left — diagonal balance -->
-      <circle cx="-60" cy="940" r="300" fill="none" stroke="#4a55a8" stroke-width="2" opacity="0.06"/>
-      <!-- Parabola connecting the two anchor zones -->
-      <path d="M 100 880 Q 720 240 1340 880" fill="none" stroke="#2f7a4b" stroke-width="1.8" opacity="0.05"/>
-      <!-- Coordinate axes, lower-right — proximity to right anchor -->
-      <line x1="940" y1="700" x2="1160" y2="700" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <line x1="1060" y1="800" x2="1060" y2="590" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <path d="M 1152 696 L 1160 700 L 1152 704" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <path d="M 1056 598 L 1060 590 L 1064 598" fill="none" stroke="#2f7a4b" stroke-width="1.5" opacity="0.07"/>
-      <!-- Dots: axis origin + accents in open zones -->
-      <circle cx="1060" cy="700" r="3" fill="#4a55a8" opacity="0.09"/>
-      <circle cx="200" cy="200" r="3.5" fill="#2f7a4b" opacity="0.09"/>
-      <circle cx="80" cy="740" r="2.5" fill="#4a55a8" opacity="0.08"/>
-    </svg>
-  </div>
   <div class="container">
 
     <a href="/" class="back-link">← Amanda Cowell</a>
 
     <header class="project-header">
+      <svg class="project-header-hex" viewBox="0 0 110 128" width="80" height="93" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="55,4 106,31 106,97 55,124 4,97 4,31" stroke="#4a55a8" stroke-width="2" opacity="0.1"/>
+        <polygon points="55,20 90,40 90,88 55,108 20,88 20,40" stroke="#4a55a8" stroke-width="1.2" opacity="0.07"/>
+      </svg>
       <h1 class="project-title">ChalkboardAI</h1>
       <p class="project-subtitle">Local-first AI math tutoring grounded in lecture-specific context. In development.</p>
       <span class="status-badge">In development</span>
