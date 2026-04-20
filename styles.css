@@ -4,8 +4,10 @@
   --bg: #B0C9B6;
   --surface: #FFFFFF;
   --text: #1A2420;
-  --accent: #2f7a4b;
-  --accent2: #4a55a8;
+  --accent: #2f7a4b;       /* forest green */
+  --accent2: #4a55a8;      /* indigo */
+  --teal: #3d8a87;         /* muted teal */
+  --terra: #b86e54;        /* dusty terra cotta */
   --muted: #536860;
   --border: #D4E0D8;
   --card-bg: #F0F6F2;
@@ -79,6 +81,16 @@ body {
 .meta-chip.accent {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.project-header--indigo .meta-chip.accent {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.project-header--teal .meta-chip.accent {
+  border-color: var(--teal);
+  color: var(--teal);
 }
 
 /* --- Tech stack --- */
@@ -181,8 +193,8 @@ a:hover { color: var(--accent2); }
   padding: 4.5rem var(--card-pad) 3.5rem;
   position: relative;
   overflow: hidden;
-  /* light green tint to differentiate from plain sections */
-  background: #F2F8F4;
+  /* diagonal two-tone split — salt pond aesthetic */
+  background: linear-gradient(140deg, #daeee3 52%, #dce5f2 52%);
 }
 
 .hero-decor {
@@ -192,19 +204,12 @@ a:hover { color: var(--accent2); }
   z-index: 0;
 }
 
-/* The coordinate-system scribble — large, right side */
+/* The coordinate-system scribble — right side, vertically centered */
 .hero-scribble {
   position: absolute;
-  right: -30px;
+  right: -20px;
   top: 50%;
-  transform: translateY(-52%);
-}
-
-/* The hex — top right corner */
-.hero-hex {
-  position: absolute;
-  right: 24px;
-  top: 24px;
+  transform: translateY(-50%);
 }
 
 .hero > *:not(.hero-decor) {
@@ -316,8 +321,16 @@ a:hover { color: var(--accent2); }
 .project-card:hover {
   box-shadow: 0 6px 24px rgba(26,36,32,0.12);
   transform: translateY(-3px);
-  border-top-color: var(--accent2);
 }
+
+/* Per-project card accent colors */
+.project-card--indigo { border-top-color: var(--accent2); }
+.project-card--teal   { border-top-color: var(--teal); }
+.project-card--terra  { border-top-color: var(--terra); }
+
+.project-card--indigo:hover { border-top-color: var(--accent2); }
+.project-card--teal:hover   { border-top-color: var(--teal); }
+.project-card--terra:hover  { border-top-color: var(--terra); }
 
 .project-card-img {
   width: 100%;
@@ -484,7 +497,7 @@ a:hover { color: var(--accent2); }
 
 /* Project header: two-zone card */
 .project-header {
-  background: #F2F8F4;
+  background: #edf5f0;
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;
@@ -492,12 +505,19 @@ a:hover { color: var(--accent2); }
   padding: 0;
 }
 
-/* Zone 1: title + meta on left, hex emblem on right */
+/* Per-project color variants */
+.project-header--indigo {
+  background: #edeef7;
+  border-top-color: var(--accent2);
+}
+
+.project-header--teal {
+  background: #eaf3f2;
+  border-top-color: var(--teal);
+}
+
+/* Zone 1: title + meta */
 .project-header-main {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2rem;
-  align-items: center;
   padding: var(--card-pad);
 }
 
@@ -505,19 +525,11 @@ a:hover { color: var(--accent2); }
   min-width: 0;
 }
 
-.project-header-emblem {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 110px;
-}
-
 /* Zone 2: tech chips strip, separated by line */
 .project-header-stack {
   border-top: 1px solid var(--border);
   padding: 1rem var(--card-pad);
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.5);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -663,8 +675,7 @@ a:hover { color: var(--accent2); }
   .hero { padding-top: 3rem; }
   .hero-decor { display: none; }
   .hero-name { font-size: 2.4rem; }
-  .project-header-emblem { display: none; }
-  .project-header-main { grid-template-columns: 1fr; padding: 2rem 1.25rem 1.5rem; gap: 0; }
+  .project-header-main { padding: 2rem 1.25rem 1.5rem; }
   .project-header-stack { padding: 1rem 1.25rem; }
   .project-header { border-top-width: 4px; }
 }
