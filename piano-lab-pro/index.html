@@ -237,13 +237,10 @@
               <p class="text-sm text-on-surface-variant leading-relaxed">To Britton Recital Hall, Hill Auditorium, and SMTD classrooms — I organized access to the actual spaces so the team understood the physical environment before designing for it.</p>
             </div>
           </div>
-          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-            <img class="w-full" src="/assets/plp-design-jam.png" alt="Design jam: dot sticker exercise mapping where students feel most anxious by venue size and audience familiarity">
-            <div class="p-8">
-              <span class="material-symbols-outlined text-primary text-3xl mb-4 block">lightbulb</span>
-              <h4 class="font-bold text-on-surface mb-2">Design jams</h4>
-              <p class="text-sm text-on-surface-variant leading-relaxed">Students placed dot stickers on a two-axis map (venue size × audience familiarity) marking where they feel most anxious. The clustering — large venue, strangers — directly shaped the product's default scenario.</p>
-            </div>
+          <div class="bg-surface-container-lowest p-8 rounded-xl">
+            <span class="material-symbols-outlined text-primary text-3xl mb-4 block">lightbulb</span>
+            <h4 class="font-bold text-on-surface mb-2">Design jams</h4>
+            <p class="text-sm text-on-surface-variant leading-relaxed">Co-design sessions with students and faculty to explore the environment and scenario space — which venues felt highest stakes, which audience types were most anxiety-inducing, and which product concepts felt most useful. The clustering shaped which scenarios the app prioritizes.</p>
           </div>
         </div>
       </div>
@@ -283,7 +280,7 @@
           </div>
         </div>
         <div class="bg-surface-container-low rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/plp-greenscreen.jpg" alt="Green screen XR Stage studio used for filming audience members">
+          <img class="w-full" src="/assets/plp-greenscreen-person.jpg" alt="Audience member being filmed on the green screen XR Stage">
           <div class="p-8 flex gap-5 items-start">
             <span class="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">videocam</span>
             <div>
@@ -297,8 +294,8 @@
           <div class="p-8 flex gap-5 items-start">
             <span class="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">piano</span>
             <div>
-              <h4 class="font-bold text-on-surface mb-2">Piano mesh optimization</h4>
-              <p class="text-sm text-on-surface-variant leading-relaxed">The grand piano mesh required reduction from 125,000 polygons to ~15,000 to hit acceptable performance on the headset. The high-poly scan (left) and the optimized production mesh (right).</p>
+              <h4 class="font-bold text-on-surface mb-2">Piano mesh: matching the real instrument</h4>
+              <p class="text-sm text-on-surface-variant leading-relaxed">The digital keyboard students practice on (left) next to the grand piano model from Hill Auditorium's stage (right). We compared them to find dimensional differences, then adjusted the Hill model's foot pedals to align with the physical keyboard students actually play — so the mixed reality overlay would match reality.</p>
             </div>
           </div>
         </div>
@@ -326,10 +323,10 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
-            <img class="w-full" src="/assets/plp-design-jam-new.jpg" alt="Design jam session: sticky notes mapping WHY students feel anxious before performances">
+            <img class="w-full" src="/assets/plp-design-jam.png" alt="Usability research: students placed dot stickers mapping where they feel most anxious by venue size and audience familiarity">
             <div class="p-8">
-              <h4 class="font-headline text-xl font-bold text-primary mb-2">Discovery: mapping anxiety to context</h4>
-              <p class="text-on-surface-variant leading-relaxed text-sm">In design jams, students mapped WHY they feel most anxious before performances. The clustering was clear — large venue, strangers. That finding became the product's default scenario and informed every environment and distraction design decision that followed.</p>
+              <h4 class="font-headline text-xl font-bold text-primary mb-2">Research: mapping where anxiety clusters</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Students placed dot stickers on a two-axis map (venue size × audience familiarity) marking where they feel most anxious. The clustering was unambiguous — large venue, strangers. That finding became the product's default scenario and informed every environment and distraction decision that followed.</p>
             </div>
           </div>
           <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
@@ -390,10 +387,16 @@
       <div class="mt-8 p-8 bg-surface-container-low rounded-xl border-l-4 border-primary">
         <h4 class="font-headline font-bold text-xl mb-3">Piano alignment: rejecting the first solution, A/B testing the second</h4>
         <p class="text-sm leading-relaxed text-on-surface-variant mb-6">Getting the virtual piano to align with the real piano keys — so the student's hands appear to play the real instrument — was harder than it looked. The first solution (manipulate a virtual cutout to match the real keys) violated standard XR interaction patterns and consistently failed in usability testing. Rather than push the team to iterate on a broken pattern, I made the call to prototype a second approach: a transparent "cuboid" overlaid on the real keys. We ran an A/B test on both. Results were mixed enough that neither won outright, and the team is now designing a hybrid. The lesson: sometimes the first workable solution isn't the right one to ship.</p>
-        <div class="rounded-xl overflow-hidden aspect-video shadow-md">
-          <iframe class="w-full h-full" src="https://www.youtube.com/embed/UHpsS5INt1A?mute=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+          <div class="rounded-xl overflow-hidden shadow-md bg-surface-container-lowest">
+            <img class="w-full" src="/assets/plp-shapesxr-proto.jpg" alt="Early prototype in ShapesXR: participant testing keyboard alignment with Meta Quest headset">
+            <p class="text-xs text-on-surface-variant italic p-3">Early ShapesXR prototype — testing the first keyboard alignment approach, before it failed in usability sessions.</p>
+          </div>
+          <div class="rounded-xl overflow-hidden aspect-video shadow-md">
+            <iframe class="w-full h-full" src="https://www.youtube.com/embed/UHpsS5INt1A?mute=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          </div>
         </div>
-        <p class="text-xs text-on-surface-variant italic mt-3">The cuboid prototype — a transparent overlay on the real piano keys, tested as the second alignment approach in our A/B study.</p>
+        <p class="text-xs text-on-surface-variant italic mt-3">Left: the first solution being tested. Right: the cuboid prototype — the second approach we A/B tested against it.</p>
       </div>
     </section>
 
