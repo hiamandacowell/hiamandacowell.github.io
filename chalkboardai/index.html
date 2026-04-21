@@ -262,7 +262,7 @@
         <div class="flex flex-col md:flex-row-reverse gap-16 items-center">
           <div class="w-full md:w-1/2 grid grid-cols-2 gap-3">
             <div class="p-2 bg-surface-container-high rounded-xl shadow-sm">
-              <img class="rounded-xl w-full" src="/assets/chalkboardai-claude-design-system.png" alt="ChalkboardAI design system light mode, built with Claude Code">
+              <img class="rounded-xl w-full" src="/assets/chalkboardai-claude-design-system.png" alt="ChalkboardAI design system light mode, built with Claude Design">
             </div>
             <div class="p-2 bg-surface-container-high rounded-xl shadow-sm">
               <img class="rounded-xl w-full" src="/assets/chalkboardai-design-system-dark.png" alt="ChalkboardAI design system dark mode">
@@ -270,88 +270,154 @@
           </div>
           <div class="w-full md:w-1/2">
             <span class="text-xs font-bold text-tertiary uppercase tracking-widest mb-4 block">Design system</span>
-            <h3 class="font-headline text-3xl font-bold mb-6">Tokens, type, and modes built with Claude Code</h3>
-            <p class="text-lg text-on-surface-variant leading-relaxed">The design foundation was built collaboratively with Claude Code: color tokens, type scale, and component variants across light and dark modes. Treating the design system as a documented artifact rather than ad-hoc styles meant every new screen started from a consistent base.</p>
+            <h3 class="font-headline text-3xl font-bold mb-6">Tokens, type, and modes built with Claude Design</h3>
+            <p class="text-lg text-on-surface-variant leading-relaxed">The design foundation was built using Claude Design, Anthropic's design tool: color tokens, type scale, and component variants across light and dark modes. Treating the design system as a documented artifact rather than ad-hoc styles meant every new screen started from a consistent base.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Product Decisions -->
-    <section class="bg-tertiary py-24 mb-24">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="font-headline text-4xl font-bold text-on-tertiary mb-2 tracking-tight">Decisions and their costs.</h2>
-        <p class="text-on-tertiary/80 max-w-2xl mb-12 text-lg italic">Each decision below is documented in a commit or a persistent decision file from the time it was made. The tradeoffs are named. New decisions are being added as iteration continues.</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-surface/10 backdrop-blur-sm border border-white/10 rounded-xl p-8">
-            <h3 class="font-headline text-xl font-bold text-on-tertiary mb-4">Socratic enforcement: accept leakage, fix the UX instead</h3>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The problem</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">The model occasionally leaks worked answers in the chat body even with strict system prompting.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I rejected</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">A two-stage critic model (added latency) and blunt regex filtering (too many false positives on legitimate recall queries).</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm">Accept occasional leakage, but hide AI-generated artifact tags during streaming so the flash-and-vanish is less jarring. No "hide answers" toggle. The complexity wasn't worth the marginal benefit.</p>
+    <section class="max-w-7xl mx-auto px-6 py-24 mb-24">
+      <div class="mb-16">
+        <h2 class="font-headline text-4xl font-bold text-primary mb-4 tracking-tight">Decisions and their costs.</h2>
+        <p class="text-on-surface-variant max-w-2xl text-lg italic">Each decision below is documented in a commit or a persistent decision file from the time it was made. The tradeoffs are named. New decisions are being added as iteration continues.</p>
+      </div>
+      <div class="space-y-6">
+
+        <!-- 01 -->
+        <div class="bg-surface-container-low rounded-xl p-8 md:p-10">
+          <div class="flex items-baseline gap-4 mb-6">
+            <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">01</span>
+            <h3 class="font-headline text-xl font-bold text-on-surface">Socratic enforcement: accept leakage, fix the UX instead</h3>
           </div>
-          <div class="bg-surface/10 backdrop-blur-sm border border-white/10 rounded-xl p-8">
-            <h3 class="font-headline text-xl font-bold text-on-tertiary mb-4">Inline chat artifacts over a duplicated help zone</h3>
-            <div class="rounded-xl overflow-hidden mb-4 opacity-80">
-              <img class="w-full" src="/assets/chalkboardai-figma-restructure.png" alt="Figma wireframe showing the earlier layout with a separate AI help canvas on the left sidebar">
-              <p class="text-xs text-on-tertiary/50 italic p-2">The earlier layout: AI-generated items appear in a separate left panel (the "help canvas") alongside the chat.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">The model occasionally leaks worked answers in the chat body even with strict system prompting.</p>
             </div>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The problem</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">An early version had a top-of-sidebar "help canvas" where AI-generated math items appeared.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The observation</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">It duplicated the chat. Users would have to track where a generated item lived in two places.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm">Removed the help zone. AI-generated items now render inline under the chat bubble that produced them, still draggable onto the main board. Single flow beat duplicated affordances.</p>
-          </div>
-          <div class="bg-surface/10 backdrop-blur-sm border border-white/10 rounded-xl p-8">
-            <h3 class="font-headline text-xl font-bold text-on-tertiary mb-4">Rolling summary over sliding window for context management</h3>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The problem</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">The model started slowing down and drifting on format rules mid-session.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I rejected</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">A sliding context window. That would have broken "the AI remembers what we worked on twenty minutes ago," which is first-class important for the product.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">Rolling summarization. Preserves continuity at the cost of a second model call.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What this taught me</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm">The reactive shape of this decision told me that designing for context pressure from the start would have avoided the triggering degradation. On the next build, context management is a day-one concern.</p>
-          </div>
-          <div class="bg-surface/10 backdrop-blur-sm border border-white/10 rounded-xl p-8">
-            <h3 class="font-headline text-xl font-bold text-on-tertiary mb-4">Accessibility-first as a tiebreaker default</h3>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The problem</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">A working bespoke regex pipeline for speaking math notation aloud. It worked, but required case-by-case authoring for each notation type.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I found</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">The Speech Rule Engine, the standards-based pipeline MathJax uses for screen readers, covered a much broader set of notation correctly out of the box.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The trade</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">About 300KB of bundle size for correct, broad coverage without hand-authoring.</p>
-            <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
-            <p class="text-on-tertiary/80 leading-relaxed text-sm">Delete the bespoke pipeline. When an accessibility-aware library exists and works, it wins by default.</p>
-          </div>
-        </div>
-        <div class="bg-surface/10 backdrop-blur-sm border border-white/10 rounded-xl p-8 mt-6">
-          <h3 class="font-headline text-xl font-bold text-on-tertiary mb-4">Routing math computation through a verified solver</h3>
-          <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">The problem</p>
-          <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">The base LLM could not be trusted to do arithmetic. On the same problem (find the limit of f(x) = 12 − 5x as x approaches 2, answer: 2) it returned 7, then 3, then −8 in a single session. A math tutor that gets the math wrong is worse than no tutor at all.</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="rounded-xl overflow-hidden opacity-80">
-              <img class="w-full" src="/assets/chalkboardai-llm-before-2.jpg" alt="Early LLM chat: model confidently gives wrong answer of 7 for a limit, then recalculates to 3">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I rejected</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">A two-stage critic model (added latency) and blunt regex filtering (too many false positives on legitimate recall queries).</p>
             </div>
-            <div class="rounded-xl overflow-hidden opacity-80">
-              <img class="w-full" src="/assets/chalkboardai-llm-before-1.jpg" alt="Early LLM chat: model revises again to -8, student asks why it got it wrong, model apologizes">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Accept occasional leakage, but hide AI-generated artifact tags during streaming so the flash-and-vanish is less jarring. No "hide answers" toggle. The complexity wasn't worth the marginal benefit.</p>
             </div>
           </div>
-          <p class="text-xs text-on-tertiary/50 italic mb-4">Three different wrong answers in one session. The correct answer is 2.</p>
-          <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I rejected</p>
-          <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">Relying on better prompting alone. The arithmetic failures weren't hallucination in the usual sense: they were the model not having a reliable computation mechanism. Prompting couldn't fix that.</p>
-          <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
-          <p class="text-on-tertiary/80 leading-relaxed text-sm">Connected the model to a math solver for computation, so the LLM handles reasoning and explanation while verified tool calls handle the arithmetic. The model went from three wrong answers on one problem to consistent accuracy on the same class of questions.</p>
         </div>
-        <div class="mt-8 flex flex-col items-center gap-3">
-          <div class="max-w-xs rounded-xl overflow-hidden shadow-lg opacity-90">
-            <img src="/assets/chalkboardai-proto-v1.gif" alt="First working session: ChalkboardAI canvas with the math solver connected" class="w-full">
+
+        <!-- 02 -->
+        <div class="bg-surface-container-low rounded-xl p-8 md:p-10">
+          <div class="flex items-baseline gap-4 mb-6">
+            <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">02</span>
+            <h3 class="font-headline text-xl font-bold text-on-surface">Inline chat artifacts over a duplicated help zone</h3>
           </div>
-          <p class="text-xs text-on-tertiary/50 italic text-center max-w-xs">First working session, after connecting the solver. The canvas, the local model, and the math that held up.</p>
+          <div class="mb-6">
+            <img class="rounded-xl w-full max-w-lg" src="/assets/chalkboardai-figma-restructure.png" alt="Figma wireframe showing the earlier layout with a separate AI help canvas on the left sidebar">
+            <p class="text-xs text-on-surface-variant italic mt-2">The earlier layout: AI-generated items appear in a separate left panel alongside the chat.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">An early version had a top-of-sidebar "help canvas" where AI-generated math items appeared.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The observation</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">It duplicated the chat. Users would have to track where a generated item lived in two places.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Removed the help zone. AI-generated items now render inline under the chat bubble that produced them, still draggable onto the main board. Single flow beat duplicated affordances.</p>
+            </div>
+          </div>
         </div>
+
+        <!-- 03 -->
+        <div class="bg-surface-container-low rounded-xl p-8 md:p-10">
+          <div class="flex items-baseline gap-4 mb-6">
+            <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">03</span>
+            <h3 class="font-headline text-xl font-bold text-on-surface">Rolling summary over sliding window for context management</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">The model started slowing down and drifting on format rules mid-session.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I rejected</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">A sliding context window. That would have broken "the AI remembers what we worked on twenty minutes ago," which is first-class important for the product.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Rolling summarization. Preserves continuity at the cost of a second model call.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What this taught me</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Designing for context pressure from the start would have avoided the triggering degradation. On the next build, context management is a day-one concern.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 -->
+        <div class="bg-surface-container-low rounded-xl p-8 md:p-10">
+          <div class="flex items-baseline gap-4 mb-6">
+            <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">04</span>
+            <h3 class="font-headline text-xl font-bold text-on-surface">Accessibility-first as a tiebreaker default</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">A working bespoke regex pipeline for speaking math notation aloud. It worked, but required case-by-case authoring for each notation type.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I found</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">The Speech Rule Engine, the standards-based pipeline MathJax uses for screen readers, covered a much broader set of notation correctly out of the box.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The trade</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">About 300KB of bundle size for correct, broad coverage without hand-authoring.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Delete the bespoke pipeline. When an accessibility-aware library exists and works, it wins by default.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 -->
+        <div class="bg-surface-container-low rounded-xl p-8 md:p-10">
+          <div class="flex items-baseline gap-4 mb-6">
+            <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">05</span>
+            <h3 class="font-headline text-xl font-bold text-on-surface">Routing math computation through a verified solver</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 max-w-xl">
+            <img class="rounded-xl w-full" src="/assets/chalkboardai-llm-before-2.jpg" alt="Early LLM chat: model confidently gives wrong answer of 7 for a limit, then recalculates to 3">
+            <img class="rounded-xl w-full" src="/assets/chalkboardai-llm-before-1.jpg" alt="Early LLM chat: model revises again to -8, student asks why it got it wrong, model apologizes">
+          </div>
+          <p class="text-xs text-on-surface-variant italic mb-6">Three different wrong answers in one session. The correct answer is 2.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">The base LLM could not be trusted to do arithmetic. On the same problem (find the limit of f(x) = 12 − 5x as x approaches 2, answer: 2) it returned 7, then 3, then −8 in a single session. A math tutor that gets the math wrong is worse than no tutor at all.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I rejected</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Relying on better prompting alone. The arithmetic failures weren't hallucination in the usual sense: they were the model not having a reliable computation mechanism. Prompting couldn't fix that.</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
+              <p class="text-on-surface-variant text-sm leading-relaxed">Connected the model to a math solver for computation, so the LLM handles reasoning and explanation while verified tool calls handle the arithmetic. The model went from three wrong answers on one problem to consistent accuracy on the same class of questions.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex flex-col items-center gap-3">
+            <div class="max-w-xs rounded-xl overflow-hidden shadow-md">
+              <img src="/assets/chalkboardai-proto-v1.gif" alt="First working session: ChalkboardAI canvas with the math solver connected" class="w-full">
+            </div>
+            <p class="text-xs text-on-surface-variant italic text-center max-w-xs">First working session, after connecting the solver. The canvas, the local model, and the math that held up.</p>
+          </div>
+        </div>
+
       </div>
     </section>
 
