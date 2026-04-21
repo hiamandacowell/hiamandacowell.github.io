@@ -112,31 +112,37 @@
           </div>
         </div>
       </div>
-      <!-- Hero image -->
-      <div class="mt-16 rounded-xl overflow-hidden aspect-[21/9] shadow-2xl">
-        <img class="w-full h-full object-cover" src="/assets/piano-lab-pro-hero.svg" alt="Piano Lab Pro in mixed reality with a musician performing in a virtual concert hall">
+      <!-- Hero video -->
+      <div class="mt-16 rounded-xl overflow-hidden aspect-video shadow-2xl">
+        <iframe class="w-full h-full" src="https://www.youtube.com/embed/9KnCv_WGrao?autoplay=1&mute=1&loop=1&playlist=9KnCv_WGrao" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
       </div>
     </header>
 
     <!-- The Problem -->
     <section class="bg-surface-container-low py-24 mb-24">
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div class="space-y-6">
-          <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tight">The performance anxiety wall.</h2>
-          <p class="text-lg leading-relaxed text-on-surface-variant">Music performance anxiety (MPA) is well-documented and widespread, and it's structurally built into how musicians train. Students rehearse alone in small practice rooms, then perform in front of live audiences in large concert halls. The gap between those two environments — the acoustics, the spatial scale, the audience presence, the social stakes — isn't something repetition in a practice room closes.</p>
-          <p class="text-lg leading-relaxed text-on-surface-variant">Piano students are particularly exposed. Their instrument is fixed: you can't carry your home environment with you. What you <em>can</em> do is make the practice environment more like the performance environment before the performance happens. That's the thesis behind Piano Lab Pro.</p>
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-16">
+          <div class="space-y-6">
+            <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tight">The performance anxiety wall.</h2>
+            <p class="text-lg leading-relaxed text-on-surface-variant">Music performance anxiety (MPA) is well-documented and widespread, and it's structurally built into how musicians train. Students rehearse alone in small practice rooms, then perform in front of live audiences in large concert halls. The gap between those two environments — the acoustics, the spatial scale, the audience presence, the social stakes — isn't something repetition in a practice room closes.</p>
+            <p class="text-lg leading-relaxed text-on-surface-variant">Piano students are particularly exposed. Their instrument is fixed: you can't carry your home environment with you. What you <em>can</em> do is make the practice environment more like the performance environment before the performance happens. That's the thesis behind Piano Lab Pro.</p>
+          </div>
+          <div class="bg-surface-container-lowest p-8 rounded-xl border-l-4 border-primary">
+            <span class="material-symbols-outlined text-primary text-3xl mb-4 block">record_voice_over</span>
+            <p class="text-lg font-medium text-on-surface mb-2">The finding that shaped everything</p>
+            <p class="text-on-surface-variant leading-relaxed">The anxiety trigger students identified most consistently wasn't the performance itself. It was the moment when the audience lights dim, the stage lights come up, and the room goes quiet — the "all eyes on me" moment. That finding became the product's core design requirement.</p>
+          </div>
         </div>
-        <div class="bg-surface-container-lowest p-8 rounded-xl border-l-4 border-primary">
-          <span class="material-symbols-outlined text-primary text-3xl mb-4 block">record_voice_over</span>
-          <p class="text-lg font-medium text-on-surface mb-2">The finding that shaped everything</p>
-          <p class="text-on-surface-variant leading-relaxed">The anxiety trigger students identified most consistently wasn't the performance itself. It was the moment when the audience lights dim, the stage lights come up, and the room goes quiet — the "all eyes on me" moment. That finding became the product's core design requirement.</p>
+        <div class="rounded-xl overflow-hidden shadow-xl">
+          <img class="w-full" src="/assets/plp-hill-panorama.jpg" alt="360° panoramic view from the Hill Auditorium stage — the performer's perspective facing an empty house">
         </div>
+        <p class="text-sm text-on-surface-variant mt-3 text-center italic">Hill Auditorium from the stage. This is what a student faces the moment the lights shift.</p>
       </div>
     </section>
 
     <!-- The Collaboration -->
     <section class="max-w-7xl mx-auto px-6 py-16 mb-24">
-      <div class="flex flex-col md:flex-row gap-16">
+      <div class="flex flex-col md:flex-row gap-16 mb-12">
         <div class="md:w-1/3">
           <h2 class="font-headline text-4xl font-bold text-primary mb-6 tracking-tight">The collaboration</h2>
           <p class="text-on-surface-variant leading-relaxed">Piano Lab Pro is a partnership between CAI's XR team and two SMTD faculty members with complementary expertise. On the CAI side: a cross-functional team of XR developers, UX designers, learning experience designers, behavioral scientists, student fellows, and me as PM — fifteen contributors across two years, from proposal through prototype.</p>
@@ -154,13 +160,23 @@
           </div>
         </div>
       </div>
+      <div class="rounded-xl overflow-hidden shadow-sm">
+        <img class="w-full" src="/assets/plp-team.jpg" alt="The cross-functional CAI XR team working session with Vision Pro headsets on the table">
+      </div>
+      <p class="text-sm text-on-surface-variant mt-3 px-1 italic">The cross-functional team during a working session. Apple Vision Pro headsets on the table; two team members actively testing while the rest iterate.</p>
     </section>
 
     <!-- Discovery -->
     <section class="bg-surface-container-low py-24 mb-24">
       <div class="max-w-7xl mx-auto px-6">
         <h2 class="font-headline text-4xl font-bold text-primary mb-4 tracking-tight">Discovery: what I needed to understand before we could scope anything</h2>
-        <p class="text-on-surface-variant max-w-2xl mb-12 text-lg">I coordinated several months of research before any development began. I needed to understand the problem well enough to scope it — and to push back when the scope started to drift. Key activities I drove:</p>
+        <p class="text-on-surface-variant max-w-2xl mb-8 text-lg">I coordinated several months of research before any development began. I needed to understand the problem well enough to scope it — and to push back when the scope started to drift. The project followed a structured Discovery → Framing → Inception → MVP path.</p>
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-12 shadow-sm">
+          <img class="w-full" src="/assets/plp-process-diagram.png" alt="Double diamond process diagram showing Discovery, Framing, Inception, and MVP phases">
+          <div class="p-6">
+            <p class="text-sm text-on-surface-variant">The CAI project framework: diverge to find the right problems, converge on the right solutions, then iterate toward MVP. Key activities I drove across the discovery and framing phases:</p>
+          </div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div class="bg-surface-container-lowest p-8 rounded-xl">
             <span class="material-symbols-outlined text-primary text-3xl mb-4 block">groups</span>
@@ -177,15 +193,21 @@
             <h4 class="font-bold text-on-surface mb-2">Literature review</h4>
             <p class="text-sm text-on-surface-variant leading-relaxed">On MPA and flow state — brought into early scoping conversations to ground design decisions in evidence rather than intuition.</p>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl">
-            <span class="material-symbols-outlined text-primary text-3xl mb-4 block">location_on</span>
-            <h4 class="font-bold text-on-surface mb-2">Site visits</h4>
-            <p class="text-sm text-on-surface-variant leading-relaxed">To Britton Recital Hall, Hill Auditorium, and SMTD classrooms — I organized access to the actual spaces so the team understood the physical environment before designing for it.</p>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/plp-site-visit.png" alt="Site visit to Hill Auditorium — team member in the empty seats">
+            <div class="p-8">
+              <span class="material-symbols-outlined text-primary text-3xl mb-4 block">location_on</span>
+              <h4 class="font-bold text-on-surface mb-2">Site visits</h4>
+              <p class="text-sm text-on-surface-variant leading-relaxed">To Britton Recital Hall, Hill Auditorium, and SMTD classrooms — I organized access to the actual spaces so the team understood the physical environment before designing for it.</p>
+            </div>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl">
-            <span class="material-symbols-outlined text-primary text-3xl mb-4 block">lightbulb</span>
-            <h4 class="font-bold text-on-surface mb-2">Design jams</h4>
-            <p class="text-sm text-on-surface-variant leading-relaxed">To develop learner personas and surface the assumptions we'd need to validate before building.</p>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/plp-design-jam.png" alt="Design jam artifact: dot sticker exercise mapping where students feel most anxious by venue size and audience familiarity">
+            <div class="p-8">
+              <span class="material-symbols-outlined text-primary text-3xl mb-4 block">lightbulb</span>
+              <h4 class="font-bold text-on-surface mb-2">Design jams</h4>
+              <p class="text-sm text-on-surface-variant leading-relaxed">Students marked where they feel most anxious on a two-axis map (venue size × audience familiarity). The clustering — large venue, strangers — directly shaped the product's default scenario.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -204,7 +226,7 @@
               <h3 class="font-headline text-2xl font-bold text-on-primary-container">Pre-performance (Default Play)</h3>
               <p class="text-on-primary-container max-w-md text-sm leading-relaxed">The student enters the venue with the house lights up and the audience audibly chatting. They can get acquainted with the space, adjust their setup, and mentally prepare at their own pace.</p>
             </div>
-            <img class="absolute top-0 right-0 h-full w-1/2 object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" src="/assets/piano-lab-pro-venue.svg" alt="Virtual U-M concert venue in mixed reality">
+            <img class="absolute top-0 right-0 h-full w-1/2 object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" src="/assets/plp-hill-render.png" alt="3D rendered Hill Auditorium in mixed reality">
           </div>
           <div class="md:col-span-4 bg-tertiary-container rounded-xl p-10 flex flex-col justify-end">
             <span class="material-symbols-outlined text-4xl mb-4 text-on-tertiary">surround_sound</span>
@@ -221,7 +243,7 @@
                 <h3 class="font-headline text-2xl font-bold text-on-secondary-container mb-4">Summary screen</h3>
                 <p class="text-sm text-on-secondary-container leading-relaxed">At the end of a performance, a Summary screen appears in passthrough so the student can see the space without removing the headset. Shows time in performance and the number of audio and visual distractions encountered, with positive reinforcement messaging grounded in the MPA research.</p>
               </div>
-              <img class="w-1/3 rounded-lg hidden md:block" src="/assets/piano-lab-pro-scoring.svg" alt="Self-scoring interface">
+              <img class="w-1/3 rounded-lg hidden md:block" src="/assets/plp-unity-editor.gif" alt="Britton Recital Hall scene in the Unity editor">
             </div>
           </div>
         </div>
@@ -254,15 +276,22 @@
             <p class="text-sm text-on-surface-variant leading-relaxed">42 audience members filmed on green screen on the XR Stage — 2.7 TB of footage — to populate virtual seats with real human motion.</p>
           </div>
         </div>
-        <div class="bg-surface-container-low p-8 rounded-xl flex gap-5 items-start">
-          <span class="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">piano</span>
-          <div>
-            <h4 class="font-bold text-on-surface mb-2">Piano mesh optimization</h4>
-            <p class="text-sm text-on-surface-variant leading-relaxed">The grand piano mesh required reduction from 125,000 polygons to ~15,000 to hit acceptable performance on the headset.</p>
+        <div class="bg-surface-container-low rounded-xl overflow-hidden">
+          <img class="w-full" src="/assets/plp-piano-mesh.png" alt="Grand piano mesh in Blender showing high-poly and optimized low-poly versions side by side">
+          <div class="p-8 flex gap-5 items-start">
+            <span class="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">piano</span>
+            <div>
+              <h4 class="font-bold text-on-surface mb-2">Piano mesh optimization</h4>
+              <p class="text-sm text-on-surface-variant leading-relaxed">The grand piano mesh required reduction from 125,000 polygons to ~15,000 to hit acceptable performance on the headset. The high-poly scan (left) and the optimized production mesh (right).</p>
+            </div>
           </div>
         </div>
       </div>
-      <p class="mt-8 text-on-surface-variant italic text-sm">Scheduling access across two auditoriums, a green screen stage, and SMTD piano classrooms — coordinating faculty, facilities, and the XR team across a semester — was a stakeholder management problem that sat on my plate.</p>
+      <div class="mt-8 rounded-xl overflow-hidden shadow-sm">
+        <img class="w-full" src="/assets/plp-photogrammetry.png" alt="Photogrammetry software interface showing the piano capture point cloud">
+      </div>
+      <p class="mt-3 text-sm text-on-surface-variant italic">Photogrammetry capture software processing the piano scan. 6,000+ photos, 4,200 aligned.</p>
+      <p class="mt-6 text-on-surface-variant italic text-sm">Scheduling access across two auditoriums, a green screen stage, and SMTD piano classrooms — coordinating faculty, facilities, and the XR team across a semester — was a stakeholder management problem that sat on my plate.</p>
     </section>
 
     <!-- Product Decisions -->
@@ -315,11 +344,14 @@
               <p class="text-sm text-on-surface-variant">U-M Institute for Social Research</p>
             </div>
           </div>
-          <div class="p-6 bg-surface-container-lowest rounded-xl flex items-center gap-5">
-            <span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
-            <div>
-              <p class="font-semibold text-on-surface">Pilot testing conducted</p>
-              <p class="text-sm text-on-surface-variant">Britton + Hill environments running</p>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/plp-usability-test.jpg" alt="Student wearing Apple Vision Pro headset during pilot testing session">
+            <div class="p-6 flex items-center gap-5">
+              <span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+              <div>
+                <p class="font-semibold text-on-surface">Pilot testing conducted</p>
+                <p class="text-sm text-on-surface-variant">Britton + Hill environments running</p>
+              </div>
             </div>
           </div>
           <div class="p-6 bg-surface-container-lowest rounded-xl flex items-center gap-5">
