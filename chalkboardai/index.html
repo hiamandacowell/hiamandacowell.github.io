@@ -181,10 +181,6 @@
           </div>
         </div>
       </div>
-      <div class="mt-12 rounded-xl overflow-hidden shadow-xl bg-surface-container-lowest">
-        <img class="w-full" src="/assets/chalkboardai-proto-v1.gif" alt="First working prototype of ChalkboardAI: canvas with a calculus integral and the AI tutor responding in the chat panel">
-        <p class="text-sm text-on-surface-variant italic p-4">First working session. The canvas, the local model, and the integral that started it all.</p>
-      </div>
     </section>
 
     <!-- The Problem -->
@@ -370,6 +366,12 @@
           <p class="text-on-tertiary/80 leading-relaxed text-sm mb-4">Relying on better prompting alone. The arithmetic failures weren't hallucination in the usual sense — they were the model not having a reliable computation mechanism. Prompting couldn't fix that.</p>
           <p class="text-xs font-bold text-on-tertiary/50 uppercase tracking-widest mb-1">What I landed on</p>
           <p class="text-on-tertiary/80 leading-relaxed text-sm">Connected the model to a math solver for computation, so the LLM handles reasoning and explanation while verified tool calls handle the arithmetic. The model went from three wrong answers on one problem to consistent accuracy on the same class of questions.</p>
+        </div>
+        <div class="mt-8 flex flex-col items-center gap-3">
+          <div class="max-w-xs rounded-xl overflow-hidden shadow-lg opacity-90">
+            <img src="/assets/chalkboardai-proto-v1.gif" alt="First working session: ChalkboardAI canvas with the math solver connected" class="w-full">
+          </div>
+          <p class="text-xs text-on-tertiary/50 italic text-center max-w-xs">First working session, after connecting the solver. The canvas, the local model, and the math that held up.</p>
         </div>
       </div>
     </section>
