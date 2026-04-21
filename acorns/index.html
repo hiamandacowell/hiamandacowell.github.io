@@ -93,9 +93,13 @@
           <h1 class="font-headline text-6xl md:text-8xl font-bold text-primary tracking-tighter leading-none mb-8">
             Acorns of Wisdom
           </h1>
-          <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed">
+          <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed mb-8">
             A web app for running anonymous team health checks — built for my own team, deployed, and still in use.
           </p>
+          <a href="https://team-health-check-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+            Try the app
+            <span class="material-symbols-outlined text-base">open_in_new</span>
+          </a>
         </div>
         <div class="lg:col-span-4 flex flex-col gap-4">
           <div class="p-6 bg-surface-container-low rounded-xl">
@@ -199,73 +203,83 @@
       <div class="mb-12 border-t border-outline-variant/40 pt-12">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">How it works</span>
         <h3 class="font-headline text-3xl font-bold text-primary mb-4">A session in three steps</h3>
-        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">The facilitator sets up a session and shares a passcode with the team. Everyone joins, rates each prompt anonymously, and then reviews results together. From start to action items: about 30 minutes.</p>
+        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">The facilitator sets up a session and shares a passcode with the team. Everyone joins from their own device, rates each prompt anonymously, and then the group reviews results together and captures action items — all in one tab, no accounts required.</p>
       </div>
 
       <!-- Overview -->
-      <div class="p-2 bg-surface-container-high rounded-xl mb-2">
-        <div class="aspect-[16/9] overflow-hidden rounded-xl">
-          <img class="w-full h-full object-cover object-top" src="/assets/acorns-ratings.jpg" alt="The main dashboard showing team ratings, vote tallies, and action items">
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16 shadow-sm">
+        <img class="w-full" src="/assets/acorns-ratings.jpg" alt="The main results dashboard showing 9 rating cards, acorn vote icons, anonymous identity, and action items panel">
+        <div class="p-8">
+          <h4 class="font-headline text-xl font-bold text-primary mb-2">The results dashboard</h4>
+          <p class="text-on-surface-variant leading-relaxed text-sm">Every prompt gets its own card showing the distribution of votes, visualized as acorn icons colored from red (low) to green (high). The current user's votes are highlighted in yellow so they can see how their ratings compare to the group's. Action items live in the same sidebar — so the team leaves with follow-ups, not just data.</p>
         </div>
       </div>
-      <p class="text-sm text-on-surface-variant mb-16 px-1">The main view: every team member's ratings aggregated, anonymously, with action items alongside.</p>
 
       <!-- Step 1 -->
-      <div class="mb-4">
+      <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 1</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1 mb-4">Set the agenda</h3>
+        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Set the agenda</h3>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-themes.jpg" alt="Default health check prompts">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">Built-in categories</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams — autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting. No setup required if the defaults fit.</p>
           </div>
         </div>
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-customquestion.jpg" alt="Adding a custom question">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">Custom questions</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults. Useful when a specific team issue needs airtime — a restructure, a new process, or anything the built-in set doesn't cover.</p>
           </div>
         </div>
       </div>
-      <p class="text-sm text-on-surface-variant mb-16 px-1">Teams choose from built-in health check prompts or write their own. Custom questions let facilitators tune the check-in to what the team actually needs to talk about.</p>
 
       <!-- Step 2 -->
-      <div class="mb-4">
+      <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 2</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1 mb-4">Rate anonymously</h3>
+        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Rate anonymously</h3>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-anonymousname.jpg" alt="Choosing an anonymous display name">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">You are: Mauve Penguin</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Each participant is assigned a random animal name on join — no accounts, no real names. The identity is consistent within the session so the chat makes sense, but nothing traces back to the individual.</p>
           </div>
         </div>
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-ratingscale.jpg" alt="The rating scale for a single prompt">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">Five-point acorn scale</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating — useful context that would never surface in a meeting.</p>
           </div>
         </div>
       </div>
-      <p class="text-sm text-on-surface-variant mb-16 px-1">Each participant picks a display name — no real names — then rates every prompt on a scale. Anonymity is the point: people say what they actually think.</p>
 
       <!-- Step 3 -->
-      <div class="mb-4">
+      <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 3</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1 mb-4">Discuss and act</h3>
+        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Review and act</h3>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-actions.jpg" alt="Opening a card to see team responses">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">Open any card</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Clicking a rating card expands it to show every individual vote — who rated what, without names — plus all anonymous comments. Gives the team something concrete to discuss rather than just an average.</p>
           </div>
         </div>
-        <div class="p-2 bg-surface-container-high rounded-xl">
-          <div class="aspect-[4/3] overflow-hidden rounded-xl">
-            <img class="w-full h-full object-cover object-top" src="/assets/acorns-chat.jpg" alt="Team chat alongside the ratings">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <img class="w-full" src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal">
+          <div class="p-8">
+            <h4 class="font-headline text-xl font-bold text-primary mb-2">Chat in character</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">A real-time anonymous chat runs alongside the results. Participants talk as their animal selves — Cobalt Narwhal replies to Mauve Penguin — so the conversation stays honest even when the topic is uncomfortable.</p>
           </div>
         </div>
       </div>
-      <p class="text-sm text-on-surface-variant mb-4 px-1">Once everyone has rated, the team reviews results together. Cards expand to show the distribution of responses; built-in chat keeps the conversation in context; action items get captured before the tab closes.</p>
     </section>
 
     <!-- What I Learned -->
