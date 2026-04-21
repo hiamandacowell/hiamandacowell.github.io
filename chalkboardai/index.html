@@ -314,7 +314,7 @@
             <h3 class="font-headline text-xl font-bold text-on-surface">Inline chat artifacts over a duplicated help zone</h3>
           </div>
           <div class="mb-6">
-            <img class="rounded-xl w-full max-w-lg" src="/assets/chalkboardai-figma-restructure.png" alt="Figma wireframe showing the earlier layout with a separate AI help canvas on the left sidebar">
+            <img class="rounded-xl w-full" src="/assets/chalkboardai-figma-restructure.png" alt="Figma wireframe showing the earlier layout with a separate AI help canvas on the left sidebar">
             <p class="text-xs text-on-surface-variant italic mt-2">The earlier layout: AI-generated items appear in a separate left panel alongside the chat.</p>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -391,11 +391,12 @@
             <span class="text-xs font-bold text-secondary uppercase tracking-widest flex-shrink-0">05</span>
             <h3 class="font-headline text-xl font-bold text-on-surface">Routing math computation through a verified solver</h3>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 max-w-xl">
-            <img class="rounded-xl w-full" src="/assets/chalkboardai-llm-before-2.jpg" alt="Early LLM chat: model confidently gives wrong answer of 7 for a limit, then recalculates to 3">
-            <img class="rounded-xl w-full" src="/assets/chalkboardai-llm-before-1.jpg" alt="Early LLM chat: model revises again to -8, student asks why it got it wrong, model apologizes">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+            <img class="rounded-xl w-full h-full object-cover" src="/assets/chalkboardai-llm-before-2.jpg" alt="Early LLM chat: model confidently gives wrong answer of 7 for a limit, then recalculates to 3">
+            <img class="rounded-xl w-full h-full object-cover" src="/assets/chalkboardai-llm-before-1.jpg" alt="Early LLM chat: model revises again to -8, student asks why it got it wrong, model apologizes">
+            <img class="rounded-xl w-full h-full object-cover" src="/assets/chalkboardai-proto-v1.gif" alt="First working session: ChalkboardAI canvas with the math solver connected">
           </div>
-          <p class="text-xs text-on-surface-variant italic mb-6">Three different wrong answers in one session. The correct answer is 2.</p>
+          <p class="text-xs text-on-surface-variant italic mb-6">Three different wrong answers in one session (correct answer: 2), and the first working session after connecting the solver.</p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">The problem</p>
@@ -409,12 +410,6 @@
               <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-2">What I landed on</p>
               <p class="text-on-surface-variant text-sm leading-relaxed">Connected the model to a math solver for computation, so the LLM handles reasoning and explanation while verified tool calls handle the arithmetic. The model went from three wrong answers on one problem to consistent accuracy on the same class of questions.</p>
             </div>
-          </div>
-          <div class="mt-8 flex flex-col items-center gap-3">
-            <div class="max-w-xs rounded-xl overflow-hidden shadow-md">
-              <img src="/assets/chalkboardai-proto-v1.gif" alt="First working session: ChalkboardAI canvas with the math solver connected" class="w-full">
-            </div>
-            <p class="text-xs text-on-surface-variant italic text-center max-w-xs">First working session, after connecting the solver. The canvas, the local model, and the math that held up.</p>
           </div>
         </div>
 
