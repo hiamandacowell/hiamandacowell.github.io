@@ -239,45 +239,22 @@
       <p class="text-on-surface-variant text-xl mb-6 italic">Student-facing v1. End-to-end, running against a synthetic curriculum. Actively iterating.</p>
 
       <div class="space-y-24 mt-12">
-        <!-- Canvas -->
-        <div class="flex flex-col md:flex-row gap-16 items-center">
-          <div class="w-full md:w-1/2">
-            <div class="p-2 bg-surface-container-high rounded-xl shadow-sm">
-              <img class="rounded-xl w-full" src="/assets/chalkboardai-canvas.svg" alt="Infinite canvas with math notation">
-            </div>
-          </div>
-          <div class="w-full md:w-1/2">
+        <!-- Canvas, Intelligence, Voice as feature grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-surface-container-low rounded-xl p-8">
             <span class="text-xs font-bold text-tertiary uppercase tracking-widest mb-4 block">Canvas</span>
-            <h3 class="font-headline text-3xl font-bold mb-6">Infinite spatial canvas</h3>
-            <p class="text-lg text-on-surface-variant leading-relaxed">Pen, eraser, shapes, text, laser tool, image paste, pan and pinch-zoom, undo/redo that covers math objects, and a pinned pen library with auto light/dark color pairing. Students work spatially, not linearly.</p>
+            <h3 class="font-headline text-xl font-bold mb-4">Infinite spatial canvas</h3>
+            <p class="text-on-surface-variant leading-relaxed">Pen, eraser, shapes, text, laser tool, image paste, pan and pinch-zoom, undo/redo that covers math objects, and a pinned pen library with auto light/dark color pairing. Students work spatially, not linearly.</p>
           </div>
-        </div>
-
-        <!-- Chat + citations -->
-        <div class="flex flex-col md:flex-row-reverse gap-16 items-center">
-          <div class="w-full md:w-1/2">
-            <div class="p-2 bg-surface-container-high rounded-xl shadow-sm">
-              <img class="rounded-xl w-full" src="/assets/chalkboardai-chat.svg" alt="Chat panel with lecture citations">
-            </div>
-          </div>
-          <div class="w-full md:w-1/2">
+          <div class="bg-surface-container-low rounded-xl p-8">
             <span class="text-xs font-bold text-tertiary uppercase tracking-widest mb-4 block">Intelligence</span>
-            <h3 class="font-headline text-3xl font-bold mb-6">Contextual grounding</h3>
-            <p class="text-lg text-on-surface-variant leading-relaxed">A vision-capable local model reads the student's board each turn and answers in context. Every response carries a citation badge back to the specific lecture it's grounded in, pulled from a local vector store with active-lecture retrieval boosting. Chat sessions are scoped per course and lecture, with rolling summarization so long sessions don't lose earlier work.</p>
+            <h3 class="font-headline text-xl font-bold mb-4">Contextual grounding</h3>
+            <p class="text-on-surface-variant leading-relaxed">A vision-capable local model reads the student's board each turn and answers in context. Every response carries a citation badge back to the specific lecture it's grounded in, pulled from a local vector store with active-lecture retrieval boosting. Chat sessions are scoped per course and lecture, with rolling summarization so long sessions don't lose earlier work.</p>
           </div>
-        </div>
-
-        <!-- Voice -->
-        <div class="flex flex-col md:flex-row gap-16 items-center">
-          <div class="w-full md:w-1/2">
-            <div class="p-2 bg-surface-container-high rounded-xl shadow-sm">
-              <img class="rounded-xl w-full" src="/assets/chalkboardai-voice.svg" alt="Voice input and output controls">
-            </div>
-          </div>
-          <div class="w-full md:w-1/2">
+          <div class="bg-surface-container-low rounded-xl p-8">
             <span class="text-xs font-bold text-tertiary uppercase tracking-widest mb-4 block">Accessibility</span>
-            <h3 class="font-headline text-3xl font-bold mb-6">Local voice I/O</h3>
-            <p class="text-lg text-on-surface-variant leading-relaxed">Whisper.cpp for transcription from the browser, Kokoro TTS for spoken responses. Math is spoken via the same accessibility pipeline MathJax uses for screen readers (Speech Rule Engine with ClearSpeak). Accuracy disclaimer permanently visible; one-time-per-session acknowledgment modal before any AI interaction.</p>
+            <h3 class="font-headline text-xl font-bold mb-4">Local voice I/O</h3>
+            <p class="text-on-surface-variant leading-relaxed">Whisper.cpp for transcription from the browser, Kokoro TTS for spoken responses. Math is spoken via the same accessibility pipeline MathJax uses for screen readers (Speech Rule Engine with ClearSpeak). Accuracy disclaimer permanently visible; one-time-per-session acknowledgment modal before any AI interaction.</p>
           </div>
         </div>
 
