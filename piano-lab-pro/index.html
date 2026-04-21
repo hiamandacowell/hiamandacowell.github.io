@@ -89,7 +89,10 @@
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         <div class="lg:col-span-8">
-          <span class="inline-block px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-bold tracking-widest uppercase mb-6">Spatial Computing · EdTech</span>
+          <div class="flex items-center gap-4 mb-6">
+            <img src="/assets/plp-icon.png" alt="Piano Lab Pro app icon" class="w-16 h-16">
+            <span class="inline-block px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-bold tracking-widest uppercase">Spatial Computing · EdTech</span>
+          </div>
           <h1 class="font-headline text-6xl md:text-8xl font-bold text-primary tracking-tighter leading-none mb-8">
             Piano Lab Pro
           </h1>
@@ -164,6 +167,23 @@
         <img class="w-full" src="/assets/plp-team.jpg" alt="The cross-functional CAI XR team working session with Vision Pro headsets on the table">
       </div>
       <p class="text-sm text-on-surface-variant mt-3 px-1 italic">The cross-functional team during a working session. Apple Vision Pro headsets on the table; two team members actively testing while the rest iterate.</p>
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-8 bg-surface-container-low rounded-xl border-t-4 border-primary">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-3 block">Client</span>
+          <h4 class="font-headline font-bold text-lg text-primary mb-2">Faculty stakeholders</h4>
+          <p class="text-sm text-on-surface-variant leading-relaxed">Aya and Anıl brought deep pedagogical and technical expertise — and strong, sometimes competing, opinions about what the product should be. Managing their vision, building trust, and knowing when to push back was a continuous stakeholder challenge across two years.</p>
+        </div>
+        <div class="p-8 bg-surface-container-low rounded-xl border-t-4 border-secondary">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-3 block">Users</span>
+          <h4 class="font-headline font-bold text-lg text-primary mb-2">Piano students</h4>
+          <p class="text-sm text-on-surface-variant leading-relaxed">The people the product was actually built for. Their experience — surfaced through interviews, design jams, and multiple rounds of usability testing — often diverged from what faculty assumed they needed. Research findings, not assumptions, determined what got built.</p>
+        </div>
+        <div class="p-8 bg-surface-container-low rounded-xl border-t-4 border-tertiary">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-3 block">Business / institutional</span>
+          <h4 class="font-headline font-bold text-lg text-primary mb-2">CAI + U-M constraints</h4>
+          <p class="text-sm text-on-surface-variant leading-relaxed">Budget, facilities access windows, IRB approval timelines, a June 2026 MVP target, and a 15-person cross-functional team with competing priorities. The institutional context was always in scope alongside the product.</p>
+        </div>
+      </div>
     </section>
 
     <!-- Discovery -->
@@ -202,11 +222,11 @@
             </div>
           </div>
           <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-            <img class="w-full" src="/assets/plp-design-jam-new.jpg" alt="Design jam session: sticky notes mapping WHY students feel anxious before performances">
+            <img class="w-full" src="/assets/plp-design-jam.png" alt="Design jam: dot sticker exercise mapping where students feel most anxious by venue size and audience familiarity">
             <div class="p-8">
               <span class="material-symbols-outlined text-primary text-3xl mb-4 block">lightbulb</span>
               <h4 class="font-bold text-on-surface mb-2">Design jams</h4>
-              <p class="text-sm text-on-surface-variant leading-relaxed">Students mapped WHY they feel most anxious on a two-axis map (venue size × audience familiarity). The clustering — large venue, strangers — directly shaped the product's default scenario.</p>
+              <p class="text-sm text-on-surface-variant leading-relaxed">Students placed dot stickers on a two-axis map (venue size × audience familiarity) marking where they feel most anxious. The clustering — large venue, strangers — directly shaped the product's default scenario.</p>
             </div>
           </div>
         </div>
@@ -327,7 +347,7 @@
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div class="rounded-xl overflow-hidden shadow-sm bg-surface-container-lowest">
             <img class="w-full" src="/assets/plp-team-watching.jpg" alt="The whole team watching a participant try the app at the piano during a faculty headset test">
             <p class="text-sm text-on-surface-variant italic p-4">Early faculty headset tests — the team crowded around to observe in real time.</p>
@@ -335,10 +355,6 @@
           <div class="rounded-xl overflow-hidden shadow-sm bg-surface-container-lowest">
             <img class="w-full" src="/assets/plp-usability-test-piano.jpg" alt="Student participant wearing Apple Vision Pro at the piano during a formal usability test session">
             <p class="text-sm text-on-surface-variant italic p-4">December 2025 usability testing — participant at the piano, headset on, running through the full flow.</p>
-          </div>
-          <div class="rounded-xl overflow-hidden shadow-sm bg-surface-container-lowest">
-            <img class="w-full" src="/assets/plp-usability-test-behind.jpg" alt="Female participant at the piano seen from behind during a usability test">
-            <p class="text-sm text-on-surface-variant italic p-4">View from behind — the participant's physical relationship to the piano is real; everything else is virtual.</p>
           </div>
         </div>
         <div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm mb-8">
@@ -353,7 +369,8 @@
 
     <!-- Product Decisions -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
-      <h2 class="font-headline text-4xl font-bold text-primary mb-12 tracking-tight">Product decisions worth calling out</h2>
+      <h2 class="font-headline text-4xl font-bold text-primary mb-4 tracking-tight">Product decisions worth calling out</h2>
+      <p class="text-on-surface-variant max-w-2xl mb-12 text-lg">Every decision below involved a three-way tension: what the faculty clients wanted, what student users actually needed, and what the team could realistically build. These are the moments where the PM role was most visible.</p>
       <div class="grid md:grid-cols-3 gap-8">
         <div class="space-y-4">
           <div class="w-12 h-12 bg-primary-fixed flex items-center justify-center rounded-full">
@@ -398,6 +415,16 @@
           </div>
         </div>
         <div class="flex flex-col gap-4">
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+            <img class="w-full" src="/assets/plp-student-guide.png" alt="Piano Lab Pro Student Guide — a Google Site with preparation content deployed to students">
+            <div class="p-5 flex items-start gap-4">
+              <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 mt-0.5">check_circle</span>
+              <div>
+                <p class="font-semibold text-on-surface">Student guide live</p>
+                <p class="text-sm text-on-surface-variant">Deployed as a standalone Google Site — covers MPA, preparation strategies, and how to use the app. Already in students' hands.</p>
+              </div>
+            </div>
+          </div>
           <div class="p-6 bg-surface-container-lowest rounded-xl flex items-center gap-5">
             <span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
             <div>
@@ -438,12 +465,16 @@
           <h2 class="font-headline text-4xl md:text-5xl font-bold text-on-primary tracking-tight mb-8">What I learned</h2>
           <div class="space-y-8">
             <div>
-              <h5 class="text-secondary-fixed-dim font-bold mb-2 uppercase text-xs tracking-widest">Holding the line on scope</h5>
-              <p class="text-lg text-primary-fixed leading-relaxed">Scoping three competing faculty concepts down to one differentiated value proposition is a PM decision that looks like a writing exercise until you've tried it with real faculty who have real enthusiasm for their own ideas. Holding that line matters.</p>
+              <h5 class="text-secondary-fixed-dim font-bold mb-2 uppercase text-xs tracking-widest">Holding the line on scope — with real clients</h5>
+              <p class="text-lg text-primary-fixed leading-relaxed">Scoping three competing faculty concepts down to one differentiated value proposition is a PM decision that looks like a writing exercise until you've tried it with real clients who have real enthusiasm for their own ideas. Holding that line while keeping the relationship intact — that's the job.</p>
+            </div>
+            <div>
+              <h5 class="text-secondary-fixed-dim font-bold mb-2 uppercase text-xs tracking-widest">User behavior beats client intuition</h5>
+              <p class="text-lg text-primary-fixed leading-relaxed">Faculty intuition about what students needed was wrong often enough that it mattered. The testing section of this project isn't a formality — it's the evidence trail for why specific product decisions went one way and not another. A PM who can say "the data says no" to a client and back it up is worth something different than one who can't.</p>
             </div>
             <div>
               <h5 class="text-secondary-fixed-dim font-bold mb-2 uppercase text-xs tracking-widest">Reading what the team can't do</h5>
-              <p class="text-lg text-primary-fixed leading-relaxed">A PM who shows up to a biometric research conversation having already identified the gap and already found the right people is doing something different than one who waits to be told what the product needs. The ISR partnership happened because I read what the team couldn't do, not because someone handed me a research spec.</p>
+              <p class="text-lg text-primary-fixed leading-relaxed">A PM who identifies a capability gap before it becomes a credibility problem — and goes and finds the right people to fill it — is doing something different than one who waits. The ISR partnership happened because I read what the team couldn't do, not because someone handed me a spec.</p>
             </div>
           </div>
         </div>
@@ -452,7 +483,10 @@
             <p class="text-primary-fixed text-lg italic leading-relaxed">"A single differentiated thesis is more buildable, more evaluable, and more honest with stakeholders than a product trying to be everything."</p>
           </div>
           <div class="p-8 bg-white/10 rounded-xl border border-white/10">
-            <p class="text-primary-fixed text-lg italic leading-relaxed">"The ISR partnership happened because I read what the team couldn't do, not because someone handed me a research spec."</p>
+            <p class="text-primary-fixed text-lg italic leading-relaxed">"When testing and client intuition conflicted, testing won. That sentence is easy to say and hard to hold in a room with faculty who built their careers on their intuition."</p>
+          </div>
+          <div class="p-8 bg-white/10 rounded-xl border border-white/10">
+            <p class="text-primary-fixed text-lg italic leading-relaxed">"The ISR partnership happened because I read what the team couldn't do, not because someone handed me a spec."</p>
           </div>
         </div>
       </div>
