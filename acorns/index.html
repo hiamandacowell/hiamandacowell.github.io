@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Epilogue:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script>
@@ -16,68 +16,70 @@
       theme: {
         extend: {
           colors: {
-            "surface-container-high": "#e4e9ec",
+            "surface-container-high": "#D8D3CB",
             "primary-fixed": "#b9ebf2",
-            "on-surface": "#171c1f",
+            "on-surface": "#1C1714",
             "on-secondary-fixed-variant": "#384b3c",
-            "outline-variant": "#c0c8c9",
+            "outline-variant": "#C5BFBA",
             "on-secondary-container": "#546757",
-            "surface-container-low": "#f0f4f8",
+            "surface-container-low": "#EDE9E2",
             "on-secondary-fixed": "#0d1f12",
             "primary": "#26585d",
-            "surface-container": "#eaeef2",
+            "surface-container": "#E3DFD7",
             "on-primary-container": "#c0f2f8",
             "on-primary": "#ffffff",
             "secondary": "#4f6353",
             "primary-container": "#407076",
-            "surface": "#f6fafe",
+            "surface": "#FAF7F2",
             "primary-fixed-dim": "#9ecfd5",
             "on-tertiary": "#ffffff",
             "secondary-fixed": "#d2e8d3",
-            "surface-container-highest": "#dfe3e7",
+            "surface-container-highest": "#CEC9C0",
             "secondary-container": "#cfe5d0",
             "on-primary-fixed": "#001f23",
             "secondary-fixed-dim": "#b6ccb8",
-            "on-surface-variant": "#404849",
+            "on-surface-variant": "#4A4440",
             "tertiary": "#554d65",
             "on-secondary": "#ffffff",
             "tertiary-container": "#6d657e",
             "on-primary-fixed-variant": "#1a4e53",
             "inverse-primary": "#9ecfd5",
-            "surface-container-lowest": "#ffffff",
-            "outline": "#70797a",
-            "surface-dim": "#d6dbde"
+            "surface-container-lowest": "#F4F1EC",
+            "outline": "#7A7470",
+            "surface-dim": "#D0CBC4",
+            "accent": "#B05C1A"
           },
           borderRadius: {
             "DEFAULT": "0.125rem",
             "lg": "0.25rem",
             "xl": "0.5rem",
-            "full": "0.75rem"
+            "full": "9999px"
           },
           fontFamily: {
             "headline": ["Fraunces", "Georgia", "serif"],
-            "body": ["Epilogue", "system-ui", "sans-serif"],
-            "label": ["Epilogue", "system-ui", "sans-serif"]
+            "body": ["Inter", "system-ui", "sans-serif"],
+            "label": ["Inter", "system-ui", "sans-serif"]
           }
         }
       }
     }
   </script>
   <style>
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body { font-family: 'Epilogue', system-ui, sans-serif; }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
 
   <!-- Nav -->
-  <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/50 shadow-sm">
+  <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/" class="text-xl font-bold font-headline text-primary tracking-tight">Amanda Cowell</a>
-      <div class="hidden md:flex items-center gap-8">
-        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors text-sm tracking-wide">Home</a>
-        <a href="/#projects" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm tracking-wide">Projects</a>
-        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="bg-primary text-on-primary px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">Contact</a>
+      <a href="/" class="font-headline text-xl font-semibold text-primary tracking-tight">Amanda L. Cowell</a>
+      <div class="hidden md:flex items-center gap-3 text-sm">
+        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors">Home</a>
+        <span class="text-outline">/</span>
+        <span class="text-on-surface font-medium">Acorns of Wisdom</span>
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="ml-5 bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">LinkedIn</a>
       </div>
       <span class="md:hidden material-symbols-outlined text-primary cursor-pointer">menu</span>
     </div>
@@ -89,14 +91,13 @@
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         <div class="lg:col-span-8">
-          <span class="inline-block px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-bold tracking-widest uppercase mb-6">Case Study</span>
-          <h1 class="font-headline text-6xl md:text-8xl font-bold text-primary tracking-tighter leading-none mb-8">
+          <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-8">
             Acorns of Wisdom
           </h1>
           <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed mb-8">
             A web app for running anonymous team health checks, built for my own team, deployed, and still in use.
           </p>
-          <a href="https://team-health-check-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+          <a href="https://team-health-check-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
             Try the app
             <span class="material-symbols-outlined text-base">open_in_new</span>
           </a>
@@ -124,31 +125,19 @@
       </div>
       <!-- Hero image -->
       <div class="mt-16 rounded-xl overflow-hidden aspect-video shadow-2xl">
-        <img class="w-full h-full object-cover" src="/assets/acorns-hero.gif" alt="Acorns of Wisdom dashboard with team ratings">
+        <img class="w-full h-full object-cover" src="/assets/acorns-hero.gif" alt="Acorns of Wisdom dashboard showing team health check ratings with acorn icons and anonymous animal identities">
       </div>
     </header>
 
     <!-- The Problem -->
     <section class="bg-surface-container-low py-24 mb-24 overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-          <div class="relative">
-            <div class="absolute -top-8 -left-4 text-[12rem] font-bold font-headline text-surface-container-high leading-none z-0 select-none">01</div>
-            <div class="relative z-10 pt-8">
-              <h2 class="font-headline text-4xl font-bold text-primary mb-8 tracking-tight">The problem</h2>
-              <p class="text-lg leading-relaxed text-on-surface-variant mb-6">A team health check is a structured check-in where people rate dimensions of how the team is working: things like psychological safety, clarity of direction, or whether meetings feel useful. Unlike a retrospective, which focuses on a sprint, a health check surfaces broader patterns: are people aligned? Do they feel safe raising concerns?</p>
-              <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to run these. Generic survey tools didn't fit our cadence and felt like homework. I wanted something low-ceremony, anonymous by default, and designed to end with action items, not just data.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mt-8 md:mt-16">
-            <div class="bg-surface-container-lowest p-8 rounded-xl space-y-4">
-              <span class="material-symbols-outlined text-tertiary text-3xl">visibility_off</span>
-              <p class="text-sm font-semibold text-outline uppercase tracking-wider">Concerns stay unsurfaced</p>
-            </div>
-            <div class="bg-surface-container-lowest p-8 rounded-xl space-y-4 mt-8">
-              <span class="material-symbols-outlined text-secondary text-3xl">chat_bubble_outline</span>
-              <p class="text-sm font-semibold text-outline uppercase tracking-wider">Generic surveys don't fit</p>
-            </div>
+        <div class="max-w-3xl relative">
+          <div class="absolute -top-8 -left-4 text-[12rem] font-bold font-headline text-surface-container-high leading-none z-0 select-none">01</div>
+          <div class="relative z-10 pt-8">
+            <h2 class="font-headline text-4xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
+            <p class="text-lg leading-relaxed text-on-surface-variant mb-6">A team health check is a structured check-in where people rate dimensions of how the team is working: things like psychological safety, clarity of direction, or whether meetings feel useful. Unlike a retrospective, which focuses on a sprint, a health check surfaces broader patterns: are people aligned? Do they feel safe raising concerns?</p>
+            <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to run these. Generic survey tools didn't fit our cadence and felt like homework. I wanted something low-ceremony, anonymous by default, and designed to end with action items, not just data.</p>
           </div>
         </div>
       </div>
@@ -156,61 +145,23 @@
 
     <!-- What I Built -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
-      <div class="mb-16">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">The solution</span>
-        <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tight">What I built</h2>
+      <div class="mb-12">
+        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-primary tracking-tight">What I built</h2>
         <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">Acorns of Wisdom is a facilitated session tool. A facilitator sets up a session with health check prompts, team members rate each one anonymously, and the group reviews results together and captures action items, all in the same browser tab, without accounts or survey software.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-        <!-- Anonymous Ratings -->
-        <div class="bg-surface-container-lowest p-10 rounded-xl transition-all hover:bg-surface-container relative group">
-          <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span class="material-symbols-outlined text-8xl">shield_person</span>
-          </div>
-          <h4 class="font-headline text-2xl font-bold text-primary mb-4">Anonymous ratings</h4>
-          <p class="text-on-surface-variant leading-relaxed">Multi-user anonymous ratings so people can rate dimensions of team health honestly.</p>
-        </div>
-        <!-- Passcode Protection -->
-        <div class="bg-primary-container p-10 rounded-xl text-on-primary-container relative">
-          <h4 class="font-headline text-2xl font-bold mb-4">Passcode protection</h4>
-          <p class="leading-relaxed opacity-90">Passcode protection so only the team sees its own results. Team dynamics stay within the circle of trust.</p>
-          <div class="mt-8 flex gap-2">
-            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
-            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
-            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
-            <div class="w-10 h-10 rounded bg-white/20 flex items-center justify-center font-bold text-lg">•</div>
-          </div>
-        </div>
-        <!-- Action Items -->
-        <div class="bg-surface-container-lowest p-10 rounded-xl hover:bg-surface-container transition-all group">
-          <h4 class="font-headline text-2xl font-bold text-primary mb-4">Action item management</h4>
-          <p class="text-on-surface-variant leading-relaxed mb-8">Drag-and-drop action items that turn discussion into follow-ups.</p>
-          <div class="space-y-3">
-            <div class="bg-secondary-container p-3 rounded flex items-center gap-3">
-              <span class="material-symbols-outlined text-secondary text-sm">drag_indicator</span>
-              <span class="text-xs font-medium text-on-secondary-container">Improve sprint retro format</span>
-            </div>
-            <div class="bg-surface-container p-3 rounded flex items-center gap-3 opacity-50">
-              <span class="material-symbols-outlined text-outline text-sm">drag_indicator</span>
-              <span class="text-xs font-medium">Schedule 1:1 check-ins</span>
-            </div>
-          </div>
-        </div>
+        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">The central design commitment is anonymity. Multi-user anonymous ratings let people be honest about how the team is doing in a way that a meeting rarely allows.</p>
       </div>
 
       <!-- Screenshots: step-by-step walkthrough -->
       <div class="mb-12 border-t border-outline-variant/40 pt-12">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">How it works</span>
-        <h3 class="font-headline text-3xl font-bold text-primary mb-4">A session in three steps</h3>
+        <h3 class="font-headline text-3xl font-semibold text-primary mb-4">A session in three steps</h3>
         <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">The facilitator sets up a session and shares a passcode with the team. Everyone joins from their own device, rates each prompt anonymously, and then the group reviews results together and captures action items, all in one tab, no accounts required.</p>
       </div>
 
       <!-- Overview -->
-      <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16 shadow-sm">
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16">
         <img class="w-full" src="/assets/acorns-ratings.jpg" alt="The main results dashboard showing 9 rating cards, acorn vote icons, anonymous identity, and action items panel">
         <div class="p-8">
-          <h4 class="font-headline text-xl font-bold text-primary mb-2">The results dashboard</h4>
+          <h4 class="font-headline text-xl font-semibold text-primary mb-2">The results dashboard</h4>
           <p class="text-on-surface-variant leading-relaxed text-sm">Every prompt gets its own card showing the distribution of votes, visualized as acorn icons colored from red (low) to green (high). The current user's votes are highlighted in yellow so they can see how their ratings compare to the group's. Action items live in the same sidebar, so the team leaves with follow-ups, not just data.</p>
         </div>
       </div>
@@ -218,21 +169,21 @@
       <!-- Step 1 -->
       <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 1</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Set the agenda</h3>
+        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Set the agenda</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">Built-in categories</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams: autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting. No setup required if the defaults fit.</p>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Built-in categories</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams: autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting.</p>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">Custom questions</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults. Useful when a specific team issue needs airtime: a restructure, a new process, or anything the built-in set doesn't cover.</p>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Custom questions</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults, for things the built-in set doesn't cover: a restructure, a new process, a specific friction point.</p>
           </div>
         </div>
       </div>
@@ -240,21 +191,21 @@
       <!-- Step 2 -->
       <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 2</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Rate anonymously</h3>
+        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Rate anonymously</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">You are: Mauve Penguin</h4>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">You are: Mauve Penguin</h4>
             <p class="text-on-surface-variant leading-relaxed text-sm">Each participant is assigned a random animal name on join. No accounts, no real names. The identity is consistent within the session so the chat makes sense, but nothing traces back to the individual.</p>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">Five-point acorn scale</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating, useful context that would never surface in a meeting.</p>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Five-point acorn scale</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating.</p>
           </div>
         </div>
       </div>
@@ -262,20 +213,20 @@
       <!-- Step 3 -->
       <div class="mb-6">
         <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 3</span>
-        <h3 class="font-headline text-2xl font-bold text-primary mt-1">Review and act</h3>
+        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Review and act</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">Open any card</h4>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Open any card</h4>
             <p class="text-on-surface-variant leading-relaxed text-sm">Clicking a rating card expands it to show every individual vote (who rated what, without names) plus all anonymous comments. Gives the team something concrete to discuss rather than just an average.</p>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
           <img class="w-full" src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-bold text-primary mb-2">Chat in character</h4>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Chat in character</h4>
             <p class="text-on-surface-variant leading-relaxed text-sm">A real-time anonymous chat runs alongside the results. Participants talk as their animal selves. Cobalt Narwhal replies to Mauve Penguin, so the conversation stays honest even when the topic is uncomfortable.</p>
           </div>
         </div>
@@ -284,22 +235,36 @@
 
     <!-- What I Learned -->
     <section class="bg-primary py-24 px-6">
-      <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-24 items-start">
-        <div class="lg:w-1/2">
-          <span class="text-secondary-fixed-dim font-bold uppercase text-xs tracking-widest mb-4 block">Takeaway</span>
-          <h2 class="font-headline text-4xl md:text-5xl font-bold text-on-primary tracking-tight mb-8">What I learned</h2>
-          <p class="text-lg text-primary-fixed leading-relaxed">The real byproduct of building this wasn't the tool itself. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's prototypable quickly and what isn't, and that changes how I scope and validate ideas with engineering teams in my day job. A PM who has built something under constraint talks differently to engineering teams than one who hasn't.</p>
-        </div>
-        <div class="lg:w-1/2 flex flex-col gap-6">
-          <div class="p-8 bg-white/10 rounded-xl border border-white/10">
-            <h4 class="font-bold text-primary-fixed mb-2">Prototype fluency changes how you scope</h4>
-            <p class="text-primary-fixed/80 text-sm leading-relaxed">Knowing what's fast to build vs. what isn't is hard to develop without building. This project gave me that.</p>
-          </div>
-          <div class="p-8 bg-white/10 rounded-xl border border-white/10">
-            <h4 class="font-bold text-primary-fixed mb-2">A PM who builds talks differently</h4>
-            <p class="text-primary-fixed/80 text-sm leading-relaxed">The conversations I have with engineering teams are different now. I can estimate, I can scope, I can say "that's actually a two-line change" with conviction.</p>
-          </div>
-        </div>
+      <div class="max-w-3xl mx-auto">
+        <span class="text-secondary-fixed-dim font-bold uppercase text-xs tracking-widest mb-4 block">Takeaway</span>
+        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-on-primary tracking-tight mb-8">What I learned</h2>
+        <p class="text-lg text-primary-fixed leading-relaxed">The real byproduct of building this wasn't the tool. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's fast to build and what isn't, and that changes how I scope and validate ideas with engineering teams. A PM who has built something under constraint talks differently to engineering teams than one who hasn't. The vocabulary is different. The estimates are different. The conversations are different.</p>
+      </div>
+    </section>
+
+    <!-- What this is and isn't -->
+    <section class="max-w-7xl mx-auto px-6 py-24">
+      <div class="bg-surface-container-low p-10 md:p-16 rounded-xl">
+        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">What this is and isn't</h2>
+        <p class="text-on-surface-variant mb-10 text-lg">Acorns is a real tool that a real team uses. It's also a small, opinionated thing. Here's what it isn't.</p>
+        <ul class="space-y-4 list-none">
+          <li class="flex items-start gap-3">
+            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
+            <p class="text-on-surface-variant leading-relaxed">Acorns is built for my team and teams like it. It hasn't been tested with teams larger than about a dozen.</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
+            <p class="text-on-surface-variant leading-relaxed">Passcode protection is lightweight, not security-grade. Anyone on the team with the passcode can see everything.</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
+            <p class="text-on-surface-variant leading-relaxed">Data lives in a single Firestore instance. This was the right call for my use case and would not be the right call at any kind of scale.</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
+            <p class="text-on-surface-variant leading-relaxed">There is no export, no analytics over time, and no integration with anything. On purpose, for now.</p>
+          </li>
+        </ul>
       </div>
     </section>
 
@@ -308,7 +273,8 @@
   <!-- Footer -->
   <footer class="bg-teal-900 w-full py-12">
     <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-      <a href="/#projects" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">← Projects</a>
+      <a href="/#projects" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; Selected Work</a>
+      <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
       <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
     </div>
   </footer>
