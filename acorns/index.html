@@ -67,10 +67,15 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99999; opacity: 0.015; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>"); background-size: 250px 250px; }
-    .salt-break { width: 100vw; margin-left: calc(50% - 50vw); margin-top: 5rem; margin-bottom: 5rem; }
-    .salt-break img { width: 100%; height: 45vh; object-fit: cover; object-position: center; display: block; }
-    @media (max-width: 640px) { .salt-break { margin-top: 3rem; margin-bottom: 3rem; } .salt-break img { height: 32vh; } }
+    .field-navy-top{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-navy-bottom{background:#2F3D63;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-navy-both{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-top{background:#B8796A;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-rose-bottom{background:#B8796A;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-both{background:#B8796A;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .section-num{font-family:'Fraunces',Georgia,serif;font-size:4.5rem;color:#26585d;font-weight:400;line-height:1;display:block;margin-bottom:.5rem}
+    .field-navy-top .section-num,.field-navy-bottom .section-num,.field-navy-both .section-num,.field-rose-top .section-num,.field-rose-bottom .section-num,.field-rose-both .section-num{color:#ECE8E1}
+    @media(max-width:768px){.field-navy-top,.field-navy-bottom,.field-navy-both,.field-rose-top,.field-rose-bottom,.field-rose-both{clip-path:none;margin-top:0;margin-bottom:0}}
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -134,127 +139,127 @@
     </header>
 
     <!-- The Problem -->
-    <section class="bg-surface-container-low py-24 mb-24 overflow-hidden">
+    <section class="bg-surface-container-low py-24 mb-24">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="max-w-3xl relative">
-          <div class="absolute -top-8 -left-4 text-[12rem] font-bold font-headline text-surface-container-high leading-none z-0 select-none">01</div>
-          <div class="relative z-10 pt-8">
-            <h2 class="font-headline text-4xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
-            <p class="text-lg leading-relaxed text-on-surface-variant mb-6"><span style="float:left; font-family:'Fraunces',Georgia,serif; font-size:4.75rem; line-height:0.78; margin-right:0.12em; margin-top:0.06em; font-weight:600; color:#B8796A;">A</span> team health check is a structured check-in where people rate dimensions of how the team is working: things like psychological safety, clarity of direction, or whether meetings feel useful. Unlike a retrospective, which focuses on a sprint, a health check surfaces broader patterns: are people aligned? Do they feel safe raising concerns?</p>
-            <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to run these. Generic survey tools didn't fit our cadence and felt like homework. I wanted something low-ceremony, anonymous by default, and designed to end with action items, not just data.</p>
-          </div>
+        <div class="max-w-3xl">
+          <span class="section-num">01</span>
+          <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
+          <p class="text-lg leading-relaxed text-on-surface-variant mb-6">A team health check is a structured check-in where people rate dimensions of how the team is working: things like psychological safety, clarity of direction, or whether meetings feel useful. Unlike a retrospective, which focuses on a sprint, a health check surfaces broader patterns: are people aligned? Do they feel safe raising concerns?</p>
+          <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to run these. Generic survey tools didn't fit our cadence and felt like homework. I wanted something low-ceremony, anonymous by default, and designed to end with action items, not just data.</p>
         </div>
       </div>
     </section>
 
     <!-- What I Built -->
-    <section class="max-w-7xl mx-auto px-6 mb-24">
-      <div class="mb-12">
-        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-primary tracking-tight">What I built</h2>
-        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">Acorns of Wisdom is a facilitated session tool. A facilitator sets up a session with health check prompts, team members rate each one anonymously, and the group reviews results together and captures action items, all in the same browser tab, without accounts or survey software.</p>
-        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">The central design commitment is anonymity. Multi-user anonymous ratings let people be honest about how the team is doing in a way that a meeting rarely allows.</p>
-      </div>
-
-      <!-- Salt photo break: salt-01 -->
-      <div class="salt-break">
-        <img src="/assets/salt/salt-01.jpg" alt="Aerial view of four salt evaporation ponds meeting at a crossroads, turquoise and pale green water divided by rust-colored berms" loading="lazy">
-      </div>
-
-      <!-- Screenshots: step-by-step walkthrough -->
-      <div class="mb-12 border-t border-outline-variant/40 pt-12">
-        <h3 class="font-headline text-3xl font-semibold text-primary mb-4">A session in three steps</h3>
-        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">The facilitator sets up a session and shares a passcode with the team. Everyone joins from their own device, rates each prompt anonymously, and then the group reviews results together and captures action items, all in one tab, no accounts required.</p>
-      </div>
-
-      <!-- Overview -->
-      <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16">
-        <img class="w-full" src="/assets/acorns-ratings.jpg" alt="The main results dashboard showing 9 rating cards, acorn vote icons, anonymous identity, and action items panel">
-        <div class="p-8">
-          <h4 class="font-headline text-xl font-semibold text-primary mb-2">The results dashboard</h4>
-          <p class="text-on-surface-variant leading-relaxed text-sm">Every prompt gets its own card showing the distribution of votes, visualized as acorn icons colored from red (low) to green (high). The current user's votes are highlighted in yellow so they can see how their ratings compare to the group's. Action items live in the same sidebar, so the team leaves with follow-ups, not just data.</p>
+    <section class="field-rose-bottom">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="mb-12">
+          <span class="section-num">02</span>
+          <h2 class="font-headline text-5xl md:text-6xl font-semibold tracking-tight">What I built</h2>
+          <p class="mt-4 max-w-2xl text-lg" style="opacity:0.85">Acorns of Wisdom is a facilitated session tool. A facilitator sets up a session with health check prompts, team members rate each one anonymously, and the group reviews results together and captures action items, all in the same browser tab, without accounts or survey software.</p>
+          <p class="mt-4 max-w-2xl text-lg" style="opacity:0.85">The central design commitment is anonymity. Multi-user anonymous ratings let people be honest about how the team is doing in a way that a meeting rarely allows.</p>
         </div>
-      </div>
 
-      <!-- Step 1 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 1</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Set the agenda</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks">
+        <!-- Screenshots: step-by-step walkthrough -->
+        <div class="mb-12 border-t border-white/20 pt-12">
+          <h3 class="font-headline text-3xl font-semibold mb-4">A session in three steps</h3>
+          <p class="max-w-2xl text-lg leading-relaxed" style="opacity:0.85">The facilitator sets up a session and shares a passcode with the team. Everyone joins from their own device, rates each prompt anonymously, and then the group reviews results together and captures action items, all in one tab, no accounts required.</p>
+        </div>
+
+        <!-- Overview -->
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16">
+          <img class="w-full" src="/assets/acorns-ratings.jpg" alt="The main results dashboard showing 9 rating cards, acorn vote icons, anonymous identity, and action items panel">
           <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Built-in categories</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams: autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting.</p>
+            <h4 class="font-headline text-xl font-semibold text-primary mb-2">The results dashboard</h4>
+            <p class="text-on-surface-variant leading-relaxed text-sm">Every prompt gets its own card showing the distribution of votes, visualized as acorn icons colored from red (low) to green (high). The current user's votes are highlighted in yellow so they can see how their ratings compare to the group's. Action items live in the same sidebar, so the team leaves with follow-ups, not just data.</p>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Custom questions</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults, for things the built-in set doesn't cover: a restructure, a new process, a specific friction point.</p>
-          </div>
-        </div>
-      </div>
 
-      <!-- Step 2 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 2</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Rate anonymously</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">You are: Mauve Penguin</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Each participant is assigned a random animal name on join. No accounts, no real names. The identity is consistent within the session so the chat makes sense, but nothing traces back to the individual.</p>
+        <!-- Step 1 -->
+        <div class="mb-6">
+          <span class="text-xs font-bold uppercase tracking-widest" style="opacity:0.7">Step 1</span>
+          <h3 class="font-headline text-2xl font-semibold mt-1">Set the agenda</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">Built-in categories</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams: autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting.</p>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">Custom questions</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults, for things the built-in set doesn't cover: a restructure, a new process, a specific friction point.</p>
+            </div>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Five-point acorn scale</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating.</p>
-          </div>
-        </div>
-      </div>
 
-      <!-- Step 3 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 3</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Review and act</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Open any card</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Clicking a rating card expands it to show every individual vote (who rated what, without names) plus all anonymous comments. Gives the team something concrete to discuss rather than just an average.</p>
+        <!-- Step 2 -->
+        <div class="mb-6">
+          <span class="text-xs font-bold uppercase tracking-widest" style="opacity:0.7">Step 2</span>
+          <h3 class="font-headline text-2xl font-semibold mt-1">Rate anonymously</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">You are: Mauve Penguin</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Each participant is assigned a random animal name on join. No accounts, no real names. The identity is consistent within the session so the chat makes sense, but nothing traces back to the individual.</p>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">Five-point acorn scale</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating.</p>
+            </div>
           </div>
         </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Chat in character</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">A real-time anonymous chat runs alongside the results. Participants talk as their animal selves. Cobalt Narwhal replies to Mauve Penguin, so the conversation stays honest even when the topic is uncomfortable.</p>
+
+        <!-- Step 3 -->
+        <div class="mb-6">
+          <span class="text-xs font-bold uppercase tracking-widest" style="opacity:0.7">Step 3</span>
+          <h3 class="font-headline text-2xl font-semibold mt-1">Review and act</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">Open any card</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">Clicking a rating card expands it to show every individual vote (who rated what, without names) plus all anonymous comments. Gives the team something concrete to discuss rather than just an average.</p>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+            <img class="w-full" src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal">
+            <div class="p-8">
+              <h4 class="font-headline text-xl font-semibold text-primary mb-2">Chat in character</h4>
+              <p class="text-on-surface-variant leading-relaxed text-sm">A real-time anonymous chat runs alongside the results. Participants talk as their animal selves. Cobalt Narwhal replies to Mauve Penguin, so the conversation stays honest even when the topic is uncomfortable.</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- What I Learned -->
-    <section class="bg-primary py-24 px-6">
-      <div class="max-w-3xl mx-auto">
-        <span class="text-secondary-fixed-dim font-bold uppercase text-xs tracking-widest mb-4 block">Takeaway</span>
-        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-on-primary tracking-tight mb-8">What I learned</h2>
-        <p class="text-lg text-primary-fixed leading-relaxed">The real byproduct of building this wasn't the tool. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's fast to build and what isn't, and that changes how I scope and validate ideas with engineering teams. A PM who has built something under constraint talks differently to engineering teams than one who hasn't. The vocabulary is different. The estimates are different. The conversations are different.</p>
+    <section class="field-navy-top">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-3xl">
+          <span class="text-xs font-bold uppercase tracking-widest mb-4 block" style="opacity:0.7">Takeaway</span>
+          <span class="section-num">03</span>
+          <h2 class="font-headline text-5xl md:text-6xl font-semibold tracking-tight mb-8">What I learned</h2>
+          <p class="text-lg leading-relaxed" style="opacity:0.9">The real byproduct of building this wasn't the tool. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's fast to build and what isn't, and that changes how I scope and validate ideas with engineering teams. A PM who has built something under constraint talks differently to engineering teams than one who hasn't. The vocabulary is different. The estimates are different. The conversations are different.</p>
+        </div>
       </div>
     </section>
 
     <!-- What this is and isn't -->
     <section class="max-w-7xl mx-auto px-6 py-24">
       <div class="bg-surface-container-low p-10 md:p-16 rounded-xl">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">What this is and isn't</h2>
+        <span class="section-num">04</span>
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-4 tracking-tight">What this is and isn't</h2>
         <p class="text-on-surface-variant mb-10 text-lg">Acorns is a real tool that a real team uses. It's also a small, opinionated thing. Here's what it isn't.</p>
         <ul class="space-y-4 list-none">
           <li class="flex items-start gap-3">

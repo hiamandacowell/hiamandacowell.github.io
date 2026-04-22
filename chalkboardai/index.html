@@ -67,10 +67,15 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99999; opacity: 0.015; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>"); background-size: 250px 250px; }
-    .salt-break { width: 100vw; margin-left: calc(50% - 50vw); margin-top: 5rem; margin-bottom: 5rem; }
-    .salt-break img { width: 100%; height: 45vh; object-fit: cover; object-position: center; display: block; }
-    @media (max-width: 640px) { .salt-break { margin-top: 3rem; margin-bottom: 3rem; } .salt-break img { height: 32vh; } }
+    .field-navy-top{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-navy-bottom{background:#2F3D63;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-navy-both{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-top{background:#B8796A;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-rose-bottom{background:#B8796A;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-both{background:#B8796A;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .section-num{font-family:'Fraunces',Georgia,serif;font-size:4.5rem;color:#26585d;font-weight:400;line-height:1;display:block;margin-bottom:.5rem}
+    .field-navy-top .section-num,.field-navy-bottom .section-num,.field-navy-both .section-num,.field-rose-top .section-num,.field-rose-bottom .section-num,.field-rose-both .section-num{color:#ECE8E1}
+    @media(max-width:768px){.field-navy-top,.field-navy-bottom,.field-navy-both,.field-rose-top,.field-rose-bottom,.field-rose-both{clip-path:none;margin-top:0;margin-bottom:0}}
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -152,7 +157,8 @@
     <!-- Why I built this -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
       <div class="max-w-3xl">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-6 tracking-tight">Why I built this</h2>
+        <span class="section-num">01</span>
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-6 tracking-tight">Why I built this</h2>
         <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
           <p>I've taught statistics and calculus to 500+ students at Washtenaw Community College over the years. AI tutors are already in my students' hands, and the ones they're using don't know what happened in our classroom. They fill gaps I didn't leave, and they miss the ones I did.</p>
           <p>I wanted to prototype the version that starts from the lecture itself. Five days was the constraint: enough to test the architectural thesis end-to-end, not enough to validate it with real users. Building solo was the point. I wanted to understand the full stack of decisions involved when no one else is making them. Work continues.</p>
@@ -165,7 +171,8 @@
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
           <div>
-            <h2 class="font-headline text-4xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
+            <span class="section-num">02</span>
+            <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
             <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
               <p>Generic AI tutors don't know how your instructor actually taught a topic. Notation, approach, example sequence, and vocabulary all vary between instructors, and those variations matter when students are trying to reinforce what they just learned.</p>
               <p>ChalkboardAI bridges this gap. An instructor uses it as a live lecture board. After class, it becomes each student's personal AI-assisted study tool, grounded in the specific lecture the student's instructor actually taught, with citations back to the source material.</p>
@@ -186,50 +193,49 @@
     </section>
 
     <!-- Why Local-First -->
-    <section class="max-w-7xl mx-auto px-6 mb-24">
-      <div class="mb-12">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">Why local-first</h2>
-        <p class="text-on-surface-variant max-w-xl text-lg">Privacy isn't a feature in education. It's the foundation.</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="md:col-span-2 bg-surface-container-low p-10 rounded-xl">
-          <h3 class="font-headline text-2xl font-semibold mb-4">FERPA &amp; FOIA compliance</h3>
-          <p class="text-on-surface-variant leading-relaxed text-lg">Every part of the AI stack runs locally on one Mac Studio. Inference via Ollama with <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">gemma3:27b</code>. Transcription via Whisper. Embeddings via <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">nomic-embed-text</code>. Text-to-speech via Kokoro. Student interactions with AI tutors are educational records under FERPA, and transcript logging and retrievability matter under FOIA. On-premise is the right architecture for real institutional deployment.</p>
+    <section class="field-navy-bottom">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="mb-12">
+          <span class="section-num">03</span>
+          <h2 class="font-headline text-5xl md:text-6xl font-semibold mb-4 tracking-tight">Why local-first</h2>
+          <p class="max-w-xl text-lg" style="opacity:0.85">Privacy isn't a feature in education. It's the foundation.</p>
         </div>
-        <div class="bg-surface-container-low p-10 rounded-xl flex flex-col justify-center">
-          <h4 class="font-headline text-3xl font-bold text-primary mb-3">$0 per-student cost</h4>
-          <p class="text-on-surface-variant leading-relaxed">Local inference zeroes out per-student API cost, which is what makes institutional deployment actually viable at scale.</p>
-        </div>
-        <div class="bg-surface-container-low p-10 rounded-xl">
-          <h3 class="font-headline text-xl font-semibold mb-2">Local RAG</h3>
-          <p class="text-on-surface-variant text-sm leading-relaxed">Vector embeddings run on the client. The AI grounds responses in the student's curriculum without leaking interaction history to any cloud service.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 bg-surface-container-low p-10 rounded-xl">
+            <h3 class="font-headline text-2xl font-semibold text-on-surface mb-4">FERPA &amp; FOIA compliance</h3>
+            <p class="text-on-surface-variant leading-relaxed text-lg">Every part of the AI stack runs locally on one Mac Studio. Inference via Ollama with <code class="text-sm bg-surface-container text-on-surface px-1.5 py-0.5 rounded font-mono">gemma3:27b</code>. Transcription via Whisper. Embeddings via <code class="text-sm bg-surface-container text-on-surface px-1.5 py-0.5 rounded font-mono">nomic-embed-text</code>. Text-to-speech via Kokoro. Student interactions with AI tutors are educational records under FERPA, and transcript logging and retrievability matter under FOIA. On-premise is the right architecture for real institutional deployment.</p>
+          </div>
+          <div class="bg-surface-container-low p-10 rounded-xl flex flex-col justify-center">
+            <h4 class="font-headline text-3xl font-bold text-primary mb-3">$0 per-student cost</h4>
+            <p class="text-on-surface-variant leading-relaxed">Local inference zeroes out per-student API cost, which is what makes institutional deployment actually viable at scale.</p>
+          </div>
+          <div class="bg-surface-container-low p-10 rounded-xl">
+            <h3 class="font-headline text-xl font-semibold text-on-surface mb-2">Local RAG</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed">Vector embeddings run on the client. The AI grounds responses in the student's curriculum without leaking interaction history to any cloud service.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Salt photo break: salt-13 -->
-    <div class="salt-break">
-      <img src="/assets/salt/salt-13.jpg" alt="Aerial view of salt evaporation ponds, stripes of olive, mauve, and pink water" loading="lazy">
-    </div>
-
     <!-- What's Shipped -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
-      <h2 class="font-headline text-4xl font-semibold text-primary mb-2 tracking-tight">What's shipped.</h2>
+      <span class="section-num">04</span>
+      <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-2 tracking-tight">What's shipped.</h2>
       <p class="text-on-surface-variant text-xl mb-6 italic">Student-facing v1. End-to-end, running against a synthetic curriculum. Actively iterating.</p>
 
       <div class="space-y-24 mt-12">
         <!-- Features grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="bg-surface-container-low rounded-xl p-8">
-            <h3 class="font-headline text-xl font-semibold mb-4">Infinite spatial canvas</h3>
+            <h3 class="font-headline text-xl font-semibold text-on-surface mb-4">Infinite spatial canvas</h3>
             <p class="text-on-surface-variant leading-relaxed">Pen, eraser, shapes, text, laser tool, image paste, pan and pinch-zoom, undo/redo that covers math objects, and a pinned pen library with auto light/dark color pairing. Students work spatially, not linearly.</p>
           </div>
           <div class="bg-surface-container-low rounded-xl p-8">
-            <h3 class="font-headline text-xl font-semibold mb-4">Contextual grounding</h3>
+            <h3 class="font-headline text-xl font-semibold text-on-surface mb-4">Contextual grounding</h3>
             <p class="text-on-surface-variant leading-relaxed">A vision-capable local model reads the student's board each turn and answers in context. Every response carries a citation badge back to the specific lecture it's grounded in, pulled from a local vector store with active-lecture retrieval boosting. Chat sessions are scoped per course and lecture, with rolling summarization so long sessions don't lose earlier work.</p>
           </div>
           <div class="bg-surface-container-low rounded-xl p-8">
-            <h3 class="font-headline text-xl font-semibold mb-4">Local voice I/O</h3>
+            <h3 class="font-headline text-xl font-semibold text-on-surface mb-4">Local voice I/O</h3>
             <p class="text-on-surface-variant leading-relaxed">Whisper.cpp for transcription from the browser, Kokoro TTS for spoken responses. Math is spoken via the same accessibility pipeline MathJax uses for screen readers (Speech Rule Engine with ClearSpeak). Accuracy disclaimer permanently visible; one-time-per-session acknowledgment modal before any AI interaction.</p>
           </div>
         </div>
@@ -245,7 +251,7 @@
             </div>
           </div>
           <div class="w-full md:w-1/2">
-            <h3 class="font-headline text-3xl font-semibold mb-6">Tokens, type, and modes built with Claude Design</h3>
+            <h3 class="font-headline text-3xl font-semibold text-on-surface mb-6">Tokens, type, and modes built with Claude Design</h3>
             <p class="text-lg text-on-surface-variant leading-relaxed">The design foundation was built using Claude Design, Anthropic's design tool: color tokens, type scale, and component variants across light and dark modes. Treating the design system as a documented artifact rather than ad-hoc styles meant every new screen started from a consistent base.</p>
           </div>
         </div>
@@ -255,7 +261,8 @@
     <!-- Product Decisions -->
     <section class="max-w-7xl mx-auto px-6 py-24 mb-24">
       <div class="mb-16">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">Decisions and their costs.</h2>
+        <span class="section-num">05</span>
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-4 tracking-tight">Decisions and their costs.</h2>
         <p class="text-on-surface-variant max-w-2xl text-lg italic">Four calls I made during the build that say more about how I think than a resume bullet would. Each is documented in a commit or a persistent decision file from the time it was made.</p>
       </div>
       <div class="space-y-6">
@@ -392,30 +399,33 @@
     </section>
 
     <!-- What building it taught me -->
-    <section class="max-w-7xl mx-auto px-6 mb-24">
-      <div class="max-w-3xl">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-12 tracking-tight">What building it taught me</h2>
-        <p class="text-on-surface-variant text-lg mb-10">Four things I learned that a spec couldn't have surfaced:</p>
-        <div class="space-y-10 border-l-2 border-surface-container-high pl-10">
-          <div>
-            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">01</span>
-            <h3 class="font-headline text-xl font-semibold mb-3">Socratic enforcement is fundamentally hard to solve in prompting alone</h3>
-            <p class="text-on-surface-variant leading-relaxed">Specified the constraint, observed the violations, tried filtering, reverted, landed on "accept it and fix the UX." Only runtime behavior would have surfaced this path.</p>
-          </div>
-          <div>
-            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">02</span>
-            <h3 class="font-headline text-xl font-semibold mb-3">Context growth degrades format adherence, not just speed</h3>
-            <p class="text-on-surface-variant leading-relaxed">The model didn't just slow down mid-session. It also started violating format rules. That observation informed the rolling-summary fix and aggressive trimming of the API payload.</p>
-          </div>
-          <div>
-            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">03</span>
-            <h3 class="font-headline text-xl font-semibold mb-3">Bespoke regex pipelines win early, then lose</h3>
-            <p class="text-on-surface-variant leading-relaxed">Targeted rules for derivative notation and function application worked fine at first. When I asked whether a standard existed, the accessibility TTS standard covered a much broader set of notation correctly with no case-by-case authoring. Default to the accessibility-aware library when one exists.</p>
-          </div>
-          <div>
-            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">04</span>
-            <h3 class="font-headline text-xl font-semibold mb-3">Install-time failures don't show up in specs</h3>
-            <p class="text-on-surface-variant leading-relaxed">Browser-bundling a speech ruleset requires locale JSON served as static assets. New Python deps don't fit the default macOS Python. Both surfaced only at install time, which led to writing a postinstall hook and a <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">uv</code>-managed Python 3.12 path.</p>
+    <section class="field-rose-top">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-3xl">
+          <span class="section-num">06</span>
+          <h2 class="font-headline text-5xl md:text-6xl font-semibold mb-12 tracking-tight">What building it taught me</h2>
+          <p class="text-lg mb-10" style="opacity:0.85">Four things I learned that a spec couldn't have surfaced:</p>
+          <div class="space-y-10 border-l-2 border-white/20 pl-10">
+            <div>
+              <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#ECE8E1; opacity:0.7">01</span>
+              <h3 class="font-headline text-xl font-semibold mb-3">Socratic enforcement is fundamentally hard to solve in prompting alone</h3>
+              <p class="leading-relaxed" style="opacity:0.85">Specified the constraint, observed the violations, tried filtering, reverted, landed on "accept it and fix the UX." Only runtime behavior would have surfaced this path.</p>
+            </div>
+            <div>
+              <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#ECE8E1; opacity:0.7">02</span>
+              <h3 class="font-headline text-xl font-semibold mb-3">Context growth degrades format adherence, not just speed</h3>
+              <p class="leading-relaxed" style="opacity:0.85">The model didn't just slow down mid-session. It also started violating format rules. That observation informed the rolling-summary fix and aggressive trimming of the API payload.</p>
+            </div>
+            <div>
+              <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#ECE8E1; opacity:0.7">03</span>
+              <h3 class="font-headline text-xl font-semibold mb-3">Bespoke regex pipelines win early, then lose</h3>
+              <p class="leading-relaxed" style="opacity:0.85">Targeted rules for derivative notation and function application worked fine at first. When I asked whether a standard existed, the accessibility TTS standard covered a much broader set of notation correctly with no case-by-case authoring. Default to the accessibility-aware library when one exists.</p>
+            </div>
+            <div>
+              <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#ECE8E1; opacity:0.7">04</span>
+              <h3 class="font-headline text-xl font-semibold mb-3">Install-time failures don't show up in specs</h3>
+              <p class="leading-relaxed" style="opacity:0.85">Browser-bundling a speech ruleset requires locale JSON served as static assets. New Python deps don't fit the default macOS Python. Both surfaced only at install time, which led to writing a postinstall hook and a <code class="text-sm bg-white/20 px-1.5 py-0.5 rounded font-mono">uv</code>-managed Python 3.12 path.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -424,7 +434,8 @@
     <!-- What's not done yet -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
       <div class="bg-surface-container-low p-10 md:p-16 rounded-xl">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">What's not done yet</h2>
+        <span class="section-num">07</span>
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold text-primary mb-4 tracking-tight">What's not done yet</h2>
         <p class="text-on-surface-variant mb-10 text-lg">Five days ships a working v1. Five days does not ship a validated product. Here's what's still unvalidated. Work is ongoing.</p>
         <ul class="space-y-4 list-none">
           <li class="flex items-start gap-3">

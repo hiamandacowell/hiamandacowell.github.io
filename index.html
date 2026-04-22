@@ -67,7 +67,15 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99999; opacity: 0.015; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>"); background-size: 250px 250px; }
+    .field-navy-top{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-navy-bottom{background:#2F3D63;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-navy-both{background:#2F3D63;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-top{background:#B8796A;color:#ECE8E1;margin-top:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:5rem;position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% 100%,0 100%)}
+    .field-rose-bottom{background:#B8796A;color:#ECE8E1;padding-top:5rem;padding-bottom:calc(8vw + 5rem);margin-bottom:-8vw;position:relative;z-index:1;clip-path:polygon(0 0,100% 0,100% calc(100% - 8vw),0 100%)}
+    .field-rose-both{background:#B8796A;color:#ECE8E1;margin-top:-8vw;margin-bottom:-8vw;padding-top:calc(8vw + 5rem);padding-bottom:calc(8vw + 5rem);position:relative;z-index:1;clip-path:polygon(0 8vw,100% 0,100% calc(100% - 8vw),0 100%)}
+    .section-num{font-family:'Fraunces',Georgia,serif;font-size:4.5rem;color:#26585d;font-weight:400;line-height:1;display:block;margin-bottom:.5rem}
+    .field-navy-top .section-num,.field-navy-bottom .section-num,.field-navy-both .section-num,.field-rose-top .section-num,.field-rose-bottom .section-num,.field-rose-both .section-num{color:#ECE8E1}
+    @media(max-width:768px){.field-navy-top,.field-navy-bottom,.field-navy-both,.field-rose-top,.field-rose-bottom,.field-rose-both{clip-path:none;margin-top:0;margin-bottom:0}}
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -115,7 +123,7 @@
     <!-- About -->
     <section class="bg-surface-container-low py-24">
       <div class="max-w-3xl mx-auto px-6">
-        <h2 class="font-headline text-3xl font-semibold text-on-surface mb-8">About</h2>
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold text-on-surface mb-8">About</h2>
         <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
           <p>I work best on small teams that are trying to figure something out. Most of my work lives at the intersection of emerging technology and learning, which means a lot of "we think this could matter, but nobody's sure yet." Getting those calls right takes digging in until you understand both the technical shape and the human shape of the problem.</p>
           <p>I come to product from mathematics, which turns out to be a real asset. I can hold a technical conversation with engineers and translate it for non-technical clients, sharpened by teaching calculus and statistics to 500+ students a semester. I prototype my own tools with Claude Code, because being hands-on keeps me honest about what's realistic to ask of a team.</p>
@@ -124,11 +132,15 @@
       </div>
     </section>
 
-    <!-- Selected Work -->
-    <section id="projects" class="py-32">
-      <div class="max-w-7xl mx-auto px-6 mb-16">
-        <h2 class="font-headline text-4xl font-semibold text-on-surface">Selected Work</h2>
+    <!-- Selected Work heading field -->
+    <section id="projects" class="field-navy-top">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="font-headline text-5xl md:text-6xl font-semibold tracking-tight">Selected Work</h2>
       </div>
+    </section>
+
+    <!-- Project bands -->
+    <section class="pb-32">
 
       <!-- ChalkboardAI (image left) -->
       <div class="group border-t border-outline-variant/40">
