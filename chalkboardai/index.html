@@ -67,6 +67,10 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99999; opacity: 0.015; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>"); background-size: 250px 250px; }
+    .salt-break { width: 100vw; margin-left: calc(50% - 50vw); margin-top: 5rem; margin-bottom: 5rem; }
+    .salt-break img { width: 100%; height: 45vh; object-fit: cover; object-position: center; display: block; }
+    @media (max-width: 640px) { .salt-break { margin-top: 3rem; margin-bottom: 3rem; } .salt-break img { height: 32vh; } }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -202,6 +206,11 @@
         </div>
       </div>
     </section>
+
+    <!-- Salt photo break: salt-13 -->
+    <div class="salt-break">
+      <img src="/assets/salt/salt-13.jpg" alt="Aerial view of salt evaporation ponds, stripes of olive, mauve, and pink water" loading="lazy">
+    </div>
 
     <!-- What's Shipped -->
     <section class="max-w-7xl mx-auto px-6 mb-24">
@@ -389,22 +398,22 @@
         <p class="text-on-surface-variant text-lg mb-10">Four things I learned that a spec couldn't have surfaced:</p>
         <div class="space-y-10 border-l-2 border-surface-container-high pl-10">
           <div>
-            <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">01</span>
+            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">01</span>
             <h3 class="font-headline text-xl font-semibold mb-3">Socratic enforcement is fundamentally hard to solve in prompting alone</h3>
             <p class="text-on-surface-variant leading-relaxed">Specified the constraint, observed the violations, tried filtering, reverted, landed on "accept it and fix the UX." Only runtime behavior would have surfaced this path.</p>
           </div>
           <div>
-            <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">02</span>
+            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">02</span>
             <h3 class="font-headline text-xl font-semibold mb-3">Context growth degrades format adherence, not just speed</h3>
             <p class="text-on-surface-variant leading-relaxed">The model didn't just slow down mid-session. It also started violating format rules. That observation informed the rolling-summary fix and aggressive trimming of the API payload.</p>
           </div>
           <div>
-            <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">03</span>
+            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">03</span>
             <h3 class="font-headline text-xl font-semibold mb-3">Bespoke regex pipelines win early, then lose</h3>
             <p class="text-on-surface-variant leading-relaxed">Targeted rules for derivative notation and function application worked fine at first. When I asked whether a standard existed, the accessibility TTS standard covered a much broader set of notation correctly with no case-by-case authoring. Default to the accessibility-aware library when one exists.</p>
           </div>
           <div>
-            <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">04</span>
+            <span class="text-xs font-bold font-headline uppercase tracking-widest mb-2 block" style="color:#2F3D63">04</span>
             <h3 class="font-headline text-xl font-semibold mb-3">Install-time failures don't show up in specs</h3>
             <p class="text-on-surface-variant leading-relaxed">Browser-bundling a speech ruleset requires locale JSON served as static assets. New Python deps don't fit the default macOS Python. Both surfaced only at install time, which led to writing a postinstall hook and a <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">uv</code>-managed Python 3.12 path.</p>
           </div>

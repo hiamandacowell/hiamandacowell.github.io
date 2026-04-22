@@ -67,6 +67,10 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99999; opacity: 0.015; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>"); background-size: 250px 250px; }
+    .salt-break { width: 100vw; margin-left: calc(50% - 50vw); margin-top: 5rem; margin-bottom: 5rem; }
+    .salt-break img { width: 100%; height: 45vh; object-fit: cover; object-position: center; display: block; }
+    @media (max-width: 640px) { .salt-break { margin-top: 3rem; margin-bottom: 3rem; } .salt-break img { height: 32vh; } }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -105,7 +109,7 @@
         <div class="lg:col-span-4 flex flex-col gap-4">
           <div class="p-6 bg-surface-container-low rounded-xl">
             <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Role</span>
-            <p class="font-medium text-on-surface">Product Manager</p>
+            <p class="font-medium" style="color:#B8796A">Product Manager</p>
           </div>
           <div class="p-6 bg-surface-container-low rounded-xl">
             <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Institution</span>
@@ -294,6 +298,11 @@
       </div>
       <p class="mt-6 text-on-surface-variant italic text-sm">Scheduling access across two auditoriums, a green screen stage, and SMTD piano classrooms, while coordinating faculty, facilities, and the XR team across a full semester, was the stakeholder management layer beneath every image on this page.</p>
     </section>
+
+    <!-- Salt photo break: salt-07 -->
+    <div class="salt-break">
+      <img src="/assets/salt/salt-07.jpg" alt="Aerial view of salt evaporation ponds, diagonal stripes in deep blue and olive" loading="lazy">
+    </div>
 
     <!-- User & Usability Testing -->
     <section class="bg-surface-container-low py-24 mb-24">
