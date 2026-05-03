@@ -85,9 +85,29 @@
       .nav-menu.is-open > a.ml-5,
       .nav-menu.is-open > a.ml-3 { margin-left: 0 !important; }
     }
+
+    /* Skip to main content link */
+    .skip-link {
+      position: absolute; top: -100px; left: 8px;
+      background: #26585d; color: #fff;
+      padding: 8px 16px; border-radius: 6px;
+      z-index: 100; text-decoration: none;
+      font-weight: 500; font-size: 14px;
+      transition: top 0.15s;
+    }
+    .skip-link:focus { top: 8px; }
+
+    /* Visible focus indicators */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #26585d;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Nav -->
   <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
@@ -102,7 +122,7 @@
     </div>
   </nav>
 
-  <main class="pt-24 pb-20">
+  <main id="main-content" class="pt-24 pb-20">
 
     <!-- Hero -->
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
@@ -148,15 +168,15 @@
       <!-- Three signal cards -->
       <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-primary">
-          <h4 class="font-bold text-on-surface mb-1">Shipped a working v1 in five days</h4>
+          <h3 class="font-bold text-on-surface mb-1">Shipped a working v1 in five days</h3>
           <p class="text-sm text-on-surface-variant">Designed, architected, and built the complete student-facing experience against mock curriculum. Local inference, local RAG, voice I/O, infinite canvas, streaming chat with citations. Actively iterating.</p>
         </div>
         <div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-secondary">
-          <h4 class="font-bold text-on-surface mb-1">Chose architecture against the default</h4>
+          <h3 class="font-bold text-on-surface mb-1">Chose architecture against the default</h3>
           <p class="text-sm text-on-surface-variant">Rejected cloud-dependent AI in favor of a local-first stack because FERPA and FOIA make privacy non-negotiable in education.</p>
         </div>
         <div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
-          <h4 class="font-bold text-on-surface mb-1">Named what five days cannot validate</h4>
+          <h3 class="font-bold text-on-surface mb-1">Named what five days cannot validate</h3>
           <p class="text-sm text-on-surface-variant">Real-user testing, instructor tooling, and institutional sign-offs are all documented as pending. The honest limitations are part of the case study.</p>
         </div>
       </div>
@@ -210,7 +230,7 @@
           <p class="text-on-surface-variant leading-relaxed text-lg">Every part of the AI stack runs locally on one Mac Studio. Inference via Ollama with <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">gemma3:27b</code>. Transcription via Whisper. Embeddings via <code class="text-sm bg-surface-container px-1.5 py-0.5 rounded font-mono">nomic-embed-text</code>. Text-to-speech via Kokoro. Student interactions with AI tutors are educational records under FERPA, and transcript logging and retrievability matter under FOIA. On-premise is the right architecture for real institutional deployment.</p>
         </div>
         <div class="bg-surface-container-low p-10 rounded-xl flex flex-col justify-center">
-          <h4 class="font-headline text-3xl font-bold text-primary mb-3">$0 per-student cost</h4>
+          <h3 class="font-headline text-3xl font-bold text-primary mb-3">$0 per-student cost</h3>
           <p class="text-on-surface-variant leading-relaxed">Local inference zeroes out per-student API cost, which is what makes institutional deployment actually viable at scale.</p>
         </div>
         <div class="bg-surface-container-low p-10 rounded-xl">
