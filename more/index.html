@@ -83,32 +83,6 @@
       }
     }
 
-    /* Filter pills */
-    .filter-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.35rem 0.8rem;
-      border: 1px solid #C5BFBA;
-      border-radius: 9999px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: #4A4440;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      line-height: 1;
-    }
-    @media (min-width: 768px) {
-      .filter-pill { padding: 0.4rem 0.95rem; }
-    }
-    .filter-pill:hover { border-color: #26585d; color: #26585d; }
-    .filter-pill.active {
-      background: #26585d;
-      color: #fff;
-      border-color: #26585d;
-    }
-
     /* Tile fallback color blocks (for items without thumbnails) */
     .tile-fallback {
       width: 100%;
@@ -166,42 +140,18 @@
   <main class="pt-20 pb-20">
 
     <!-- Page header -->
-    <header class="max-w-7xl mx-auto px-6 pt-10 md:pt-16 pb-6 md:pb-8">
+    <header class="max-w-7xl mx-auto px-6 pt-10 md:pt-16 pb-8 md:pb-10">
       <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-5">
         More
       </h1>
-      <p class="text-xl md:text-2xl text-on-surface-variant font-light leading-relaxed">
-        Get to know me!
+      <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed">
+        A loose collection of other corners of my work and life.
       </p>
     </header>
-
-    <!-- Filters -->
-    <section aria-label="Filters" class="max-w-7xl mx-auto px-6 mb-8">
-      <div class="bg-surface-container-low rounded-xl p-4 md:p-7 flex flex-col gap-3 md:gap-4">
-        <div class="flex flex-col md:flex-row md:items-center md:gap-5 gap-1.5">
-          <span class="text-xs font-bold text-secondary uppercase tracking-widest md:w-20 flex-shrink-0">Type</span>
-          <div id="filter-types" class="flex flex-wrap gap-1.5 md:gap-2"></div>
-        </div>
-        <div class="flex flex-col md:flex-row md:items-center md:gap-5 gap-1.5">
-          <span class="text-xs font-bold text-secondary uppercase tracking-widest md:w-20 flex-shrink-0">Subject</span>
-          <div id="filter-subjects" class="flex flex-wrap gap-1.5 md:gap-2"></div>
-        </div>
-        <div class="flex items-center justify-between pt-2 border-t border-outline-variant/30 mt-1">
-          <span id="result-count" class="text-sm text-on-surface-variant"></span>
-          <button id="clear-filters" type="button" class="text-sm text-primary hover:underline" hidden>Clear filters</button>
-        </div>
-      </div>
-    </section>
 
     <!-- Grid -->
     <section aria-label="Items" class="max-w-7xl mx-auto px-6 pb-12">
       <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
-
-      <!-- Empty state -->
-      <div id="empty-state" class="text-center py-20" hidden>
-        <p class="font-headline text-2xl text-on-surface mb-3">Nothing matches these filters.</p>
-        <button id="empty-state-clear" type="button" class="text-primary hover:underline text-sm">Clear filters</button>
-      </div>
     </section>
 
   </main>
@@ -228,7 +178,7 @@
         id          — unique slug (used as a stable key)
         title       — string, displayed
         types       — array of: 'video' | 'writing' | 'presentation' | 'project'
-        subjects    — array of: 'math' | 'xr' | 'ai' | 'teaching'
+        subjects    — array of: 'math' | 'xr' | 'ai' | 'teaching' | 'personal'
         description — string, 1–2 sentences
         thumbnail   — image URL, or null to use a colored fallback block
         link        — destination URL (internal path or external https://)
@@ -236,8 +186,6 @@
     ============================================================
   -->
   <script>
-    const TYPES = ['video', 'writing', 'presentation', 'project'];
-    const SUBJECTS = ['math', 'xr', 'ai', 'teaching', 'personal'];
     const TYPE_LABELS = { video: 'Video', writing: 'Writing', presentation: 'Presentation', project: 'Project' };
     const SUBJECT_LABELS = { math: 'Math', xr: 'XR', ai: 'AI', teaching: 'Teaching', personal: 'Personal' };
 
@@ -253,6 +201,16 @@
         external: false
       },
       {
+        id: 'enabling-student-success-xr',
+        title: 'Enabling Student Success with Extended Reality',
+        types: ['presentation'],
+        subjects: ['teaching', 'xr'],
+        description: 'A presentation with panel session at EDUCAUSE Annual Conference 2025 on how Georgia Tech and the University of Michigan use XR to support student success in higher education.',
+        thumbnail: '/assets/educause-2025-podium.jpg',
+        link: '/more/enabling-student-success-xr/',
+        external: false
+      },
+      {
         id: 'training-for-tomorrow',
         title: 'Training for Tomorrow: Concussion Assessment in Virtual Reality',
         types: ['video', 'presentation'],
@@ -260,16 +218,6 @@
         description: "A talk given at the University of Michigan's Enriching Scholarship 2025 conference on the development of a VR experience for training aspiring clinicians in concussion assessment.",
         thumbnail: 'https://img.youtube.com/vi/JoN833ErDRI/maxresdefault.jpg',
         link: '/more/training-for-tomorrow/',
-        external: false
-      },
-      {
-        id: 'topological-data-analysis',
-        title: 'Topological Data Analysis: Tools and Some Applications',
-        types: ['writing'],
-        subjects: ['math'],
-        description: "My master's thesis in Mathematics, exploring how topological tools can be used to study the shape of data.",
-        thumbnail: '/assets/thesis-figure-three-twos.png',
-        link: '/more/topological-data-analysis/',
         external: false
       },
       {
@@ -283,94 +231,16 @@
         external: false
       },
       {
-        id: 'enabling-student-success-xr',
-        title: 'Enabling Student Success with Extended Reality',
-        types: ['presentation'],
-        subjects: ['teaching', 'xr'],
-        description: 'A presentation with panel session at EDUCAUSE Annual Conference 2025 on how Georgia Tech and the University of Michigan use XR to support student success in higher education.',
-        thumbnail: '/assets/educause-2025-podium.jpg',
-        link: '/more/enabling-student-success-xr/',
+        id: 'topological-data-analysis',
+        title: 'Topological Data Analysis: Tools and Some Applications',
+        types: ['writing'],
+        subjects: ['math'],
+        description: "My master's thesis in Mathematics, exploring how topological tools can be used to study the shape of data.",
+        thumbnail: '/assets/thesis-figure-three-twos.png',
+        link: '/more/topological-data-analysis/',
         external: false
       }
     ];
-
-    // ---- State ----
-    const activeTypes = new Set();
-    const activeSubjects = new Set();
-
-    // ---- URL <-> state ----
-    function readUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const types = params.get('type');
-      const subjects = params.get('subject');
-      if (types) {
-        types.split(',').filter(t => TYPES.includes(t)).forEach(t => activeTypes.add(t));
-      }
-      if (subjects) {
-        subjects.split(',').filter(s => SUBJECTS.includes(s)).forEach(s => activeSubjects.add(s));
-      }
-    }
-
-    function writeUrl() {
-      const params = new URLSearchParams();
-      if (activeTypes.size) params.set('type', [...activeTypes].join(','));
-      if (activeSubjects.size) params.set('subject', [...activeSubjects].join(','));
-      const qs = params.toString();
-      const newUrl = qs ? window.location.pathname + '?' + qs : window.location.pathname;
-      window.history.replaceState(null, '', newUrl);
-    }
-
-    // ---- Render filter pills ----
-    function renderPills() {
-      const typesContainer = document.getElementById('filter-types');
-      const subjectsContainer = document.getElementById('filter-subjects');
-      typesContainer.innerHTML = '';
-      subjectsContainer.innerHTML = '';
-
-      TYPES.forEach(t => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'filter-pill' + (activeTypes.has(t) ? ' active' : '');
-        btn.textContent = TYPE_LABELS[t];
-        btn.setAttribute('aria-pressed', activeTypes.has(t) ? 'true' : 'false');
-        btn.addEventListener('click', () => toggleFilter('type', t));
-        typesContainer.appendChild(btn);
-      });
-
-      SUBJECTS.forEach(s => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'filter-pill' + (activeSubjects.has(s) ? ' active' : '');
-        btn.textContent = SUBJECT_LABELS[s];
-        btn.setAttribute('aria-pressed', activeSubjects.has(s) ? 'true' : 'false');
-        btn.addEventListener('click', () => toggleFilter('subject', s));
-        subjectsContainer.appendChild(btn);
-      });
-    }
-
-    function toggleFilter(kind, value) {
-      const set = kind === 'type' ? activeTypes : activeSubjects;
-      if (set.has(value)) set.delete(value);
-      else set.add(value);
-      writeUrl();
-      renderPills();
-      renderGrid();
-    }
-
-    function clearFilters() {
-      activeTypes.clear();
-      activeSubjects.clear();
-      writeUrl();
-      renderPills();
-      renderGrid();
-    }
-
-    // ---- Render grid ----
-    function matches(item) {
-      const typeOk = activeTypes.size === 0 || item.types.some(t => activeTypes.has(t));
-      const subjectOk = activeSubjects.size === 0 || item.subjects.some(s => activeSubjects.has(s));
-      return typeOk && subjectOk;
-    }
 
     function escapeHtml(s) {
       return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -409,31 +279,7 @@
       }
     }
 
-    function renderGrid() {
-      const grid = document.getElementById('grid');
-      const matching = items.filter(matches);
-
-      grid.innerHTML = matching.map(tileHtml).join('');
-      document.getElementById('empty-state').hidden = matching.length > 0;
-      grid.hidden = matching.length === 0;
-
-      const count = document.getElementById('result-count');
-      const filtered = activeTypes.size + activeSubjects.size > 0;
-      count.textContent = filtered
-        ? `Showing ${matching.length} of ${items.length}`
-        : `${items.length} item${items.length === 1 ? '' : 's'}`;
-
-      const clear = document.getElementById('clear-filters');
-      clear.hidden = !filtered;
-    }
-
-    // ---- Init ----
-    document.getElementById('clear-filters').addEventListener('click', clearFilters);
-    document.getElementById('empty-state-clear').addEventListener('click', clearFilters);
-
-    readUrl();
-    renderPills();
-    renderGrid();
+    document.getElementById('grid').innerHTML = items.map(tileHtml).join('');
   </script>
 
 </body>
