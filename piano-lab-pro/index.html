@@ -65,6 +65,7 @@
     }
   </script>
   <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 128px; }
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     @media (max-width: 767px) {
@@ -81,9 +82,6 @@
         gap: 1rem;
         border-bottom: 1px solid rgba(197,191,186,0.4);
       }
-      .nav-menu.is-open > span { display: none; }
-      .nav-menu.is-open > a.ml-5,
-      .nav-menu.is-open > a.ml-3 { margin-left: 0 !important; }
     }
 
     /* Skip to main content link */
@@ -103,13 +101,57 @@
       outline-offset: 2px;
       border-radius: 4px;
     }
+
+    /* Section progress nav */
+    .section-nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 2px 4px;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .section-nav-track {
+      display: block;
+      height: 4px;
+      background: rgba(122, 116, 112, 0.25);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .section-nav-fill {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: #26585d;
+      border-radius: 9999px;
+      transition: width 120ms linear;
+    }
+    .section-nav-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #4A4440;
+      transition: color 150ms, font-weight 150ms;
+      text-align: left;
+    }
+    .section-nav-item:hover .section-nav-label {
+      color: #26585d;
+    }
+    .section-nav-item.is-active .section-nav-label {
+      color: #1C1714;
+      font-weight: 700;
+    }
+    @media (max-width: 380px) {
+      .section-nav-label { display: none; }
+    }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
 
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Nav -->
+  <!-- Site nav -->
   <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="flex items-center gap-3">
@@ -125,238 +167,285 @@
     </div>
   </nav>
 
-  <main id="main-content" class="pt-24 pb-20">
+  <!-- Section progress nav (sticky, sits directly below the site nav)
+       To reuse on another case study: copy this <nav> block + the matching
+       <script id="section-progress-nav-script"> at the bottom of the page,
+       and update the SECTIONS array there. Section <section id="..."> tags
+       on the page must match the ids in the SECTIONS array. -->
+  <nav id="section-nav" aria-label="Page sections" class="fixed left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40" style="top: 73px;">
+    <div class="max-w-7xl mx-auto px-6 py-2">
+      <div class="grid grid-cols-5 gap-1.5 md:gap-2">
+        <a href="#context" data-section="context" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Context</span>
+        </a>
+        <a href="#problem" data-section="problem" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Problem</span>
+        </a>
+        <a href="#approach" data-section="approach" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Approach</span>
+        </a>
+        <a href="#decisions" data-section="decisions" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Decisions</span>
+        </a>
+        <a href="#outcome" data-section="outcome" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Outcome</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="pb-20" style="padding-top: 132px;">
 
     <!-- Hero -->
-    <header class="max-w-5xl mx-auto px-6 pt-12 md:pt-20 pb-24">
-      <div class="flex items-center gap-3 md:gap-4 mb-6">
-        <img src="/assets/plp-icon.png" alt="" class="h-10 md:h-14 w-auto flex-shrink-0">
+    <header class="max-w-5xl mx-auto px-6 pt-8 md:pt-10 pb-8 md:pb-10">
+      <div class="flex items-center gap-3 md:gap-4 mb-5">
+        <img src="/assets/plp-icon.png" alt="" class="h-12 md:h-16 w-auto flex-shrink-0">
         <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-none">Piano Lab Pro</h1>
       </div>
-      <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed mb-3">
-        Mixed reality performance preparation on Apple Vision Pro, built at U-M's Center for Academic Innovation in partnership with the School of Music, Theatre &amp; Dance.
-      </p>
-      <p class="text-base text-on-surface-variant italic mb-10">
-        Two years from discovery to MVP.
+      <p class="text-xl md:text-2xl font-light text-on-surface-variant leading-relaxed mb-7">
+        Mixed reality performance preparation on Apple Vision Pro, built at the University of Michigan's Center for Academic Innovation in partnership with the School of Music, Theatre &amp; Dance.
       </p>
 
-      <!-- Metadata strip (flat, divider-separated) -->
-      <dl class="border-y border-outline-variant/40 py-4 mb-10 grid grid-cols-2 md:grid-cols-4 gap-y-3 md:gap-y-0">
-        <div class="md:border-r md:border-outline-variant/40 md:pr-6">
-          <dt class="text-xs font-bold text-secondary uppercase tracking-widest mb-1">Role</dt>
-          <dd class="text-sm font-medium text-on-surface">Product Manager</dd>
+      <!-- Metadata strip (3 cells side by side, Institution removed) -->
+      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-4 pt-5 border-t border-outline-variant/40">
+        <div>
+          <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Role</dt>
+          <dd class="text-sm md:text-base text-on-surface">Product Manager</dd>
         </div>
-        <div class="md:border-r md:border-outline-variant/40 md:px-6">
-          <dt class="text-xs font-bold text-secondary uppercase tracking-widest mb-1">Institution</dt>
-          <dd class="text-sm font-medium text-on-surface">U-M CAI</dd>
+        <div>
+          <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Timeline</dt>
+          <dd class="text-sm md:text-base text-on-surface">Feb 2025 to present</dd>
         </div>
-        <div class="md:border-r md:border-outline-variant/40 md:px-6">
-          <dt class="text-xs font-bold text-secondary uppercase tracking-widest mb-1">Timeline</dt>
-          <dd class="text-sm font-medium text-on-surface">Feb 2025–present</dd>
-        </div>
-        <div class="md:pl-6">
-          <dt class="text-xs font-bold text-secondary uppercase tracking-widest mb-1">Team</dt>
-          <dd class="text-sm font-medium text-on-surface">Core 6, 35+ total</dd>
+        <div>
+          <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Team</dt>
+          <dd class="text-sm md:text-base text-on-surface">Core team of 6, 35+ contributors</dd>
         </div>
       </dl>
-
-      <!-- Three highlights (with primary left-border accent) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-primary">
-          <p class="font-medium text-on-surface mb-2">Scoped three faculty ideas to one value prop</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">Found the through-line that made the product focused, buildable, and honest with stakeholders.</p>
-        </div>
-        <div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-primary">
-          <p class="font-medium text-on-surface mb-2">Grounded decisions in user research</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">When research and assumptions diverged, research set the direction.</p>
-        </div>
-        <div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-primary">
-          <p class="font-medium text-on-surface mb-2">Balanced faculty intent with student need</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">Held both sides while the team scoped, built, and made decisions through testing.</p>
-        </div>
-      </div>
     </header>
 
-    <!-- The problem -->
-    <section class="mb-20">
-      <div class="max-w-5xl mx-auto px-6">
-        <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">The problem.</h2>
-        <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-4 mb-10">
-          <p>Music performance anxiety is well-documented, widespread, and structurally built into how musicians train. Students rehearse alone in small practice rooms, then perform in large concert halls in front of live audiences. Repetition in a practice room doesn't close that gap.</p>
-          <p>Piano students are particularly exposed. Their instrument is fixed: you can't carry your home environment with you. What you <em>can</em> do is make the practice environment more like the performance environment before the performance happens.</p>
-        </div>
+    <!-- Section 1: Context (visible heading hidden — nav-active state already labels it) -->
+    <section id="context" aria-labelledby="context-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="context-heading" class="sr-only">Context</h2>
 
-        <!-- Key finding: pulled-out treatment, not a beige box -->
-        <div class="border-l-4 border-primary pl-6 mb-10">
-          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3 not-italic">Key finding from interviews</p>
-          <p class="font-headline italic text-xl md:text-2xl text-on-surface leading-relaxed">The strongest signal wasn't about the performance itself. It was the moment the lights shift, the audience quiets, and the room changes. That moment became the product's core design requirement.</p>
+      <figure class="mb-10">
+        <div class="rounded-xl overflow-hidden aspect-video shadow-2xl">
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/9KnCv_WGrao?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=9KnCv_WGrao" title="Piano Lab Pro: mixed reality performance preparation on Apple Vision Pro" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
         </div>
+        <figcaption class="text-sm text-on-surface-variant italic mt-3">Orientation video: what the student experiences inside the headset.</figcaption>
+      </figure>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>Piano Lab Pro is a mixed reality app on Apple Vision Pro that lets piano students practice in front of a virtual audience, in a virtual concert hall, before they ever set foot on the real stage.</p>
       </div>
 
-      <!-- Panorama: slightly wider than body -->
-      <div class="max-w-6xl mx-auto px-6">
-        <div class="rounded-xl overflow-hidden">
-          <img src="/assets/plp-hill-panorama.jpg" alt="360 degree panoramic view from the Hill Auditorium stage, the performer's perspective facing an empty house" class="w-full">
+      <!-- Target user callout -->
+      <aside class="bg-surface-container-low rounded-xl border-l-4 border-primary px-5 py-4 md:px-6 md:py-5 mb-10">
+        <p class="text-[10px] font-bold text-secondary uppercase tracking-[0.14em] mb-3">Target user</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <div class="flex items-baseline gap-2.5">
+            <p class="font-headline text-2xl md:text-3xl font-semibold text-primary leading-none flex-shrink-0">400+</p>
+            <p class="text-xs md:text-sm text-on-surface-variant leading-snug">U-M piano students per year</p>
+          </div>
+          <div class="flex items-baseline gap-2.5">
+            <p class="font-headline text-2xl md:text-3xl font-semibold text-primary leading-none flex-shrink-0">40+</p>
+            <p class="text-xs md:text-sm text-on-surface-variant leading-snug">piano courses</p>
+          </div>
+          <div class="flex items-baseline gap-2.5">
+            <p class="font-headline text-2xl md:text-3xl font-semibold text-primary leading-none flex-shrink-0">28</p>
+            <p class="text-xs md:text-sm text-on-surface-variant leading-snug">sections of PIANO 110 alone, for non-music majors</p>
+          </div>
         </div>
-        <p class="text-xs text-on-surface-variant italic mt-2 max-w-5xl mx-auto">Hill Auditorium from the stage. What a student faces the moment the lights shift.</p>
+      </aside>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>I led the call for proposals, the evaluation framework that selected this project from the candidate pool, and the scoping conversations that narrowed three faculty concepts into one focused product. From there I owned product through discovery, framing, build, and validation, working with a core team of six and 35+ contributors across design, research, and production. Two faculty partners shaped the work from inside their disciplines: <strong class="text-on-surface font-semibold">Aya Higuchi Hagelthorn</strong>, Lecturer of Piano Pedagogy, Director of Collegiate Class Piano, and Coordinator of the Piano Pedagogy Laboratory Program, brought the pedagogical anchor. <strong class="text-on-surface font-semibold">Anıl Çamcı</strong>, Associate Professor and Director of Graduate Studies in the Department of Performing Arts Technology, led the spatial audio design.</p>
+        <p>As of May 2026, the project is on track for its June 2026 MVP. The load-bearing pieces are complete.</p>
+      </div>
+
+      <figure class="md:flex md:flex-col md:items-center">
+        <img src="/assets/plp-stage-team.png" alt="The team on the Hill Auditorium stage" class="block rounded-xl w-full md:w-auto md:max-h-[400px]">
+      </figure>
+    </section>
+
+    <!-- Section 2: Problem -->
+    <section id="problem" aria-labelledby="problem-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="problem-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Problem</h2>
+
+      <!-- Overarching problem callout -->
+      <aside class="bg-surface-container-low rounded-xl border-l-4 border-primary p-8 md:p-10 mb-10">
+        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">Overarching problem</p>
+        <p class="font-headline text-2xl md:text-3xl font-semibold text-on-surface leading-snug">
+          Performance anxiety in musicians<br>
+          reduces performance quality,<br>
+          attenuates learning,<br>
+          and reduces confidence.
+        </p>
+      </aside>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>Music performance anxiety is well-documented, widespread, and structurally built into how musicians train. Students rehearse alone in small practice rooms, then perform in large concert halls in front of live audiences. Repetition in a practice room doesn't close that gap.</p>
+        <p>Piano students are particularly exposed. Their instrument is fixed, you can't carry your home environment with you. What you <em>can</em> do is make the practice environment more like the performance environment before the performance happens. That's the thesis behind Piano Lab Pro.</p>
+        <p>Across our research, the moment students named most consistently as the anxiety trigger wasn't the performance itself. It was the transition into it: the audience lights dim, the stage lights come up, the room goes quiet. That moment became the product's core design requirement, and it's what makes Piano Lab Pro different from a generic VR practice room.</p>
+      </div>
+
+      <figure class="mb-10 md:flex md:flex-col md:items-center">
+        <img src="/assets/piano-sidebyside.png" alt="Side-by-side: a piano classroom on the left, Hill Auditorium from the stage on the right" class="block rounded-xl w-full md:w-auto md:max-h-[400px]">
+        <figcaption class="text-sm text-on-surface-variant italic mt-3 md:text-center">Where students practice. Where students perform. The product closes the gap between them.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Section 3: Approach -->
+    <section id="approach" aria-labelledby="approach-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="approach-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Approach</h2>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>Discovery to framing to inception to MVP. I led several months of research before development began so the team could scope with confidence.</p>
+        <p><strong class="text-on-surface font-semibold">Discovery.</strong> Several rounds of user research ran in parallel with site visits to Britton Recital Hall and Hill Auditorium. The methods varied (interviews, surveys, in-context observation), most of which I can't share publicly to protect student data.</p>
+        <p>Synthesis from student interviews surfaced four anxiety themes that clustered around the moment of transition into performance: fear of failure and judgement, preparedness and cognitive slips, responsibility and external expectations, and awareness of physical anxiety response. To pressure-test where those anxieties actually lived, we ran a co-design workshop in which students mapped venue type against audience type and marked where they felt most anxious. Two clusters emerged. The dominant one (14 dots) was large venue with strangers, which became Hill Auditorium in the product. The second (8 dots) was small venue with familiar audience, a different kind of anxiety that justified building Britton Recital Hall as a second environment.</p>
+      </div>
+
+      <figure class="mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <!-- Dot-vote photo (left) -->
+          <div class="rounded-xl overflow-hidden bg-surface-container-low aspect-[4/3] md:aspect-auto md:h-[400px] flex items-center justify-center">
+            <img src="/assets/plp-design-jam.png" alt="Co-design workshop: students mapped venue size against audience familiarity and marked where they felt most anxious. Two clusters emerged: large venue with strangers (14 dots) and small venue with familiar audience (8 dots)." class="block max-h-full max-w-full w-auto h-auto object-contain">
+          </div>
+          <!-- Anxiety themes graphic (right) — recreated from interview-synthesis artifact in site branding -->
+          <aside aria-label="Four anxiety themes from interview synthesis" class="rounded-xl bg-surface border border-outline-variant aspect-[4/3] md:aspect-auto md:h-[400px] flex flex-col p-5 md:p-6">
+            <p class="font-headline text-sm md:text-base lg:text-lg font-semibold text-on-surface leading-snug mb-3 md:mb-4 text-center">
+              What makes performing in front of others most <span class="text-primary">challenging</span> for you?
+            </p>
+            <div class="grid grid-cols-2 gap-2 md:gap-2.5 flex-1">
+              <div class="rounded-lg bg-primary-fixed flex items-center justify-center p-3 text-center">
+                <p class="font-headline font-semibold text-on-surface text-sm md:text-base leading-tight">Fear of Failure and Judgement</p>
+              </div>
+              <div class="rounded-lg bg-secondary-fixed flex items-center justify-center p-3 text-center">
+                <p class="font-headline font-semibold text-on-surface text-sm md:text-base leading-tight">Responsibility and External Expectations</p>
+              </div>
+              <div class="rounded-lg bg-surface-container-high flex items-center justify-center p-3 text-center">
+                <p class="font-headline font-semibold text-on-surface text-sm md:text-base leading-tight">Preparedness &amp; Cognitive Slips</p>
+              </div>
+              <div class="rounded-lg bg-[#F0D5BD] flex items-center justify-center p-3 text-center">
+                <p class="font-headline font-semibold text-on-surface text-sm md:text-base leading-tight">Awareness of Physical Anxiety Response</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <figcaption class="text-sm text-on-surface-variant italic mt-3">Left: where students said those anxieties actually lived. Right: themes from interview synthesis.</figcaption>
+      </figure>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-8">
+        <p><strong class="text-on-surface font-semibold">Build.</strong> The student wears an Apple Vision Pro at a real piano. Through passthrough they see their hands and the real keys. Everything else is virtual: Hill Auditorium or Britton Recital Hall, a live audience, calibrated venue reverb. The flow is continuous. Default state has the house lights up and the audience chatting. When the student is ready, they trigger the transition: lights shift, crowd quiets, stage is lit. The "all eyes on me" moment is now part of the practice session.</p>
+        <p>We built Britton first on purpose. It was the smaller, more accessible venue, and it let us work out the capture-and-build workflow before committing to the higher-stakes Hill Auditorium session. By the time we walked into Hill, the process was tested: 6,000+ photos and 4,200 aligned in photogrammetry, and 20 balloons popped at mapped locations to capture acoustic impulse response. Audience capture meant 42 people filmed on green screen on the XR Stage, 2.7 TB of footage to populate virtual seats with real human motion. Doing Britton first made Hill possible in a single capture day instead of three.</p>
+      </div>
+
+      <!-- Stakeholder-management aside: smaller side note about coordination work behind the build -->
+      <p class="text-sm md:text-base italic text-on-surface-variant border-l-2 border-outline-variant/70 pl-5 mb-10">Scheduling access across two auditoriums, a green screen stage, and SMTD piano classrooms, while coordinating faculty, facilities, and the XR team across a full semester, was the stakeholder management layer beneath every image on this page.</p>
+
+      <figure class="mb-10 md:flex md:flex-col md:items-center">
+        <img src="/assets/plp-unity-editor.gif" alt="Britton Recital Hall scene in Unity: audience panels, spatial sound sources, optimized piano mesh" class="block rounded-xl w-full md:w-auto md:max-h-[400px]">
+      </figure>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>The app is one piece of the product. The other is the <strong class="text-on-surface font-semibold">student guide</strong>, a scaffolding piece designed in collaboration with behavioral scientists. Students take a self-assessment that helps them identify their own anxiety triggers and surfaces specific strategies they can then practice inside the app. The guide isn't supplemental, it's how a session is meant to work: identify, prepare, practice, reflect. Building the app without it would have made the experience effective for some students and inert for others.</p>
+      </div>
+
+      <figure class="mb-10 md:flex md:flex-col md:items-center">
+        <img src="/assets/plp-student-guide.png" alt="Piano Lab Pro Student Guide, a Google Site with preparation content deployed to students" class="block rounded-xl w-full md:w-auto md:max-h-[400px]">
+      </figure>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+        <p><strong class="text-on-surface font-semibold">Validation.</strong> Multiple rounds of user testing across the project, formal and informal, focused on environment realism, keyboard alignment, and instruction clarity. The findings drove product decisions, not just polish. I also brought in U-M's Institute for Social Research to design the formal impact study, because self-reported anxiety scores weren't going to be enough on their own to validate whether the app worked.</p>
       </div>
     </section>
 
-    <hr class="max-w-5xl mx-auto border-outline-variant/40 mb-20">
+    <!-- Section 4: Decisions -->
+    <section id="decisions" aria-labelledby="decisions-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="decisions-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Decisions</h2>
 
-    <!-- From three ideas to one product -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">From three ideas to one product.</h2>
-      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-4 mb-8">
-        <p>Two years, a small core team, and 35+ contributors overall. The XR developers, UX designers, learning experience designers, behavioral scientists, and student fellows came from CAI; the two faculty partners (Aya Hagelthorn and Anıl Çamcı, both at the School of Music, Theatre &amp; Dance) came with three competing concepts that each could have been their own product. I led the discovery work, scoped from three ideas to one, and stayed with the build through prototype.</p>
-      </div>
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-12">Three decisions worth surfacing, out of many that shaped this project.</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-start">
-        <div class="rounded-xl overflow-hidden bg-surface-container-low">
-          <img src="/assets/plp-learner-goals.jpg" alt="Design jam output: final learner goals chosen by dot vote" class="w-full">
-        </div>
-        <div class="rounded-xl overflow-hidden bg-surface-container-low p-6 md:p-8 flex items-center justify-center">
-          <img src="/assets/plp-process-diagram.png" alt="Double diamond process diagram showing Discovery, Framing, Inception, and MVP phases" class="w-full h-auto">
-        </div>
-      </div>
-      <p class="text-xs text-on-surface-variant italic mb-10">CAI process and the dot-voted learner goals that anchored every decision.</p>
+      <div class="space-y-6 md:space-y-8">
 
-      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-4 mb-8">
-        <p>The student wears Apple Vision Pro at a real piano. Through passthrough they see their own hands on real keys. Everything else is virtual: Hill Auditorium or Britton Recital Hall, a live audience, calibrated venue reverb. When they're ready, the student triggers the transition: lights shift, the crowd quiets, the stage is lit. That "all eyes on me" moment is now part of the practice session.</p>
-      </div>
-
-      <div class="rounded-xl overflow-hidden">
-        <img src="/assets/plp-hill-render.png" alt="3D rendered Hill Auditorium in mixed reality, the student's virtual environment" class="w-full">
-      </div>
-      <p class="text-xs text-on-surface-variant italic mt-2">The student wears the headset at a real piano. The lights shift, the audience quiets, and the practice session becomes the moment they fear most.</p>
-    </section>
-
-    <hr class="max-w-5xl mx-auto border-outline-variant/40 mb-20">
-
-    <!-- Building it (and what testing changed) -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">Building it (and what testing changed).</h2>
-      <p class="text-lg md:text-xl text-on-surface-variant italic mb-10">Three major moments shaped by users: which venues, simplifying the flow, and how to handle piano alignment.</p>
-
-      <!-- Beat 1: dot map — float-left image with two prose paragraphs wrapping around it -->
-      <div>
-        <div class="md:float-left md:w-1/2 md:mr-8 mb-6">
-          <div class="rounded-xl overflow-hidden bg-surface-container-low mb-3">
-            <img src="/assets/plp-design-jam.png" alt="Usability research: students placed dot stickers mapping where they feel most anxious by venue size and audience familiarity" class="w-full">
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">01</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Built the evaluation framework that selected the project</h3>
           </div>
-          <p class="text-xs text-on-surface-variant italic">Students mapped where they feel most anxious by venue size and audience familiarity. Two clusters emerged that drove the decision to build both Hill Auditorium and Britton Recital Hall.</p>
-        </div>
-        <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-4">
-          <p>Students were asked to mark where they felt most anxious on a two-axis grid: venue size and audience familiarity. The dots clustered in two corners. Large venue, strangers. Small venue, familiar audience.</p>
-          <p>Those two clusters drove the decision to build both Hill Auditorium and Britton Recital Hall, rather than picking one and assuming it generalized.</p>
-          <p>Additionally, Default Play and Performance Mode, originally separate menu options, were merged into a single continuous flow once testing showed a strong desire to orient themselves in the venue before starting a performance.</p>
-          <p>Similarly, the original piano alignment approach was clunky in usability sessions and didn't match XR alignment best practices; the team built an alternative and A/B tested the two against each other. Ultimately the evidence pointed toward a third hybrid version of the two.</p>
-        </div>
-        <div class="clear-both"></div>
-      </div>
-
-      <!-- Beat: production setup + 3-col block (supporting role) -->
-      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mt-12 mb-6">Building both venues at the fidelity the experience required took real production work.</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 items-start">
-        <div class="bg-surface-container-low rounded-xl p-6">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none mb-3">6,000+</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">photos captured at Hill Auditorium, 4,200 aligned</p>
-        </div>
-        <div class="bg-surface-container-low rounded-xl p-6">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none mb-3">2.7 TB</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">of audience footage on green screen, 42 members</p>
-        </div>
-        <div class="rounded-xl overflow-hidden bg-surface-container-low">
-          <img src="/assets/plp-greenscreen-person.jpg" alt="Audience member being filmed on the green screen XR Stage" class="w-full">
-        </div>
-      </div>
-
-      <p class="text-sm text-on-surface-variant italic">The Institute for Social Research partnership is set up as forward-looking validation infrastructure. IRB approval is in place, pilot testing has been conducted, and the full impact study runs post-launch.</p>
-    </section>
-
-    <!-- Decisions and their costs -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-3">Decisions and their costs.</h2>
-
-      <div class="space-y-4">
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">01</p>
-          <div>
-            <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Scoping three faculty ideas to one value prop</p>
-            <p class="text-sm text-on-surface-variant italic">faculty enthusiasm vs. buildable scope</p>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>When I joined CAI, the team was about to receive a fresh round of XR proposals with no shared structure for evaluating them. I built the framework from scratch before any proposals came in: criteria spanning learner outcomes, technology fit, and operational fit, plus a free-form section for the things that don't score cleanly. Every team member rated independently. After scoring, we gathered red flags, identified what was worth saving in each proposal, and met with faculty to refine the ideas before any final call.</p>
+            <p>On the criteria alone, Piano Lab Pro wasn't the clear winner. But that wasn't the framework's job. The framework's job was to surface what to ask faculty about, and the scoped-down version of Piano Lab Pro that emerged from those conversations was the clear choice.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> A first-pass framework should be deliberately broader than what you'll end up using. The redundant criteria are the ones that teach you which criteria actually matter; you can't subtract before you've added.</p>
           </div>
-        </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">02</p>
-          <div>
-            <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Merging Default Play and Performance Mode</p>
-            <p class="text-sm text-on-surface-variant italic">faculty mental model vs. what users actually needed</p>
+        </article>
+
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">02</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Scoped a five-objective proposal to one</h3>
           </div>
-        </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">03</p>
-          <div>
-            <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Piano alignment: rejecting the first solution, A/B testing the second</p>
-            <p class="text-sm text-on-surface-variant italic">schedule pressure vs. usability data</p>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>Aya's proposal bundled five learning objectives: performance anxiety, harmonization, ensemble practice, technical proficiency, and sight-reading. Each was a full product on its own, and shipping all five from an incubator team in one project wasn't realistic.</p>
+            <p>I scoped the project to performance anxiety, for three reasons that converged. A landscape scan showed existing apps already addressed the technical-skill side of piano, so building another would have been duplicative <em>and</em> a heavy lift for the team. Performance anxiety played to the AVP's strengths (high-fidelity visuals and spatial audio) in a way the other objectives didn't. And it generalized: performance anxiety isn't a piano problem, or even a music problem; it's a near-universal one (presentations, speaking, auditions) which gave the project a much larger scale of potential impact.</p>
+            <p>In the conversation with Aya, I explained the reasoning and the team's constraints. She was receptive and asked whether the cut objectives could come back later. I didn't promise they would, but I offered avenues: separate engagements down the line, or work she might lead with other partners that we'd support at handoff.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> Saying no to four objectives goes down easier when the no comes with three reasons converging from different directions (scale, technology fit, team capacity), not one. The conversation isn't "we can't" but "here's why this is the strongest version of your idea."</p>
           </div>
-        </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
-          <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">04</p>
-          <div>
-            <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Setting up validation infrastructure before it was needed</p>
-            <p class="text-sm text-on-surface-variant italic">institutional credibility vs. team capacity</p>
+        </article>
+
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">03</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Ran an A/B test instead of letting team intuition decide</h3>
           </div>
-        </div>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>Aligning the virtual piano with the real keys was harder than it looked. Our first solution, a virtual piano body with a cutout for the real keys, was clunky in mockup. Manipulating large objects in XR doesn't match how human brains work, and the cutout itself was ambiguous (users couldn't tell how much was meant to show the keys vs. the surrounding piano body).</p>
+            <p>The team had a strong intuition the approach wasn't working. What we didn't have was evidence for what users would prefer instead. So instead of iterating on the first solution or picking a replacement based on team preference, I prototyped a second approach (a transparent cuboid overlaid on the real keys) and ran an A/B test. The point wasn't to declare a winner internally, it was to let non-XR-expert users tell us what their brains actually wanted, with the team's biases removed from the answer.</p>
+            <p>Results were mixed enough that neither solution won outright. The team is now designing a hybrid drawing on what each test surfaced.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> Team intuition is a strong signal that something is wrong, but a weak signal for what's right. When the team agrees a solution is clunky but disagrees on what to replace it with, that's a moment to run the comparison instead of arguing about it.</p>
+          </div>
+        </article>
+
       </div>
     </section>
 
-    <hr class="max-w-5xl mx-auto border-outline-variant/40 mb-20">
+    <!-- Section 5: Outcome -->
+    <section id="outcome" aria-labelledby="outcome-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="outcome-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Outcome</h2>
 
-    <!-- Where it stands + what I learned (closing — smaller heading) -->
-    <section class="max-w-5xl mx-auto px-6 mb-16">
-      <h2 class="font-headline text-2xl md:text-3xl font-semibold text-primary tracking-tight mb-8">Where it stands + what I learned.</h2>
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>As of May 2026, the working prototype runs on Apple Vision Pro with both venues fully built, live audience, calibrated acoustics, Bluetooth MIDI routing, and the full pre-performance to performance flow. IRB approval is in place. Pilot testing has been conducted. The student guide is deployed and in students' hands. The load-bearing pieces are complete.</p>
+      </div>
 
-      <!-- Status (different tint to differentiate) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
-        <div class="bg-surface-container rounded-xl p-5">
-          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">Done</p>
-          <ul class="space-y-1.5 text-sm text-on-surface-variant">
-            <li class="flex gap-2"><span class="text-primary font-bold flex-shrink-0">&#10003;</span>IRB approval</li>
-            <li class="flex gap-2"><span class="text-primary font-bold flex-shrink-0">&#10003;</span>Usability testing</li>
-            <li class="flex gap-2"><span class="text-primary font-bold flex-shrink-0">&#10003;</span>Student guide deployed</li>
-            <li class="flex gap-2"><span class="text-primary font-bold flex-shrink-0">&#10003;</span>Both venues built</li>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        <div class="bg-surface-container rounded-xl p-6">
+          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">Done</p>
+          <ul class="space-y-2.5 text-sm md:text-base text-on-surface-variant">
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">&#10003;</span><span>IRB approval in place (U-M Institute for Social Research)</span></li>
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">&#10003;</span><span>Multiple iteration loops of usability testing completed; findings drove key product decisions</span></li>
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">&#10003;</span><span>Student guide deployed</span></li>
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">&#10003;</span><span>Both venues (Hill + Britton) fully built; live audience and calibrated acoustics running</span></li>
           </ul>
         </div>
-        <div class="bg-surface-container rounded-xl p-5">
-          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">In progress</p>
-          <ul class="space-y-1.5 text-sm text-on-surface-variant">
-            <li class="flex gap-2"><span class="text-outline font-bold flex-shrink-0">&#9675;</span>Alignment UX</li>
-            <li class="flex gap-2"><span class="text-outline font-bold flex-shrink-0">&#9675;</span>Instructor-side tooling</li>
+        <div class="bg-surface-container rounded-xl p-6">
+          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">In progress</p>
+          <ul class="space-y-2.5 text-sm md:text-base text-on-surface-variant">
+            <li class="flex gap-3"><span class="text-outline font-bold flex-shrink-0">&#9675;</span><span>Alignment UX (hybrid solution in design)</span></li>
+            <li class="flex gap-3"><span class="text-outline font-bold flex-shrink-0">&#9675;</span><span>Onboarding sequence and summary screen content</span></li>
+            <li class="flex gap-3"><span class="text-outline font-bold flex-shrink-0">&#9675;</span><span>Instructor-side tooling (planned, not yet built)</span></li>
           </ul>
         </div>
       </div>
 
-      <!-- Lessons: italic with secondary left border, no card background -->
-      <div class="space-y-5">
-        <div class="border-l-2 border-secondary pl-6 py-1">
-          <p class="font-headline italic text-lg md:text-xl text-on-surface leading-relaxed">Holding the line on scope, with real clients.</p>
-        </div>
-        <div class="border-l-2 border-secondary pl-6 py-1">
-          <p class="font-headline italic text-lg md:text-xl text-on-surface leading-relaxed">Let research lead.</p>
-        </div>
-        <div class="border-l-2 border-secondary pl-6 py-1">
-          <p class="font-headline italic text-lg md:text-xl text-on-surface leading-relaxed">Reading what the team can't do.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Deep dive CTA: primary-filled action -->
-    <section class="max-w-5xl mx-auto px-6">
       <a href="/piano-lab-pro/deep-dive/" class="block bg-primary text-on-primary rounded-xl p-6 md:p-7 hover:opacity-90 transition-opacity group">
         <div class="flex items-center justify-between gap-6">
           <div>
-            <p class="font-medium text-base md:text-lg mb-1">Want the full version?</p>
-            <p class="text-sm opacity-90 leading-relaxed">Read the deep dive: team, discovery process, full coordination, all images, additional decisions.</p>
+            <p class="font-medium text-base md:text-lg mb-1">Read the deep dive</p>
+            <p class="text-sm opacity-90 leading-relaxed">Methods, artifacts, and full reflections.</p>
           </div>
           <span class="font-headline text-3xl md:text-4xl flex-shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
         </div>
@@ -378,6 +467,68 @@
     document.getElementById('nav-toggle').addEventListener('click', function() {
       document.getElementById('nav-menu').classList.toggle('is-open');
     });
+  </script>
+
+  <script id="section-progress-nav-script">
+  (function () {
+    // Reusable scroll-spy + progress nav.
+    // To reuse on another case study: copy this script + the matching <nav id="section-nav">
+    // markup, and edit the SECTIONS array below. Each id must match a <section id="..."> on the page.
+    const SECTIONS = [
+      { id: 'context',   label: 'Context'   },
+      { id: 'problem',   label: 'Problem'   },
+      { id: 'approach',  label: 'Approach'  },
+      { id: 'decisions', label: 'Decisions' },
+      { id: 'outcome',   label: 'Outcome'   }
+    ];
+    const HEADER_HEIGHT = 128; // site nav (~73px) + section nav (~55px)
+
+    const items = SECTIONS.map(s => ({
+      id: s.id,
+      section: document.getElementById(s.id),
+      navEl: document.querySelector('[data-section="' + s.id + '"]'),
+      fillEl: document.querySelector('[data-section="' + s.id + '"] .section-nav-fill')
+    })).filter(x => x.section && x.navEl && x.fillEl);
+
+    let raf = null;
+
+    function update() {
+      raf = null;
+      const scrollPos = window.scrollY + HEADER_HEIGHT;
+      let activeIdx = -1;
+
+      items.forEach((item, i) => {
+        const top = item.section.offsetTop;
+        const next = i + 1 < items.length ? items[i + 1].section : null;
+        const bottom = next ? next.offsetTop : (item.section.offsetTop + item.section.offsetHeight);
+
+        let pct;
+        if (scrollPos < top) pct = 0;
+        else if (scrollPos >= bottom) pct = 100;
+        else pct = ((scrollPos - top) / (bottom - top)) * 100;
+
+        item.fillEl.style.width = pct.toFixed(2) + '%';
+
+        if (scrollPos >= top) activeIdx = i;
+      });
+
+      // Default to first segment if nothing is reached yet (i.e., still in the hero).
+      if (activeIdx === -1) activeIdx = 0;
+
+      items.forEach((item, i) => {
+        item.navEl.classList.toggle('is-active', i === activeIdx);
+      });
+    }
+
+    function schedule() {
+      if (raf == null) raf = requestAnimationFrame(update);
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    // Run once on load.
+    update();
+  })();
   </script>
 
 </body>
