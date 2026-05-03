@@ -235,32 +235,29 @@
       <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">Building it (and what testing changed).</h2>
       <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-8">Capturing two real auditoriums at the fidelity the experience required was an operational problem. Running it was my job.</p>
 
-      <!-- Production stats: number-prominent -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div class="bg-surface-container-low rounded-xl p-6">
+      <!-- Production zone: 2 stat boxes + green screen photo, grouped (3 columns) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        <div class="bg-surface-container-low rounded-xl p-6 flex flex-col justify-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none mb-3">6,000+</p>
-          <p class="text-sm font-medium text-on-surface mb-1">Hill Auditorium capture</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">photos captured, 4,200 aligned. 20 balloons popped for impulse response.</p>
+          <p class="text-sm text-on-surface-variant leading-relaxed">photos captured at Hill Auditorium, 4,200 aligned</p>
         </div>
-        <div class="bg-surface-container-low rounded-xl p-6">
+        <div class="bg-surface-container-low rounded-xl p-6 flex flex-col justify-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none mb-3">2.7 TB</p>
-          <p class="text-sm font-medium text-on-surface mb-1">Audience capture</p>
-          <p class="text-sm text-on-surface-variant leading-relaxed">42 audience members on green screen. 2.7 TB of footage.</p>
+          <p class="text-sm text-on-surface-variant leading-relaxed">of audience footage on green screen, 42 members</p>
+        </div>
+        <div class="rounded-xl overflow-hidden bg-surface-container-low">
+          <img src="/assets/plp-greenscreen-person.jpg" alt="Audience member being filmed on the green screen XR Stage" class="w-full h-full object-cover">
         </div>
       </div>
 
-      <!-- Production photos: smaller than body width -->
-      <div class="max-w-3xl mx-auto mb-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="rounded-xl overflow-hidden bg-surface-container-low">
-            <img src="/assets/plp-greenscreen-person.jpg" alt="Audience member being filmed on the green screen XR Stage" class="w-full">
-          </div>
-          <div class="rounded-xl overflow-hidden bg-surface-container-low">
-            <img src="/assets/plp-design-jam.png" alt="Usability research: students placed dot stickers mapping where they feel most anxious by venue size and audience familiarity" class="w-full">
-          </div>
-        </div>
+      <!-- Transition into research -->
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-8">The choice of which two venues to capture wasn't arbitrary. It came from earlier research with students.</p>
+
+      <!-- Anxiety dot map: body-width single featured image -->
+      <div class="rounded-xl overflow-hidden bg-surface-container-low mb-3">
+        <img src="/assets/plp-design-jam.png" alt="Usability research: students placed dot stickers mapping where they feel most anxious by venue size and audience familiarity" class="w-full">
       </div>
-      <p class="text-xs text-on-surface-variant italic mb-10 max-w-3xl mx-auto">Two of the production realities: capturing audience footage on green screen, and the anxiety map that drove venue choices.</p>
+      <p class="text-xs text-on-surface-variant italic mb-10">Students mapped where they feel most anxious by venue size and audience familiarity. Two clusters emerged that drove the decision to build both Hill Auditorium and Britton Recital Hall.</p>
 
       <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-4 mb-6">
         <p>Two product decisions came directly from testing findings. Default Play and Performance Mode, originally separate menu options, were merged into a single continuous flow once testing showed the separation made the anxiety-triggering transition optional. The original piano alignment approach failed consistently in usability sessions; rather than iterate on a broken pattern, I prototyped an alternative and A/B tested them against each other.</p>
@@ -275,28 +272,28 @@
       <p class="text-base text-on-surface-variant italic mb-10">Every decision here was a three-way tension between faculty clients, student users, and what the team could build.</p>
 
       <div class="space-y-4">
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-baseline">
+        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">01</p>
           <div>
             <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Scoping three faculty ideas to one value prop</p>
             <p class="text-sm text-on-surface-variant italic">faculty enthusiasm vs. buildable scope</p>
           </div>
         </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-baseline">
+        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">02</p>
           <div>
             <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Merging Default Play and Performance Mode</p>
             <p class="text-sm text-on-surface-variant italic">faculty mental model vs. what users actually needed</p>
           </div>
         </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-baseline">
+        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">03</p>
           <div>
             <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Piano alignment: rejecting the first solution, A/B testing the second</p>
             <p class="text-sm text-on-surface-variant italic">schedule pressure vs. usability data</p>
           </div>
         </div>
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-baseline">
+        <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col md:flex-row md:gap-7 md:items-center">
           <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0 mb-3 md:mb-0">04</p>
           <div>
             <p class="font-headline text-xl md:text-2xl font-semibold text-on-surface mb-2 leading-tight">Setting up validation infrastructure before it was needed</p>
