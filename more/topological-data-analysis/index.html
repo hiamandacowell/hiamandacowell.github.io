@@ -108,7 +108,7 @@
   <main class="pt-24 pb-20">
 
     <!-- Header: title full width, metadata row below -->
-    <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
+    <header class="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-10 md:pb-12">
 
       <!-- Title -->
       <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-[1.05] mb-10 md:mb-12">
@@ -136,85 +136,94 @@
       </div>
 
       <!-- OhioLINK CTA -->
-      <a href="http://rave.ohiolink.edu/etdc/view?acc_num=toledo1620579529905963" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mb-16 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
+      <a href="http://rave.ohiolink.edu/etdc/view?acc_num=toledo1620579529905963" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
         Read on OhioLINK
         <span aria-hidden="true">↗</span>
       </a>
 
-      <!-- About the thesis -->
-      <div class="max-w-3xl mb-10">
-        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">
-          About the thesis
-        </p>
+    </header>
+
+    <!-- Body sections -->
+
+    <!-- About the thesis (full-width cream card) -->
+    <section class="max-w-7xl mx-auto px-6 mb-4 md:mb-6">
+      <div class="bg-surface-container-low rounded-xl p-6 md:p-10">
+        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">About the thesis</p>
         <p class="text-lg leading-relaxed text-on-surface-variant">
           Topological Data Analysis (TDA) combines topology, the mathematical study of shape, with data analysis. The thesis introduces the foundational tools of TDA, including simplicial complexes, homology, and persistent homology, and discusses how these tools are used to study the shape of data in fields like medical imaging and autonomous navigation.
         </p>
       </div>
+    </section>
 
-      <!-- Abstract -->
-      <div class="max-w-3xl mb-20">
-        <div class="bg-surface-container-low rounded-xl p-6 md:p-8 border-l-4 border-primary">
-          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">Abstract</p>
-          <p class="text-base leading-relaxed text-on-surface-variant italic">
-            Topology looks to explore the essential information encoded in geometric objects. Data often focuses on numbers and other units of information. When combining these two fields, we get Topological Data Analysis (TDA), where we explore data using specific properties of geometric objects. In this paper, we introduce the necessary background for topology in the context of data, including simplices and complexes, and how we use these to create geometric structure on discrete spaces. Different types of homology are discussed, including persistent homology and its tools such as barcode and persistence diagrams. Finally, we introduce some applications for TDA that have been used in different contexts.
+    <!-- Concept block: Topology + figure -->
+    <section class="max-w-7xl mx-auto px-6 mb-4 md:mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div class="lg:col-span-6 bg-surface-container-low rounded-xl p-6 md:p-8">
+          <h2 class="font-headline text-2xl md:text-3xl font-semibold text-primary tracking-tight mb-4">Topology</h2>
+          <p class="text-base md:text-lg leading-relaxed text-on-surface-variant">
+            Topology is the study of shapes you can bend, stretch, or fold without tearing. Two shapes are the same if you can deform one into the other. What TDA cares about most is how many holes a shape has.
           </p>
         </div>
-      </div>
-
-      <!-- Concept blocks: each figure with framing intro -->
-
-      <section class="mb-16 md:mb-20">
-        <div class="max-w-3xl mb-6">
-          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Topology — shape, not numbers</h2>
-          <p class="text-lg leading-relaxed text-on-surface-variant">
-            Topology studies the properties of shapes that survive bending, stretching, or folding without tearing. To topology, two shapes are "the same" if one can be deformed into the other. The concrete invariant TDA uses most is the number of holes.
-          </p>
-        </div>
-        <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
-          <div class="bg-white rounded-lg overflow-hidden">
+        <figure class="lg:col-span-6 bg-surface-container-low rounded-xl p-3 md:p-4 flex flex-col">
+          <div class="bg-white rounded-lg overflow-hidden flex-1 flex items-center">
             <img src="/assets/thesis-figure-three-twos.png" alt="Three handwritten versions of the digit 2, with no loops, one loop, and two loops" class="w-full h-auto block">
           </div>
-          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1 max-w-3xl">
+          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1">
             Three handwritten versions of the digit 2. To topology, these are different shapes, distinguished by the number of holes.
           </figcaption>
         </figure>
-      </section>
+      </div>
+    </section>
 
-      <section class="mb-16 md:mb-20">
-        <div class="max-w-3xl mb-6">
-          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Simplicial complexes — building shapes from pieces</h2>
-          <p class="text-lg leading-relaxed text-on-surface-variant">
-            To analyze a dataset's shape, TDA first builds a structure called a simplicial complex from the data. The pieces are simple: points, line segments, triangles, tetrahedra, and higher-dimensional analogs.
+    <!-- Abstract (full-width callout) -->
+    <section class="max-w-7xl mx-auto px-6 mb-4 md:mb-6">
+      <div class="bg-surface-container-low rounded-xl p-6 md:p-10 border-l-4 border-primary">
+        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">Abstract</p>
+        <p class="text-base leading-relaxed text-on-surface-variant italic">
+          Topology looks to explore the essential information encoded in geometric objects. Data often focuses on numbers and other units of information. When combining these two fields, we get Topological Data Analysis (TDA), where we explore data using specific properties of geometric objects. In this paper, we introduce the necessary background for topology in the context of data, including simplices and complexes, and how we use these to create geometric structure on discrete spaces. Different types of homology are discussed, including persistent homology and its tools such as barcode and persistence diagrams. Finally, we introduce some applications for TDA that have been used in different contexts.
+        </p>
+      </div>
+    </section>
+
+    <!-- Concept block: Simplicial complexes + figure -->
+    <section class="max-w-7xl mx-auto px-6 mb-4 md:mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div class="lg:col-span-6 bg-surface-container-low rounded-xl p-6 md:p-8">
+          <h2 class="font-headline text-2xl md:text-3xl font-semibold text-primary tracking-tight mb-4">Simplicial complexes</h2>
+          <p class="text-base md:text-lg leading-relaxed text-on-surface-variant">
+            Before TDA can study the shape of a dataset, it has to build that shape from the data. The building blocks are simple: points, line segments, triangles, tetrahedra, and so on.
           </p>
         </div>
-        <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
-          <div class="bg-white rounded-lg overflow-hidden">
+        <figure class="lg:col-span-6 bg-surface-container-low rounded-xl p-3 md:p-4 flex flex-col">
+          <div class="bg-white rounded-lg overflow-hidden flex-1 flex items-center">
             <img src="/assets/thesis-figure-simplex-progression.png" alt="A point, a line segment, a triangle, and a tetrahedron" class="w-full h-auto block">
           </div>
-          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1 max-w-3xl">
+          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1">
             The basic building blocks of simplicial complexes: a point, a line segment, a triangle, and a tetrahedron.
           </figcaption>
         </figure>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <div class="max-w-3xl mb-6">
-          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Persistent homology — tracking shape across scale</h2>
-          <p class="text-lg leading-relaxed text-on-surface-variant">
-            Real-world data is noisy, so TDA examines a simplicial complex at many scales at once. Cycles appear and disappear as the complex grows. Features that vanish quickly are noise; features that persist across many scales are real.
+    <!-- Concept block: Persistent homology + figure -->
+    <section class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div class="lg:col-span-6 bg-surface-container-low rounded-xl p-6 md:p-8">
+          <h2 class="font-headline text-2xl md:text-3xl font-semibold text-primary tracking-tight mb-4">Persistent homology</h2>
+          <p class="text-base md:text-lg leading-relaxed text-on-surface-variant">
+            Real data is messy, so TDA looks at a complex at many scales at once. Cycles appear and disappear as the complex grows. The ones that stick around across many scales are the ones that matter.
           </p>
         </div>
-        <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
-          <div class="bg-white rounded-lg overflow-hidden">
+        <figure class="lg:col-span-6 bg-surface-container-low rounded-xl p-3 md:p-4 flex flex-col">
+          <div class="bg-white rounded-lg overflow-hidden flex-1 flex items-center">
             <img src="/assets/thesis-figure-cycle-birth-death.png" alt="A hexagonal complex shown across five stages: no cycle, cycle born, cycle persists, cycle persists, cycle dies" class="w-full h-auto block">
           </div>
-          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1 max-w-3xl">
+          <figcaption class="text-sm italic text-on-surface-variant px-2 pt-3 pb-1">
             The birth and death of a one-dimensional cycle as a complex is built up. This is the core mechanic of persistent homology.
           </figcaption>
         </figure>
-      </section>
-
-    </header>
+      </div>
+    </section>
 
   </main>
 
