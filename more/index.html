@@ -47,7 +47,8 @@
             "surface-container-lowest": "#F4F1EC",
             "outline": "#7A7470",
             "surface-dim": "#D0CBC4",
-            "accent": "#B05C1A"
+            "accent": "#B05C1A",
+            "logo-blue": "#2A4E6A"
           },
           borderRadius: {
             "DEFAULT": "0.125rem",
@@ -138,6 +139,67 @@
       outline-offset: 2px;
       border-radius: 4px;
     }
+
+    /* Press list (In the news) */
+    .press-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 24px;
+      align-items: baseline;
+      padding: 14px 0;
+      border-top: 1px solid rgba(122, 116, 112, 0.25);
+    }
+    .press-row:last-child {
+      border-bottom: 1px solid rgba(122, 116, 112, 0.25);
+    }
+    @media (max-width: 639px) {
+      .press-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+    .press-date {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 12px;
+      color: #7A7470;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-feature-settings: 'tnum' 1;
+    }
+    .press-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #2A4E6A;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      display: block;
+      transition: color 150ms ease;
+    }
+    .press-title:hover {
+      color: #1C1714;
+    }
+    .press-publication {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 12px;
+      color: #7A7470;
+      margin: 2px 0 6px;
+    }
+    .press-quote,
+    .press-context {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #4A4440;
+      margin: 0;
+    }
+    .press-quote {
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: italic;
+    }
+    .press-context {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -201,6 +263,21 @@
     <!-- Grid -->
     <section aria-label="Items" class="max-w-7xl mx-auto px-6 pb-12">
       <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+    </section>
+
+    <!-- In the news -->
+    <header id="in-the-news" class="max-w-7xl mx-auto px-6 pt-12 md:pt-16 pb-8 md:pb-10" style="scroll-margin-top: 96px;">
+      <h2 class="font-headline italic text-4xl md:text-5xl font-normal text-on-surface tracking-tight mb-4">
+        In the news.
+      </h2>
+      <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed">
+        Where my work has shown up.
+      </p>
+    </header>
+
+    <!-- Press list -->
+    <section aria-label="Press" class="max-w-7xl mx-auto px-6 pb-12">
+      <div id="press-list"></div>
     </section>
 
   </main>
@@ -339,6 +416,77 @@
     }
 
     document.getElementById('grid').innerHTML = items.map(tileHtml).join('');
+
+    /*
+      ============================================================
+        Press data: edit this array to add, remove, or reorder.
+        Each item:
+          id          : unique slug (used as a stable key)
+          publication : string, displayed
+          dateShort   : short date string for the date rail (e.g. "Apr 2026")
+          title       : string, used as the link text
+          link        : external URL
+          quote       : pull quote text (use this OR context, not both)
+          context     : non-quote descriptive text (use this OR quote, not both)
+        Always rendered as external links opening in a new tab.
+      ============================================================
+    */
+    const pressItems = [
+      {
+        id: 'cai-student-fellowship-showcase-2026',
+        publication: 'University of Michigan Center for Academic Innovation',
+        dateShort: 'Apr 2026',
+        title: 'Student Fellows Prove the Power of Teamwork at Annual Showcase',
+        link: 'https://ai.umich.edu/blog-posts/student-fellows-prove-the-power-of-teamwork-at-annual-showcase/',
+        quote: 'They bring creativity. They bring what they learn from their classrooms and teach us.'
+      },
+      {
+        id: 'concussion-vr-tool-2025',
+        publication: 'Online Teaching at U-M',
+        dateShort: 'Nov 2025',
+        title: 'Virtual Reality Tool Transforms Concussion Course',
+        link: 'https://onlineteaching.umich.edu/articles/virtual-reality-tool-transforms-concussion-course/',
+        quote: 'Collaborations like these help us pilot and explore what is possible with XR and serve as a launching point for integrating with other emerging technologies, like AI.'
+      },
+      {
+        id: 'xred-summer-project-2025',
+        publication: 'University of Michigan Center for Academic Innovation',
+        dateShort: 'Sep 2025',
+        title: 'Student Fellows Use Summer Project to Showcase XR Potential in Online Courses',
+        link: 'https://ai.umich.edu/blog-posts/student-fellows-use-summer-project-to-showcase-xr-potential-in-online-courses/',
+        quote: 'We wanted to task them with contributing insights on how XR fits in with course design and build frameworks that we can use to better collaborate with partners of CAI.'
+      },
+      {
+        id: 'cai-gen-ai-projects-2025',
+        publication: 'University of Michigan Center for Academic Innovation',
+        dateShort: 'Feb 2025',
+        title: 'CAI Announces New Generative AI Projects to Support Teaching and Learning',
+        link: 'https://ai.umich.edu/blog-posts/generative-ai-projects-teaching-learning/',
+        context: 'I led the round of faculty consultations and proposal evaluations behind these awarded generative AI projects in teaching and learning.'
+      }
+    ];
+
+    function pressItemHtml(item) {
+      let body = '';
+      if (item.quote) {
+        body = `<blockquote class="press-quote">“${escapeHtml(item.quote)}” – Amanda</blockquote>`;
+      } else if (item.context) {
+        body = `<p class="press-context">${escapeHtml(item.context)}</p>`;
+      }
+
+      return `
+        <div class="press-row">
+          <div class="press-date">${escapeHtml(item.dateShort)}</div>
+          <div>
+            <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="press-title">${escapeHtml(item.title)}</a>
+            <p class="press-publication">${escapeHtml(item.publication)}</p>
+            ${body}
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('press-list').innerHTML = pressItems.map(pressItemHtml).join('');
   </script>
 
 </body>
