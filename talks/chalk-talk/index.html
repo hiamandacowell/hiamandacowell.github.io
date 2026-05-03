@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Talks: Amanda L. Cowell</title>
+  <title>Chalk Talk — Talks: Amanda L. Cowell</title>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,11 +90,13 @@
   <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="font-headline text-xl font-semibold text-primary tracking-tight">Amanda L. Cowell</a>
-      <div id="nav-menu" class="nav-menu hidden md:flex items-center gap-8">
-        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors text-sm">Home</a>
-        <a href="/#projects" class="text-on-surface-variant hover:text-primary transition-colors text-sm">Work</a>
-        <a href="/talks/" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm">Talks</a>
-        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">LinkedIn</a>
+      <div id="nav-menu" class="nav-menu hidden md:flex items-center gap-3 text-sm">
+        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors">Home</a>
+        <span class="text-outline">/</span>
+        <a href="/talks/" class="text-on-surface-variant hover:text-primary transition-colors">Talks</a>
+        <span class="text-outline">/</span>
+        <span class="text-on-surface font-medium">Chalk Talk</span>
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="ml-5 bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">LinkedIn</a>
       </div>
       <button id="nav-toggle" type="button" aria-label="Toggle menu" class="md:hidden material-symbols-outlined text-primary cursor-pointer bg-transparent border-0 p-0">menu</button>
     </div>
@@ -102,58 +104,54 @@
 
   <main class="pt-24 pb-20">
 
-    <!-- Page header -->
+    <!-- Header -->
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
-      <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-8">
-        Talks
-      </h1>
-      <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed">
-        Talks I've given, with whatever recording, slides, or photos I have from each.
-      </p>
-    </header>
 
-    <!-- Talks grid -->
-    <section id="talks-grid" class="max-w-7xl mx-auto px-6 pb-20">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        <!-- Card: Chalk Talk -->
-        <a href="/talks/chalk-talk/" class="group block rounded-xl overflow-hidden bg-surface-container-low hover:bg-surface-container transition-colors">
-          <div class="aspect-video overflow-hidden bg-surface-container-highest">
-            <img
-              src="https://img.youtube.com/vi/GLHKsd4zJtE/maxresdefault.jpg"
-              alt="Chalk Talk video thumbnail"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              loading="lazy">
-          </div>
-          <div class="p-6 md:p-8">
-            <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">
-              FordLabs Passion Talks &middot; June 2023
-            </p>
-            <h2 class="font-headline text-2xl font-semibold text-on-surface mb-3 tracking-tight">Chalk Talk</h2>
-            <p class="text-sm leading-relaxed text-on-surface-variant mb-5">
-              A short, personal talk given at FordLabs, where Passion Talks were a team tradition. Awarded Most Passionate Talker.
-            </p>
-            <span class="text-primary font-medium text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-              Watch the talk <span aria-hidden="true">&#8594;</span>
-            </span>
-          </div>
-        </a>
-
-        <!-- Add next talk card here:
-             Duplicate the <a class="group block ..."> block above. The thumbnail can be a YouTube
-             still (https://img.youtube.com/vi/{ID}/maxresdefault.jpg), a slide screenshot, an event
-             photo, or any /assets/ image. The href points to a per-talk subpage at /talks/[slug]/.
-        -->
-
+      <!-- Title + award row -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12">
+        <div class="lg:col-span-8">
+          <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-6">Chalk Talk</h1>
+          <p class="text-xs font-bold text-secondary uppercase tracking-widest">
+            FordLabs Passion Talks &middot; June 2023
+          </p>
+        </div>
+        <div class="lg:col-span-4">
+          <figure class="rounded-xl overflow-hidden bg-surface-container-low">
+            <img src="/assets/chalk-talk-award.jpg" alt="Most Passionate Talker award certificate from The Flabbies, FordLabs" class="w-full h-auto block">
+            <figcaption class="px-4 py-3 text-xs text-on-surface-variant italic">
+              Most Passionate Talker, The Flabbies &middot; FordLabs, Feb 2024
+            </figcaption>
+          </figure>
+        </div>
       </div>
-    </section>
+
+      <!-- Video (full width, primary visual) -->
+      <div class="rounded-xl overflow-hidden aspect-video shadow-2xl mb-10 bg-surface-container-highest">
+        <iframe
+          class="w-full h-full"
+          src="https://www.youtube.com/embed/GLHKsd4zJtE"
+          title="Chalk Talk by Amanda Cowell"
+          frameborder="0"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+
+      <!-- Description -->
+      <div class="max-w-3xl">
+        <p class="text-lg leading-relaxed text-on-surface-variant">
+          Passion Talks at FordLabs were a team tradition where members presented on something they cared about outside of work, in a short and personal format.
+        </p>
+      </div>
+
+    </header>
 
   </main>
 
   <!-- Footer -->
   <footer class="bg-teal-900 w-full py-12">
     <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-      <a href="/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; Home</a>
+      <a href="/talks/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; All talks</a>
       <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
       <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
     </div>
