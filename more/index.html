@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>More: Amanda L. Cowell</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#D8D3CB",
+            "primary-fixed": "#b9ebf2",
+            "on-surface": "#1C1714",
+            "on-secondary-fixed-variant": "#384b3c",
+            "outline-variant": "#C5BFBA",
+            "on-secondary-container": "#546757",
+            "surface-container-low": "#EDE9E2",
+            "on-secondary-fixed": "#0d1f12",
+            "primary": "#26585d",
+            "surface-container": "#E3DFD7",
+            "on-primary-container": "#c0f2f8",
+            "on-primary": "#ffffff",
+            "secondary": "#4f6353",
+            "primary-container": "#407076",
+            "surface": "#FAF7F2",
+            "primary-fixed-dim": "#9ecfd5",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#d2e8d3",
+            "surface-container-highest": "#CEC9C0",
+            "secondary-container": "#cfe5d0",
+            "on-primary-fixed": "#001f23",
+            "secondary-fixed-dim": "#b6ccb8",
+            "on-surface-variant": "#4A4440",
+            "tertiary": "#554d65",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#6d657e",
+            "on-primary-fixed-variant": "#1a4e53",
+            "inverse-primary": "#9ecfd5",
+            "surface-container-lowest": "#F4F1EC",
+            "outline": "#7A7470",
+            "surface-dim": "#D0CBC4",
+            "accent": "#B05C1A"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            "headline": ["Fraunces", "Georgia", "serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+            "label": ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    @media (max-width: 767px) {
+      .nav-menu.is-open {
+        display: flex !important;
+        flex-direction: column;
+        align-items: flex-start;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #FAF7F2;
+        padding: 1.5rem;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(197,191,186,0.4);
+      }
+    }
+
+    /* Filter pills */
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 0.95rem;
+      border: 1px solid #C5BFBA;
+      border-radius: 9999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #4A4440;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+    .filter-pill:hover { border-color: #26585d; color: #26585d; }
+    .filter-pill.active {
+      background: #26585d;
+      color: #fff;
+      border-color: #26585d;
+    }
+
+    /* Tile fallback color blocks (for items without thumbnails) */
+    .tile-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .tile-fallback-text {
+      font-family: 'Fraunces', serif;
+      font-weight: 400;
+      font-size: 1.625rem;
+      line-height: 1.15;
+      color: #ECE8E1;
+      letter-spacing: -0.01em;
+    }
+    .tile-fallback-video       { background: #2F3D63; }
+    .tile-fallback-writing     { background: #B05C1A; }
+    .tile-fallback-presentation { background: #B8796A; }
+    .tile-fallback-project     { background: #26585d; }
+
+    /* Tile tag chips */
+    .tile-tag {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 0.25rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(28,35,51,0.06);
+      color: #4A4440;
+    }
+    .tile-tag.tile-tag-type { color: #26585d; background: rgba(38,88,93,0.10); }
+  </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="font-headline text-xl font-semibold text-primary tracking-tight">Amanda L. Cowell</a>
+      <div id="nav-menu" class="nav-menu hidden md:flex items-center gap-8">
+        <a href="/" class="text-on-surface-variant hover:text-primary transition-colors text-sm">Home</a>
+        <a href="/#projects" class="text-on-surface-variant hover:text-primary transition-colors text-sm">Work</a>
+        <a href="/more/" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm">More</a>
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">LinkedIn</a>
+      </div>
+      <button id="nav-toggle" type="button" aria-label="Toggle menu" class="md:hidden material-symbols-outlined text-primary cursor-pointer bg-transparent border-0 p-0">menu</button>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-20">
+
+    <!-- Page header -->
+    <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-8">
+        More
+      </h1>
+      <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed">
+        A collection of things that go beyond the case studies — talks, writing, projects, and other artifacts of how I spend my time.
+      </p>
+    </header>
+
+    <!-- Filters -->
+    <section aria-label="Filters" class="max-w-7xl mx-auto px-6 mb-10">
+      <div class="bg-surface-container-low rounded-xl p-6 md:p-7 flex flex-col gap-4">
+        <div class="flex flex-col md:flex-row md:items-center md:gap-5 gap-2">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest md:w-20 flex-shrink-0">Type</span>
+          <div id="filter-types" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-center md:gap-5 gap-2">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest md:w-20 flex-shrink-0">Subject</span>
+          <div id="filter-subjects" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-outline-variant/30 mt-1">
+          <span id="result-count" class="text-sm text-on-surface-variant"></span>
+          <button id="clear-filters" type="button" class="text-sm text-primary hover:underline" hidden>Clear filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section aria-label="Items" class="max-w-7xl mx-auto px-6 pb-12">
+      <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="text-center py-20" hidden>
+        <p class="font-headline text-2xl text-on-surface mb-3">Nothing matches these filters.</p>
+        <button id="empty-state-clear" type="button" class="text-primary hover:underline text-sm">Clear filters</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-teal-900 w-full py-12">
+    <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <a href="/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; Home</a>
+      <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
+      <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      document.getElementById('nav-menu').classList.toggle('is-open');
+    });
+  </script>
+
+  <!--
+    ============================================================
+      Items data — edit this array to add, remove, or reorder.
+      Each item:
+        id          — unique slug (used as a stable key)
+        title       — string, displayed
+        types       — array of: 'video' | 'writing' | 'presentation' | 'project'
+        subjects    — array of: 'math' | 'xr' | 'ai' | 'teaching'
+        description — string, 1–2 sentences
+        thumbnail   — image URL, or null to use a colored fallback block
+        link        — destination URL (internal path or external https://)
+        external    — true to open in a new tab + show ↗ icon, false otherwise
+    ============================================================
+  -->
+  <script>
+    const TYPES = ['video', 'writing', 'presentation', 'project'];
+    const SUBJECTS = ['math', 'xr', 'ai', 'teaching'];
+    const TYPE_LABELS = { video: 'Video', writing: 'Writing', presentation: 'Presentation', project: 'Project' };
+    const SUBJECT_LABELS = { math: 'Math', xr: 'XR', ai: 'AI', teaching: 'Teaching' };
+
+    const items = [
+      {
+        id: 'chalk-talk',
+        title: 'Chalk Talk',
+        types: ['video', 'presentation'],
+        subjects: ['teaching'],
+        description: 'A short, personal talk in the FordLabs Passion Talks tradition. Awarded Most Passionate Talker.',
+        thumbnail: 'https://img.youtube.com/vi/GLHKsd4zJtE/maxresdefault.jpg',
+        link: '/more/chalk-talk/',
+        external: false
+      },
+      {
+        id: 'enriching-scholarship',
+        title: 'Enriching Scholarship presentation',
+        types: ['video', 'presentation'],
+        subjects: ['teaching'],
+        description: '[Add description.] Talk given at the U-M Enriching Scholarship conference.',
+        thumbnail: null,
+        link: null,
+        external: false
+      },
+      {
+        id: 'masters-thesis',
+        title: "Master's thesis",
+        types: ['writing'],
+        subjects: ['math'],
+        description: '[Add description of thesis topic.] Hosted on OhioLink.',
+        thumbnail: null,
+        link: null,
+        external: true
+      },
+      {
+        id: 'daily-puzzles',
+        title: 'Daily puzzles',
+        types: ['project'],
+        subjects: ['math'],
+        description: '[Add description.] A personal habit of working through daily puzzles.',
+        thumbnail: null,
+        link: null,
+        external: false
+      },
+      {
+        id: 'educause',
+        title: 'EDUCAUSE presentation',
+        types: ['presentation'],
+        subjects: ['xr'],
+        description: '[Add description.] Co-presented with Georgia Tech.',
+        thumbnail: null,
+        link: null,
+        external: false
+      }
+    ];
+
+    // ---- State ----
+    const activeTypes = new Set();
+    const activeSubjects = new Set();
+
+    // ---- URL <-> state ----
+    function readUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const types = params.get('type');
+      const subjects = params.get('subject');
+      if (types) {
+        types.split(',').filter(t => TYPES.includes(t)).forEach(t => activeTypes.add(t));
+      }
+      if (subjects) {
+        subjects.split(',').filter(s => SUBJECTS.includes(s)).forEach(s => activeSubjects.add(s));
+      }
+    }
+
+    function writeUrl() {
+      const params = new URLSearchParams();
+      if (activeTypes.size) params.set('type', [...activeTypes].join(','));
+      if (activeSubjects.size) params.set('subject', [...activeSubjects].join(','));
+      const qs = params.toString();
+      const newUrl = qs ? window.location.pathname + '?' + qs : window.location.pathname;
+      window.history.replaceState(null, '', newUrl);
+    }
+
+    // ---- Render filter pills ----
+    function renderPills() {
+      const typesContainer = document.getElementById('filter-types');
+      const subjectsContainer = document.getElementById('filter-subjects');
+      typesContainer.innerHTML = '';
+      subjectsContainer.innerHTML = '';
+
+      TYPES.forEach(t => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filter-pill' + (activeTypes.has(t) ? ' active' : '');
+        btn.textContent = TYPE_LABELS[t];
+        btn.setAttribute('aria-pressed', activeTypes.has(t) ? 'true' : 'false');
+        btn.addEventListener('click', () => toggleFilter('type', t));
+        typesContainer.appendChild(btn);
+      });
+
+      SUBJECTS.forEach(s => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filter-pill' + (activeSubjects.has(s) ? ' active' : '');
+        btn.textContent = SUBJECT_LABELS[s];
+        btn.setAttribute('aria-pressed', activeSubjects.has(s) ? 'true' : 'false');
+        btn.addEventListener('click', () => toggleFilter('subject', s));
+        subjectsContainer.appendChild(btn);
+      });
+    }
+
+    function toggleFilter(kind, value) {
+      const set = kind === 'type' ? activeTypes : activeSubjects;
+      if (set.has(value)) set.delete(value);
+      else set.add(value);
+      writeUrl();
+      renderPills();
+      renderGrid();
+    }
+
+    function clearFilters() {
+      activeTypes.clear();
+      activeSubjects.clear();
+      writeUrl();
+      renderPills();
+      renderGrid();
+    }
+
+    // ---- Render grid ----
+    function matches(item) {
+      const typeOk = activeTypes.size === 0 || item.types.some(t => activeTypes.has(t));
+      const subjectOk = activeSubjects.size === 0 || item.subjects.some(s => activeSubjects.has(s));
+      return typeOk && subjectOk;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function tileHtml(item) {
+      const primaryType = item.types[0] || 'project';
+      const thumbBlock = item.thumbnail
+        ? `<img src="${escapeHtml(item.thumbnail)}" alt="" class="w-full h-full object-cover" loading="lazy">`
+        : `<div class="tile-fallback tile-fallback-${primaryType}"><span class="tile-fallback-text">${escapeHtml(item.title)}</span></div>`;
+
+      const tags = [
+        ...item.types.map(t => `<span class="tile-tag tile-tag-type">${escapeHtml(TYPE_LABELS[t] || t)}</span>`),
+        ...item.subjects.map(s => `<span class="tile-tag">${escapeHtml(SUBJECT_LABELS[s] || s)}</span>`)
+      ].join('');
+
+      const arrow = item.link
+        ? `<span class="text-primary font-medium text-sm inline-flex items-center gap-1 mt-4">${item.external ? 'Visit' : 'View'} <span aria-hidden="true">${item.external ? '↗' : '→'}</span></span>`
+        : `<span class="text-on-surface-variant text-sm italic mt-4 inline-block">Coming soon</span>`;
+
+      const card = `
+        <div class="aspect-video overflow-hidden bg-surface-container-highest">${thumbBlock}</div>
+        <div class="p-6 md:p-7 flex flex-col flex-1">
+          <div class="flex flex-wrap gap-1.5 mb-3">${tags}</div>
+          <h2 class="font-headline text-xl md:text-2xl font-semibold text-on-surface tracking-tight mb-3">${escapeHtml(item.title)}</h2>
+          <p class="text-sm leading-relaxed text-on-surface-variant flex-1">${escapeHtml(item.description)}</p>
+          ${arrow}
+        </div>
+      `;
+
+      if (item.link) {
+        const target = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return `<a href="${escapeHtml(item.link)}"${target} class="group flex flex-col rounded-xl overflow-hidden bg-surface-container-low hover:bg-surface-container transition-colors">${card}</a>`;
+      } else {
+        return `<div class="flex flex-col rounded-xl overflow-hidden bg-surface-container-low opacity-90">${card}</div>`;
+      }
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      const matching = items.filter(matches);
+
+      grid.innerHTML = matching.map(tileHtml).join('');
+      document.getElementById('empty-state').hidden = matching.length > 0;
+      grid.hidden = matching.length === 0;
+
+      const count = document.getElementById('result-count');
+      const filtered = activeTypes.size + activeSubjects.size > 0;
+      count.textContent = filtered
+        ? `Showing ${matching.length} of ${items.length}`
+        : `${items.length} item${items.length === 1 ? '' : 's'}`;
+
+      const clear = document.getElementById('clear-filters');
+      clear.hidden = !filtered;
+    }
+
+    // ---- Init ----
+    document.getElementById('clear-filters').addEventListener('click', clearFilters);
+    document.getElementById('empty-state-clear').addEventListener('click', clearFilters);
+
+    readUrl();
+    renderPills();
+    renderGrid();
+  </script>
+
+</body>
+</html>
