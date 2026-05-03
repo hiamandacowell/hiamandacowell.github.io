@@ -107,38 +107,75 @@
 
   <main class="pt-24 pb-20">
 
-    <!-- Header -->
+    <!-- Header: title + metadata sidebar -->
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
 
-      <!-- Title -->
-      <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-[1.05] mb-6 max-w-5xl">
-        Topological Data Analysis: Tools and Some Applications
-      </h1>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start mb-16">
 
-      <!-- Context line -->
-      <p class="text-lg md:text-xl text-on-surface-variant font-light leading-relaxed max-w-3xl mb-8">
-        Master of Arts in Mathematics, University of Toledo, 2021. Advisor: Dr. Funda Gültepe.
-      </p>
+        <!-- Title -->
+        <div class="lg:col-span-8">
+          <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-[1.05]">
+            Topological Data Analysis: Tools and Some Applications
+          </h1>
+        </div>
 
-      <!-- OhioLINK CTA -->
-      <a href="http://rave.ohiolink.edu/etdc/view?acc_num=toledo1620579529905963" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mb-12 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
-        Read the full thesis on OhioLINK
-        <span aria-hidden="true">↗</span>
-      </a>
+        <!-- Metadata sidebar -->
+        <div class="lg:col-span-4 flex flex-col gap-3">
+          <div class="p-5 bg-surface-container-low rounded-xl">
+            <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Degree</span>
+            <p class="font-medium text-on-surface">Master of Arts in Mathematics</p>
+          </div>
+          <div class="p-5 bg-surface-container-low rounded-xl">
+            <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Institution</span>
+            <p class="font-medium text-on-surface">University of Toledo</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-5 bg-surface-container-low rounded-xl">
+              <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Year</span>
+              <p class="font-medium text-on-surface">2021</p>
+            </div>
+            <div class="p-5 bg-surface-container-low rounded-xl">
+              <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Advisor</span>
+              <p class="font-medium text-on-surface">Dr. Funda Gültepe</p>
+            </div>
+          </div>
+          <a href="http://rave.ohiolink.edu/etdc/view?acc_num=toledo1620579529905963" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 mt-1 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
+            Read on OhioLINK
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
 
-      <!-- Description -->
-      <div class="max-w-3xl mb-12">
+      </div>
+
+      <!-- About the thesis -->
+      <div class="max-w-3xl mb-10">
         <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">
           About the thesis
         </p>
-        <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
-          <p>Topological Data Analysis (TDA) combines topology, the mathematical study of shape, with data analysis. The thesis introduces the foundational tools of TDA, including simplicial complexes, homology, and persistent homology, and discusses how these tools are used to study the shape of data in fields like medical imaging and autonomous navigation.</p>
+        <p class="text-lg leading-relaxed text-on-surface-variant">
+          Topological Data Analysis (TDA) combines topology, the mathematical study of shape, with data analysis. The thesis introduces the foundational tools of TDA, including simplicial complexes, homology, and persistent homology, and discusses how these tools are used to study the shape of data in fields like medical imaging and autonomous navigation.
+        </p>
+      </div>
+
+      <!-- Abstract -->
+      <div class="max-w-3xl mb-20">
+        <div class="bg-surface-container-low rounded-xl p-6 md:p-8 border-l-4 border-primary">
+          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-3">Abstract</p>
+          <p class="text-base leading-relaxed text-on-surface-variant italic">
+            [Paste the formal thesis abstract here.]
+          </p>
         </div>
       </div>
 
-      <!-- Figures -->
-      <div class="space-y-8 md:space-y-10">
+      <!-- Concept blocks: each figure with framing intro -->
 
+      <section class="mb-16 md:mb-20">
+        <div class="max-w-3xl mb-6">
+          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Topology — shape, not numbers</h2>
+          <p class="text-lg leading-relaxed text-on-surface-variant">
+            Topology studies the properties of shapes that survive bending, stretching, or folding without tearing. To topology, two shapes are "the same" if one can be deformed into the other. The concrete invariant TDA uses most is the number of holes.
+          </p>
+        </div>
         <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
           <div class="bg-white rounded-lg overflow-hidden">
             <img src="/assets/thesis-figure-three-twos.png" alt="Three handwritten versions of the digit 2, with no loops, one loop, and two loops" class="w-full h-auto block">
@@ -147,7 +184,15 @@
             Three handwritten versions of the digit 2. To topology, these are different shapes, distinguished by the number of holes.
           </figcaption>
         </figure>
+      </section>
 
+      <section class="mb-16 md:mb-20">
+        <div class="max-w-3xl mb-6">
+          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Simplicial complexes — building shapes from pieces</h2>
+          <p class="text-lg leading-relaxed text-on-surface-variant">
+            To analyze a dataset's shape, TDA first builds a structure called a simplicial complex from the data. The pieces are simple: points, line segments, triangles, tetrahedra, and higher-dimensional analogs.
+          </p>
+        </div>
         <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
           <div class="bg-white rounded-lg overflow-hidden">
             <img src="/assets/thesis-figure-simplex-progression.png" alt="A point, a line segment, a triangle, and a tetrahedron" class="w-full h-auto block">
@@ -156,7 +201,15 @@
             The basic building blocks of simplicial complexes: a point, a line segment, a triangle, and a tetrahedron.
           </figcaption>
         </figure>
+      </section>
 
+      <section>
+        <div class="max-w-3xl mb-6">
+          <h2 class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-4">Persistent homology — tracking shape across scale</h2>
+          <p class="text-lg leading-relaxed text-on-surface-variant">
+            Real-world data is noisy, so TDA examines a simplicial complex at many scales at once. Cycles appear and disappear as the complex grows. Features that vanish quickly are noise; features that persist across many scales are real.
+          </p>
+        </div>
         <figure class="bg-surface-container-low rounded-xl p-3 md:p-4">
           <div class="bg-white rounded-lg overflow-hidden">
             <img src="/assets/thesis-figure-cycle-birth-death.png" alt="A hexagonal complex shown across five stages: no cycle, cycle born, cycle persists, cycle persists, cycle dies" class="w-full h-auto block">
@@ -165,8 +218,7 @@
             The birth and death of a one-dimensional cycle as a complex is built up. This is the core mechanic of persistent homology.
           </figcaption>
         </figure>
-
-      </div>
+      </section>
 
     </header>
 
