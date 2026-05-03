@@ -65,6 +65,7 @@
     }
   </script>
   <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 128px; }
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     @media (max-width: 767px) {
@@ -81,9 +82,6 @@
         gap: 1rem;
         border-bottom: 1px solid rgba(197,191,186,0.4);
       }
-      .nav-menu.is-open > span { display: none; }
-      .nav-menu.is-open > a.ml-5,
-      .nav-menu.is-open > a.ml-3 { margin-left: 0 !important; }
     }
 
     /* Skip to main content link */
@@ -103,13 +101,57 @@
       outline-offset: 2px;
       border-radius: 4px;
     }
+
+    /* Section progress nav */
+    .section-nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 2px 4px;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .section-nav-track {
+      display: block;
+      height: 4px;
+      background: rgba(122, 116, 112, 0.25);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .section-nav-fill {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: #26585d;
+      border-radius: 9999px;
+      transition: width 120ms linear;
+    }
+    .section-nav-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #4A4440;
+      transition: color 150ms, font-weight 150ms;
+      text-align: left;
+    }
+    .section-nav-item:hover .section-nav-label {
+      color: #26585d;
+    }
+    .section-nav-item.is-active .section-nav-label {
+      color: #1C1714;
+      font-weight: 700;
+    }
+    @media (max-width: 380px) {
+      .section-nav-label { display: none; }
+    }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
 
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Nav -->
+  <!-- Site nav -->
   <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="flex items-center gap-3">
@@ -125,193 +167,226 @@
     </div>
   </nav>
 
-  <main id="main-content" class="pt-24 pb-20">
-
-    <!-- Hero -->
-    <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        <div class="lg:col-span-8">
-          <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-8">
-            Acorns of Wisdom
-          </h1>
-          <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed mb-8">
-            A web app for running anonymous team health checks, built for my own team, deployed, and still in use.
-          </p>
-          <a href="https://team-health-check-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
-            Try the app
-            <span class="material-symbols-outlined text-base">open_in_new</span>
-          </a>
-        </div>
-        <div class="lg:col-span-4 flex flex-col gap-4">
-          <div class="p-6 bg-surface-container-low rounded-xl">
-            <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Role</span>
-            <p class="font-medium text-on-surface">Self-directed</p>
-          </div>
-          <div class="p-6 bg-surface-container-low rounded-xl">
-            <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Timeline</span>
-            <p class="font-medium text-on-surface">2 weeks, February 2026</p>
-          </div>
-          <div class="p-6 bg-surface-container-low rounded-xl">
-            <span class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Stack</span>
-            <div class="flex flex-wrap gap-1.5 mt-1">
-              <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono italic">Built with Claude Code</span>
-              <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">React</span>
-              <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Firebase</span>
-              <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Firestore</span>
-              <span class="text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-mono">Vercel</span>
-            </div>
-          </div>
-        </div>
+  <!-- Section progress nav -->
+  <nav id="section-nav" aria-label="Page sections" class="fixed left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40" style="top: 73px;">
+    <div class="max-w-7xl mx-auto px-6 py-2">
+      <div class="grid grid-cols-5 gap-1.5 md:gap-2">
+        <a href="#context" data-section="context" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Context</span>
+        </a>
+        <a href="#problem" data-section="problem" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Problem</span>
+        </a>
+        <a href="#approach" data-section="approach" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Approach</span>
+        </a>
+        <a href="#decisions" data-section="decisions" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Decisions</span>
+        </a>
+        <a href="#outcome" data-section="outcome" class="section-nav-item">
+          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
+          <span class="section-nav-label">Outcome</span>
+        </a>
       </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="pb-20" style="padding-top: 132px;">
+
+    <!-- Section 1: Context — wraps the hero so progress-nav scroll tracking starts at the page title -->
+    <section id="context" aria-labelledby="context-heading" class="mb-20">
+      <h2 id="context-heading" class="sr-only">Context</h2>
+
+      <!-- Hero -->
+      <header class="max-w-5xl mx-auto px-6 pt-8 md:pt-10 pb-8 md:pb-10">
+        <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-none mb-5">Acorns of Wisdom</h1>
+        <p class="text-xl md:text-2xl font-light text-on-surface-variant leading-relaxed mb-7">
+          A team health check web app I built to teach myself AI-assisted prototyping. Recreated from a FordLabs tool I admired, with my own branding and architecture choices. Deployed and in use.
+        </p>
+
+        <a href="https://team-health-check-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity mb-8">
+          Try the app
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+
+        <!-- Metadata strip (3 cells side by side) -->
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-4 pt-5 border-t border-outline-variant/40">
+          <div>
+            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Role</dt>
+            <dd class="text-sm md:text-base text-on-surface">Self-directed</dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Timeline</dt>
+            <dd class="text-sm md:text-base text-on-surface">2 weeks, February 2026</dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Stack</dt>
+            <dd class="text-sm md:text-base text-on-surface">Built with Claude Code, React, Firebase, Firestore, Vercel</dd>
+          </div>
+        </dl>
+      </header>
+
       <!-- Hero image -->
-      <div class="mt-16 rounded-xl overflow-hidden aspect-video shadow-2xl">
-        <img class="w-full h-full object-cover" src="/assets/acorns-hero.gif" alt="Acorns of Wisdom dashboard showing team health check ratings with acorn icons and anonymous animal identities">
+      <div class="max-w-5xl mx-auto px-6 mb-16 md:mb-20">
+        <figure class="md:flex md:flex-col md:items-center">
+          <img src="/assets/acorns-hero.gif" alt="Acorns of Wisdom dashboard showing team health check ratings with acorn icons and anonymous animal identities" class="block rounded-xl w-full md:w-auto md:max-h-[460px] shadow-2xl">
+        </figure>
       </div>
-    </header>
 
-    <!-- The Problem -->
-    <section class="bg-surface-container-low py-24 mb-24 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="max-w-3xl relative">
-          <div class="absolute -top-8 -left-4 text-[12rem] font-bold font-headline text-surface-container-high leading-none z-0 select-none">01</div>
-          <div class="relative z-10 pt-8">
-            <h2 class="font-headline text-4xl font-semibold text-primary mb-8 tracking-tight">The problem</h2>
-            <p class="text-lg leading-relaxed text-on-surface-variant mb-6">A team health check is a structured check-in where people rate dimensions of how the team is working: things like psychological safety, clarity of direction, or whether meetings feel useful. Unlike a retrospective, which focuses on a sprint, a health check surfaces broader patterns: are people aligned? Do they feel safe raising concerns?</p>
-            <p class="text-lg leading-relaxed text-on-surface-variant">My team didn't have a consistent way to run these. Generic survey tools didn't fit our cadence and felt like homework. I wanted something low-ceremony, anonymous by default, and designed to end with action items, not just data.</p>
-          </div>
-        </div>
+      <!-- Context body prose -->
+      <div class="max-w-5xl mx-auto px-6 text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+        <p>Acorns was the first time I took a vibe-coded project all the way to a public deployment. I wanted to actually learn AI-assisted prototyping, and the way to learn it was to build something my team would actually use, not a toy app. So I chose to recreate Vibez, a team health check tool from my time at FordLabs, with my own branding and a few architecture decisions I wanted to think through end-to-end.</p>
+        <p>Vibez gave me a starting point I already trusted. With the design problem out of the way, I could spend the two weeks on the build workflow itself: how to scope work for an AI coding partner, when to push back on its suggestions, what kinds of tasks accelerate and which ones still need careful human input.</p>
       </div>
     </section>
 
-    <!-- What I Built -->
-    <section class="max-w-7xl mx-auto px-6 mb-24">
-      <div class="mb-12">
-        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-primary tracking-tight">What I built</h2>
-        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">Acorns of Wisdom is a facilitated session tool. A facilitator sets up a session with health check prompts, team members rate each one anonymously, and the group reviews results together and captures action items, all in the same browser tab, without accounts or survey software.</p>
-        <p class="text-on-surface-variant mt-4 max-w-2xl text-lg">The central design commitment is anonymity. Multi-user anonymous ratings let people be honest about how the team is doing in a way that a meeting rarely allows.</p>
-      </div>
+    <!-- Section 2: Problem -->
+    <section id="problem" aria-labelledby="problem-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="problem-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Problem</h2>
 
-      <!-- Screenshots: step-by-step walkthrough -->
-      <div class="mb-12 border-t border-outline-variant/40 pt-12">
-        <h3 class="font-headline text-3xl font-semibold text-primary mb-4">A session in three steps</h3>
-        <p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">The facilitator sets up a session and shares a passcode with the team. Everyone joins from their own device, rates each prompt anonymously, and then the group reviews results together and captures action items, all in one tab, no accounts required.</p>
-      </div>
+      <!-- Overarching problem callout -->
+      <aside class="bg-surface-container-low rounded-xl border-l-4 border-primary p-8 md:p-10 mb-10">
+        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">Overarching problem</p>
+        <p class="font-headline text-2xl md:text-3xl font-semibold text-on-surface leading-snug">
+          AI-assisted prototyping is a PM skill now. A PM who has built something under constraint scopes and estimates with engineering teams differently than one who hasn't.
+        </p>
+      </aside>
 
-      <!-- Overview -->
-      <div class="bg-surface-container-lowest rounded-xl overflow-hidden mb-16">
-        <img class="w-full" src="/assets/acorns-ratings.jpg" alt="The main results dashboard showing 9 rating cards, acorn vote icons, anonymous identity, and action items panel">
-        <div class="p-8">
-          <h4 class="font-headline text-xl font-semibold text-primary mb-2">The results dashboard</h4>
-          <p class="text-on-surface-variant leading-relaxed text-sm">Every prompt gets its own card showing the distribution of votes, visualized as acorn icons colored from red (low) to green (high). The current user's votes are highlighted in yellow so they can see how their ratings compare to the group's. Action items live in the same sidebar, so the team leaves with follow-ups, not just data.</p>
-        </div>
-      </div>
-
-      <!-- Step 1 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 1</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Set the agenda</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Built-in categories</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Eight pre-built prompts cover the dimensions that matter most to most teams: autonomy, equipment, quality, stress, vision, and more. Toggle any on or off before starting.</p>
-          </div>
-        </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Custom questions</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Facilitators can write their own prompts alongside the defaults, for things the built-in set doesn't cover: a restructure, a new process, a specific friction point.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 2</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Rate anonymously</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">You are: Mauve Penguin</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Each participant is assigned a random animal name on join. No accounts, no real names. The identity is consistent within the session so the chat makes sense, but nothing traces back to the individual.</p>
-          </div>
-        </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Five-point acorn scale</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Each prompt gets a rating from 1 to 5, visualized as expressive acorn icons. Participants can add an anonymous comment with any rating.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="mb-6">
-        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Step 3</span>
-        <h3 class="font-headline text-2xl font-semibold text-primary mt-1">Review and act</h3>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Open any card</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">Clicking a rating card expands it to show every individual vote (who rated what, without names) plus all anonymous comments. Gives the team something concrete to discuss rather than just an average.</p>
-          </div>
-        </div>
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden">
-          <img class="w-full" src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal">
-          <div class="p-8">
-            <h4 class="font-headline text-xl font-semibold text-primary mb-2">Chat in character</h4>
-            <p class="text-on-surface-variant leading-relaxed text-sm">A real-time anonymous chat runs alongside the results. Participants talk as their animal selves. Cobalt Narwhal replies to Mauve Penguin, so the conversation stays honest even when the topic is uncomfortable.</p>
-          </div>
-        </div>
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+        <p>Reading about Claude Code wasn't going to teach me what I needed to learn. The vocabulary, the rhythm, the failure modes of AI-assisted building only show up when you do it yourself.</p>
+        <p>I picked a target with the right shape: small enough to ship in two weeks, real enough to expose the actual work, and inherited enough that I wouldn't have to design from scratch. Vibez fit. It was a tool I'd worked with, I knew the bones were good, and I had a clear sense of what I wanted to keep, change, and add.</p>
       </div>
     </section>
 
-    <!-- What I Learned -->
-    <section class="bg-primary py-24 px-6">
-      <div class="max-w-3xl mx-auto">
-        <span class="text-secondary-fixed-dim font-bold uppercase text-xs tracking-widest mb-4 block">Takeaway</span>
-        <h2 class="font-headline text-4xl md:text-5xl font-semibold text-on-primary tracking-tight mb-8">What I learned</h2>
-        <p class="text-lg text-primary-fixed leading-relaxed">The real byproduct of building this wasn't the tool. It was hands-on fluency with AI-assisted prototyping. I now have a much sharper sense of what's fast to build and what isn't, and that changes how I scope and validate ideas with engineering teams. A PM who has built something under constraint talks differently to engineering teams than one who hasn't. The vocabulary is different. The estimates are different. The conversations are different.</p>
+    <!-- Section 3: Approach -->
+    <section id="approach" aria-labelledby="approach-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="approach-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Approach</h2>
+
+      <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5 mb-10">
+        <p>The core of Acorns comes from Vibez: anonymous ratings, default health-check prompts, action items captured in the same view as the data, real-time anonymous chat alongside the dashboard. I kept those mechanics because they worked.</p>
+        <p>What's mine is the surface and the architecture. Code names (Mauve Penguin, Cobalt Narwhal) sit on top of the anonymity layer so the chat reads as a conversation rather than as a wall of unattributed text. The acorn rating scale, the squirrel mascot, and the visual identity are all new. Underneath, the architecture is deliberately minimal: single Firestore instance, passcode-based access rather than full auth, no integrations, no historical analytics, no exports.</p>
+      </div>
+
+      <!-- Vibez vs Acorns comparison pair (anchor comparison — uses the tan-card grouping pattern) -->
+      <figure class="mb-12 bg-surface-container-low rounded-xl p-6 md:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+          <img src="/assets/vibez-original.jpg" alt="Vibez dashboard at FordLabs, the original team health check tool" class="block rounded-lg w-full md:max-h-[360px] md:w-auto md:mx-auto">
+          <img src="/assets/acorns-dashboard.jpg" alt="Acorns of Wisdom dashboard, the recreation with new branding and architecture" class="block rounded-lg w-full md:max-h-[360px] md:w-auto md:mx-auto">
+        </div>
+        <figcaption class="text-sm text-on-surface-variant italic mt-5 md:mt-6">Left: Vibez at FordLabs, the original. Right: Acorns of Wisdom. Same core mechanics, different surface and architecture.</figcaption>
+      </figure>
+
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-8">The session works in three steps.</p>
+
+      <!-- Step 1: Set the agenda -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start mb-6">
+        <img src="/assets/acorns-themes.jpg" alt="Eight default health check categories shown as selectable cards with yellow checkmarks" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+        <img src="/assets/acorns-customquestion.jpg" alt="Custom question form with label and question text fields" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+      </div>
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-12">
+        <strong class="text-on-surface font-semibold">Step 1: Set the agenda.</strong> The eight built-in prompts cover the dimensions most teams care about: autonomy, equipment, quality, stress, vision, and others. Facilitators toggle them on or off, and write custom prompts alongside the defaults for things specific to their team.
+      </p>
+
+      <!-- Step 2: Rate anonymously -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start mb-6">
+        <img src="/assets/acorns-anonymousname.jpg" alt="Sidebar showing 'You are: Mauve Penguin' with animated squirrel mascot" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+        <img src="/assets/acorns-ratingscale.jpg" alt="Rating scale showing five acorn icons from red frowning to green smiling, with optional comment field" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+      </div>
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-12">
+        <strong class="text-on-surface font-semibold">Step 2: Rate anonymously.</strong> Each participant gets a random animal name on join. The identity is consistent within the session so the chat works, but nothing traces back to the individual. Each prompt is rated 1 to 5 on an acorn scale, with an optional anonymous comment.
+      </p>
+
+      <!-- Step 3: Review and act -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start mb-6">
+        <img src="/assets/acorns-actions.jpg" alt="Expanded card showing individual vote breakdown and anonymous comments" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+        <img src="/assets/acorns-chat.jpg" alt="Anonymous chat panel showing messages between Mauve Penguin and Cobalt Narwhal" class="block rounded-lg w-full md:max-h-[320px] md:w-auto md:mx-auto">
+      </div>
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant">
+        <strong class="text-on-surface font-semibold">Step 3: Review and act.</strong> Clicking any rating card expands it to show every vote and every comment. The anonymous chat runs alongside so participants can talk through specific ratings as their animal selves. Action items live in the same sidebar as the ratings, so the team leaves with follow-ups.
+      </p>
+    </section>
+
+    <!-- Section 4: Decisions -->
+    <section id="decisions" aria-labelledby="decisions-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="decisions-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Decisions</h2>
+
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-12">Three calls I made that shaped what Acorns is and isn't.</p>
+
+      <div class="space-y-6 md:space-y-8">
+
+        <!-- Decision 01 -->
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">01</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Code names on top of inherited anonymity</h3>
+          </div>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>Vibez gave participants anonymous identifiers that read as user codes. They worked, but the chat panel collapsed into a wall of nondescript labels that didn't help anyone follow a conversation. So I added a code-name layer: random animal names like Mauve Penguin and Cobalt Narwhal, persistent within a session.</p>
+            <p>The change is small and the effect is real. Participants can address each other in chat, references stay coherent ("Cobalt Narwhal, can you say more about that?"), and the surface gets a little warmth without compromising anonymity.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> Inherited mechanics still benefit from a critical pass. Anonymity worked in Vibez, but the <em>expression</em> of anonymity could be better, and that small change made the chat layer noticeably more usable.</p>
+          </div>
+        </article>
+
+        <!-- Decision 02 -->
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">02</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Built for a small team, kept that way</h3>
+          </div>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>Acorns runs on a single Firestore instance with passcode-based access rather than full authentication. There are no integrations, no historical analytics, no exports. Each of those is a real limit, and each is the right call for the actual use case.</p>
+            <p>The pull to expand a small tool toward something more general is real, especially when AI-assisted prototyping makes the next feature cheap. I held the scope on purpose. A health check tool for an eight-person team is a different product than one for a fifty-person org, and trying to be both makes both worse.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> AI tools dropped the cost of prototyping features to try and test ideas. The cost of <em>deciding</em> what belongs in a small product stayed exactly where it was. Knowing what to leave out is still the design work, regardless of what's cheap to prototype.</p>
+          </div>
+        </article>
+
+        <!-- Decision 03 -->
+        <article class="bg-surface-container-low rounded-xl p-6 md:p-10">
+          <div class="flex items-start gap-5 md:gap-7 mb-6">
+            <p class="font-headline text-5xl md:text-6xl font-semibold text-primary leading-none flex-shrink-0">03</p>
+            <h3 class="font-headline text-xl md:text-2xl font-semibold text-on-surface leading-tight pt-1.5 md:pt-2">Visual identity as part of the product, not as decoration</h3>
+          </div>
+          <div class="text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
+            <p>The squirrel mascot, the acorn rating scale, and the warm color palette weren't add-ons after the build. They were part of the product from the start. A team health check is a slightly uncomfortable thing to ask people to do, and a tool that signals "this is meant to be a little playful" lowers the activation cost. I drew the squirrel myself, instead of grabbing one from a stock library.</p>
+            <p><strong class="text-on-surface font-semibold">What I learned.</strong> Branding gets called soft when you're picking what to cut, but the soft choices are often the ones that determine whether anyone uses the thing. Treat the visual identity as a real design surface and ship with it from day one, not as polish at the end.</p>
+          </div>
+        </article>
+
       </div>
     </section>
 
-    <!-- What this is and isn't -->
-    <section class="max-w-7xl mx-auto px-6 py-24">
-      <div class="bg-surface-container-low p-10 md:p-16 rounded-xl">
-        <h2 class="font-headline text-4xl font-semibold text-primary mb-4 tracking-tight">What this is and isn't</h2>
-        <p class="text-on-surface-variant mb-10 text-lg">Acorns is a real tool that a real team uses. It's also a small, opinionated thing. Here's what it isn't.</p>
-        <ul class="space-y-4 list-none">
-          <li class="flex items-start gap-3">
-            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
-            <p class="text-on-surface-variant leading-relaxed">Acorns is built for my team and teams like it. It hasn't been tested with teams larger than about a dozen.</p>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
-            <p class="text-on-surface-variant leading-relaxed">Passcode protection is lightweight, not security-grade. Anyone on the team with the passcode can see everything.</p>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
-            <p class="text-on-surface-variant leading-relaxed">Data lives in a single Firestore instance. This was the right call for my use case and would not be the right call at any kind of scale.</p>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-outline mt-1.5 flex-shrink-0 text-lg leading-none">&#8211;</span>
-            <p class="text-on-surface-variant leading-relaxed">There is no export, no analytics over time, and no integration with anything. On purpose, for now.</p>
-          </li>
-        </ul>
-      </div>
+    <!-- Section 5: Outcome -->
+    <section id="outcome" aria-labelledby="outcome-heading" class="max-w-5xl mx-auto px-6 mb-20">
+      <h2 id="outcome-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-8">Outcome</h2>
+
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-10">Acorns is in active use on my team. The deeper outcome was the workflow fluency I came out with. I have a much sharper sense now of what's fast to build with AI assistance and what isn't, and that changes how I scope and validate ideas with engineering teams. A PM who has built something under constraint estimates differently than one who hasn't.</p>
+
+      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-6">A few honest limits worth naming:</p>
+
+      <ul class="space-y-4 text-base md:text-lg leading-relaxed text-on-surface-variant">
+        <li class="flex gap-3">
+          <span class="text-outline font-bold flex-shrink-0 mt-0.5">&#9675;</span>
+          <span><strong class="text-on-surface font-semibold">Tested only with my team.</strong> It's built for the team I built it for. Anything beyond about a dozen people is unverified.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-outline font-bold flex-shrink-0 mt-0.5">&#9675;</span>
+          <span><strong class="text-on-surface font-semibold">Passcode protection is lightweight, not security-grade.</strong> Anyone with the passcode can see everything.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-outline font-bold flex-shrink-0 mt-0.5">&#9675;</span>
+          <span><strong class="text-on-surface font-semibold">No history, no exports, no integrations.</strong> Each session is self-contained. The data doesn't leave the tool, and that's the design for now.</span>
+        </li>
+      </ul>
     </section>
 
   </main>
 
   <!-- Footer -->
-  <footer class="bg-teal-900 w-full py-12">
+  <footer class="bg-teal-900 w-full py-12 mt-16">
     <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
       <a href="/work/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; Work</a>
       <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
@@ -323,6 +398,66 @@
     document.getElementById('nav-toggle').addEventListener('click', function() {
       document.getElementById('nav-menu').classList.toggle('is-open');
     });
+  </script>
+
+  <script id="section-progress-nav-script">
+  (function () {
+    // Reusable scroll-spy + progress nav. To reuse on another case study: copy this script
+    // + the matching <nav id="section-nav"> markup, and edit the SECTIONS array below.
+    // Each id must match a <section id="..."> on the page.
+    const SECTIONS = [
+      { id: 'context',   label: 'Context'   },
+      { id: 'problem',   label: 'Problem'   },
+      { id: 'approach',  label: 'Approach'  },
+      { id: 'decisions', label: 'Decisions' },
+      { id: 'outcome',   label: 'Outcome'   }
+    ];
+    const HEADER_HEIGHT = 128;
+
+    const items = SECTIONS.map(s => ({
+      id: s.id,
+      section: document.getElementById(s.id),
+      navEl: document.querySelector('[data-section="' + s.id + '"]'),
+      fillEl: document.querySelector('[data-section="' + s.id + '"] .section-nav-fill')
+    })).filter(x => x.section && x.navEl && x.fillEl);
+
+    let raf = null;
+
+    function update() {
+      raf = null;
+      const scrollPos = window.scrollY + HEADER_HEIGHT;
+      let activeIdx = -1;
+
+      items.forEach((item, i) => {
+        const top = item.section.offsetTop;
+        const next = i + 1 < items.length ? items[i + 1].section : null;
+        const bottom = next ? next.offsetTop : (item.section.offsetTop + item.section.offsetHeight);
+
+        let pct;
+        if (scrollPos < top) pct = 0;
+        else if (scrollPos >= bottom) pct = 100;
+        else pct = ((scrollPos - top) / (bottom - top)) * 100;
+
+        item.fillEl.style.width = pct.toFixed(2) + '%';
+
+        if (scrollPos >= top) activeIdx = i;
+      });
+
+      if (activeIdx === -1) activeIdx = 0;
+
+      items.forEach((item, i) => {
+        item.navEl.classList.toggle('is-active', i === activeIdx);
+      });
+    }
+
+    function schedule() {
+      if (raf == null) raf = requestAnimationFrame(update);
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    update();
+  })();
   </script>
 
 </body>
