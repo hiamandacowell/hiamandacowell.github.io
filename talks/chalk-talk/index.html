@@ -107,26 +107,19 @@
     <!-- Header -->
     <header class="max-w-7xl mx-auto px-6 py-16 md:py-24">
 
-      <!-- Title + award row -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12">
-        <div class="lg:col-span-8">
-          <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-6">Chalk Talk</h1>
-          <p class="text-xs font-bold text-secondary uppercase tracking-widest">
-            FordLabs Passion Talks &middot; June 2023
-          </p>
-        </div>
-        <div class="lg:col-span-4">
-          <figure class="rounded-xl overflow-hidden bg-surface-container-low">
-            <img src="/assets/chalk-talk-award.jpg" alt="Most Passionate Talker award certificate from The Flabbies, FordLabs" class="w-full h-auto block">
-            <figcaption class="px-4 py-3 text-xs text-on-surface-variant italic">
-              Most Passionate Talker, The Flabbies &middot; FordLabs, Feb 2024
-            </figcaption>
-          </figure>
-        </div>
+      <!-- Title + context -->
+      <div class="mb-10">
+        <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">
+          FordLabs Passion Talks &middot; June 2023
+        </p>
+        <h1 class="font-headline text-6xl md:text-8xl font-semibold text-primary tracking-tighter leading-none mb-6">Chalk Talk</h1>
+        <p class="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl leading-relaxed">
+          A short, personal talk in the FordLabs Passion Talks tradition.
+        </p>
       </div>
 
       <!-- Video (full width, primary visual) -->
-      <div class="rounded-xl overflow-hidden aspect-video shadow-2xl mb-10 bg-surface-container-highest">
+      <div class="rounded-xl overflow-hidden aspect-video shadow-2xl mb-12 bg-surface-container-highest">
         <iframe
           class="w-full h-full"
           src="https://www.youtube.com/embed/GLHKsd4zJtE"
@@ -137,11 +130,22 @@
           allowfullscreen></iframe>
       </div>
 
-      <!-- Description -->
-      <div class="max-w-3xl">
-        <p class="text-lg leading-relaxed text-on-surface-variant">
-          Passion Talks at FordLabs were a team tradition where members presented on something they cared about outside of work, in a short and personal format.
-        </p>
+      <!-- Description + award accent -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="lg:col-span-8">
+          <span class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 block">About the talk</span>
+          <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
+            <p>Passion Talks at FordLabs were a team tradition where members presented on something they cared about outside of work, in a short and personal format.</p>
+          </div>
+        </div>
+        <div class="lg:col-span-4">
+          <figure class="rounded-xl overflow-hidden bg-surface-container-low">
+            <img src="/assets/chalk-talk-award.jpg" alt="Most Passionate Talker award certificate from The Flabbies, FordLabs" class="w-full h-auto block">
+            <figcaption class="px-4 py-3 text-xs text-on-surface-variant italic">
+              Most Passionate Talker, The Flabbies &middot; FordLabs, Feb 2024
+            </figcaption>
+          </figure>
+        </div>
       </div>
 
     </header>
