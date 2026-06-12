@@ -119,6 +119,8 @@
     .cc-web .cc-say, .cc-web .cc-say li, .cc-web .cc-q {
       font-family: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
     }
+    /* keep Claude's replies to a comfortable measure, not the full panel width */
+    .cc-web .cc-say, .cc-web .cc-deliv, .cc-web .cc-think { max-width: 88%; }
 
     /* Attachment chips (sit inside the user bubble) */
     .cc-files { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 11px; }
@@ -137,7 +139,7 @@
 
     .cc-say { margin: 0 0 14px; color: #ECECEC; }
     .cc-say strong { color: #fff; font-weight: 600; }
-    .cc-say ul { margin: 8px 0 0; padding-left: 21px; list-style: disc; }
+    ul.cc-say { margin: 8px 0 0; padding-left: 28px; list-style: disc; }
     .cc-say li { margin: 6px 0; color: #E4E4E4; }
     .cc-tool {
       margin: 0 0 14px; font-size: 13.5px; color: #9c9c9c;
