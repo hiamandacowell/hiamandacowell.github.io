@@ -65,97 +65,96 @@
 
     /* ---- Chat transcript (Claude-style) ---- */
     .cc-transcript {
-      border: 1px solid #322f2b; border-radius: 0.75rem; overflow: hidden; background: #1d1a17;
+      border: 1px solid #3a3935; border-radius: 16px; overflow: hidden; background: #262624;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     }
     .cc-bar {
-      display: flex; align-items: center; gap: 9px; padding: 12px 16px;
-      background: #232019; border-bottom: 1px solid #322f2b;
+      display: flex; align-items: center; gap: 9px; padding: 13px 18px;
+      background: #2c2b28; border-bottom: 1px solid #3a3935;
     }
     .cc-spark { display: block; flex-shrink: 0; }
-    .cc-app { font-size: 13px; font-weight: 600; color: #ece8e1; }
+    .cc-app { font-size: 13.5px; font-weight: 600; color: #EDEBE4; letter-spacing: -0.01em; }
     .cc-model {
-      font-size: 11px; color: #a59c91; background: #2c2925; border: 1px solid #3a3631;
+      font-size: 11px; color: #a8a399; background: #34332f; border: 1px solid #423f3a;
       border-radius: 9999px; padding: 2px 9px; margin-left: 2px;
     }
     .cc-shell { position: relative; }
     .cc-body {
-      padding: 20px 22px 24px; color: #ECE6DD; font-size: 14.5px; line-height: 1.62;
+      padding: 24px; color: #EDEBE4; font-size: 15px; line-height: 1.7; letter-spacing: -0.003em;
     }
     .cc-body.cc-teaser { max-height: var(--cc-teaser, 300px); overflow: hidden; }
     .cc-body.is-open { max-height: 640px; overflow-y: auto; }
     .cc-body.is-open::-webkit-scrollbar { width: 10px; }
-    .cc-body.is-open::-webkit-scrollbar-track { background: #232019; }
-    .cc-body.is-open::-webkit-scrollbar-thumb { background: #3a3631; border-radius: 9999px; }
+    .cc-body.is-open::-webkit-scrollbar-track { background: #2c2b28; }
+    .cc-body.is-open::-webkit-scrollbar-thumb { background: #44423d; border-radius: 9999px; }
     .cc-fade {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 110px; pointer-events: none;
-      background: linear-gradient(to bottom, rgba(29,26,23,0), #1d1a17 90%);
+      position: absolute; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(38,38,36,0), #262624 90%);
     }
     .cc-fade.is-hidden { display: none; }
     .cc-expand {
-      width: 100%; text-align: center; padding: 12px; background: #232019; border: 0;
-      border-top: 1px solid #322f2b; color: #cf9c80; font-weight: 500; font-size: 13px;
+      width: 100%; text-align: center; padding: 13px; background: #2c2b28; border: 0;
+      border-top: 1px solid #3a3935; color: #d49b7d; font-weight: 500; font-size: 13.5px;
       cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
       font-family: 'Inter', system-ui, sans-serif;
     }
-    .cc-expand:hover { background: #29251f; color: #e0b094; }
+    .cc-expand:hover { background: #322f2b; color: #e3ad8f; }
     .cc-expand .material-symbols-outlined { font-size: 19px; }
 
     /* User turn = rounded bubble, no label */
     .cc-user {
-      background: #302c27; border-radius: 14px; padding: 15px 18px; margin: 0 0 4px;
+      background: #34332e; border-radius: 16px; padding: 16px 19px; margin: 0;
     }
-    .cc-user p { margin: 0 0 10px; color: #E4DFD7; }
+    .cc-user p { margin: 0 0 12px; color: #E9E6DE; }
     .cc-user p:last-child { margin-bottom: 0; }
-    .cc-user ul { margin: 8px 0 0; padding-left: 18px; }
-    .cc-user li { margin: 4px 0; color: #D2CCC3; }
+    .cc-user ul { margin: 10px 0 0; padding-left: 20px; list-style: disc; }
+    .cc-user li { margin: 5px 0; color: #DCD8CF; }
 
     /* Assistant turn = plain text, marked with the Claude logo */
-    .cc-agent { margin: 22px 0 12px; }
-    .cc-agent .cc-spark { width: 19px; height: 19px; }
+    .cc-agent { margin: 26px 0 13px; }
+    .cc-agent .cc-spark { width: 22px; height: 22px; }
 
     /* Attachment chips */
-    .cc-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 13px; }
+    .cc-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
     .cc-file {
-      display: flex; align-items: center; gap: 10px;
-      background: #262320; border: 1px solid #3a3631; border-radius: 9px;
-      padding: 8px 14px 8px 10px;
+      display: flex; align-items: center; gap: 11px;
+      background: #2b2a27; border: 1px solid #423f3a; border-radius: 10px;
+      padding: 9px 14px 9px 11px;
     }
-    .cc-file-icon { color: #d97757; font-size: 24px; flex-shrink: 0; }
-    .cc-file-meta { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+    .cc-file-icon { color: #d97757; font-size: 25px; flex-shrink: 0; }
+    .cc-file-meta { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
     .cc-file-name {
-      font-size: 13px; color: #e7e2da; font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;
+      font-size: 13px; color: #E9E6DE; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px;
     }
-    .cc-file-type { font-size: 10px; color: #8f877d; letter-spacing: 0.08em; }
+    .cc-file-type { font-size: 10.5px; color: #9f9b92; letter-spacing: 0.06em; }
 
-    .cc-say { margin: 0 0 12px; color: #ECE6DD; }
+    .cc-say { margin: 0 0 15px; color: #EDEBE4; }
     .cc-say strong { color: #fff; font-weight: 600; }
-    .cc-say ul { margin: 6px 0 0; padding-left: 18px; }
-    .cc-say li { margin: 4px 0; color: #d7d1c8; }
+    .cc-say ul { margin: 8px 0 0; padding-left: 21px; list-style: disc; }
+    .cc-say li { margin: 6px 0; color: #E3E0D8; }
     .cc-tool {
-      margin: 0 0 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12.5px; color: #8f877d;
+      margin: 0 0 15px; font-size: 13.5px; color: #9f9b92;
     }
-    .cc-tool .cc-verb { color: #cf9c80; }
-    .cc-tool.cc-create .cc-verb { color: #87b98a; }
-    .cc-note { font-style: italic; color: #8f877d; font-size: 12.5px; margin: 0 0 13px; }
+    .cc-tool .cc-verb { color: #cf8e6d; }
+    .cc-tool.cc-create .cc-verb { color: #8fbf8f; }
+    .cc-note { font-style: italic; color: #9f9b92; font-size: 13px; margin: 0 0 15px; }
     .cc-say code, .cc-user code, .cc-q code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em;
-      background: #2c2925; color: #ddd6cc; padding: 1px 5px; border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85em;
+      background: #34332f; color: #e3ddd2; padding: 1.5px 5px; border-radius: 5px;
     }
     .cc-think {
-      font-size: 12.5px; color: #8f877d; font-style: italic; margin: 0 0 13px;
-      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13.5px; color: #9b968d; margin: 0 0 15px;
     }
     .cc-q {
-      border-left: 2px solid #3d3934; padding: 2px 0 2px 14px; margin: 0 0 12px;
-      color: #cfc9bf; font-style: italic;
+      border-left: 2px solid #4a4843; padding: 2px 0 2px 15px; margin: 0 0 14px;
+      color: #cfcabf; font-style: italic;
     }
     .cc-q code { font-style: normal; }
     .cc-deliv {
-      background: #262320; border: 1px solid #38342f; border-radius: 8px;
-      padding: 14px 16px; margin: 6px 0 14px; color: #ddd7cd; white-space: pre-wrap;
-      font-size: 13px; line-height: 1.55;
+      background: #21211e; border: 1px solid #3a3935; border-radius: 10px;
+      padding: 15px 17px; margin: 8px 0 15px; color: #E0DDD4; white-space: pre-wrap;
+      font-size: 13.5px; line-height: 1.62;
     }
 
     /* ---- Embeds ---- */
@@ -186,7 +185,20 @@
   <!-- Reusable Claude logo (sparkle) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="claude-spark" viewBox="0 0 24 24">
-      <path d="M12 2 C12.6 8 16 11.4 22 12 C16 12.6 12.6 16 12 22 C11.4 16 8 12.6 2 12 C8 11.4 11.4 8 12 2 Z" fill="#d97757"/>
+      <g fill="#d97757">
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(30 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(60 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(90 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(120 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(150 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(180 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(210 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(240 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(270 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(300 12 12)"/>
+        <rect x="11.05" y="2.3" width="1.9" height="8.4" rx="0.95" transform="rotate(330 12 12)"/>
+      </g>
     </symbol>
   </svg>
 
@@ -272,7 +284,7 @@
 
               <!-- Turn 2: Claude -->
               <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
-              <p class="cc-think"><svg width="13" height="13" aria-hidden="true" style="opacity:.7"><use href="#claude-spark"/></svg> Identified gaps in Claude Code prompt and formulated targeted refinements &rsaquo;</p>
+              <p class="cc-think">Identified gaps in Claude Code prompt and formulated targeted refinements &rsaquo;</p>
               <p class="cc-say">Your prompt already has good bones. The framing is clear, the assumptions are doing real work, and pointing Claude Code at the green "must have" stickies as the scope boundary is exactly the right move. A few targeted additions will change the output meaningfully, plus one real decision you should make before you run it.</p>
               <p class="cc-say"><strong>The one decision to make first: what should Claude Code actually build it in?</strong></p>
               <p class="cc-say">You never name a stack, so Claude Code will pick one for you. Two sensible directions:</p>
@@ -302,7 +314,7 @@
 
               <!-- Turn 4: Claude -->
               <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
-              <p class="cc-think"><svg width="13" height="13" aria-hidden="true" style="opacity:.7"><use href="#claude-spark"/></svg> Synthesized refined prompt preserving user's voice and preferences &rsaquo;</p>
+              <p class="cc-think">Synthesized refined prompt preserving user's voice and preferences &rsaquo;</p>
               <p class="cc-say">Here's the full prompt with everything folded in. I kept your wording and voice, slotted the individual-flows note into the assumptions list, and added the stack, fidelity, done, and gap-handling instructions.</p>
               <div class="cc-deliv">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.
 
