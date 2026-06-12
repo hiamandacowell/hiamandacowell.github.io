@@ -65,96 +65,97 @@
 
     /* ---- Chat transcript (Claude-style) ---- */
     .cc-transcript {
-      border: 1px solid #3a3935; border-radius: 16px; overflow: hidden; background: #262624;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      border: 1px solid #3c3c39; border-radius: 16px; overflow: hidden; background: #2a2a28;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     }
     .cc-bar {
       display: flex; align-items: center; gap: 9px; padding: 13px 18px;
-      background: #2c2b28; border-bottom: 1px solid #3a3935;
+      background: #2f2f2d; border-bottom: 1px solid #3c3c39;
     }
     .cc-spark { display: block; flex-shrink: 0; }
-    .cc-app { font-size: 13.5px; font-weight: 600; color: #EDEBE4; letter-spacing: -0.01em; }
+    .cc-app { font-size: 13.5px; font-weight: 600; color: #ECECEA; }
     .cc-model {
-      font-size: 11px; color: #a8a399; background: #34332f; border: 1px solid #423f3a;
+      font-size: 11px; color: #aaa9a3; background: #3a3a37; border: 1px solid #47463f;
       border-radius: 9999px; padding: 2px 9px; margin-left: 2px;
     }
     .cc-shell { position: relative; }
     .cc-body {
-      padding: 24px; color: #EDEBE4; font-size: 15px; line-height: 1.7; letter-spacing: -0.003em;
+      padding: 22px 22px 24px; color: #ECECEA; font-size: 15px; line-height: 1.6;
     }
     .cc-body.cc-teaser { max-height: var(--cc-teaser, 300px); overflow: hidden; }
     .cc-body.is-open { max-height: 640px; overflow-y: auto; }
     .cc-body.is-open::-webkit-scrollbar { width: 10px; }
-    .cc-body.is-open::-webkit-scrollbar-track { background: #2c2b28; }
-    .cc-body.is-open::-webkit-scrollbar-thumb { background: #44423d; border-radius: 9999px; }
+    .cc-body.is-open::-webkit-scrollbar-track { background: #2f2f2d; }
+    .cc-body.is-open::-webkit-scrollbar-thumb { background: #47463f; border-radius: 9999px; }
     .cc-fade {
       position: absolute; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none;
-      background: linear-gradient(to bottom, rgba(38,38,36,0), #262624 90%);
+      background: linear-gradient(to bottom, rgba(42,42,40,0), #2a2a28 90%);
     }
     .cc-fade.is-hidden { display: none; }
     .cc-expand {
-      width: 100%; text-align: center; padding: 13px; background: #2c2b28; border: 0;
-      border-top: 1px solid #3a3935; color: #d49b7d; font-weight: 500; font-size: 13.5px;
+      width: 100%; text-align: center; padding: 13px; background: #2f2f2d; border: 0;
+      border-top: 1px solid #3c3c39; color: #d49b7d; font-weight: 500; font-size: 13.5px;
       cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: inherit;
     }
-    .cc-expand:hover { background: #322f2b; color: #e3ad8f; }
+    .cc-expand:hover { background: #34342f; color: #e3ad8f; }
     .cc-expand .material-symbols-outlined { font-size: 19px; }
 
-    /* User turn = rounded bubble, no label */
+    /* User turn = right-aligned bubble that hugs its content (does not span full width) */
     .cc-user {
-      background: #34332e; border-radius: 16px; padding: 16px 19px; margin: 0;
+      background: #3a3a37; border-radius: 16px; padding: 12px 16px;
+      margin: 0 0 8px auto; max-width: 82%; width: fit-content;
     }
-    .cc-user p { margin: 0 0 12px; color: #E9E6DE; }
+    .cc-user p { margin: 0 0 10px; color: #ECECEA; }
     .cc-user p:last-child { margin-bottom: 0; }
-    .cc-user ul { margin: 10px 0 0; padding-left: 20px; list-style: disc; }
-    .cc-user li { margin: 5px 0; color: #DCD8CF; }
+    .cc-user ul { margin: 9px 0 0; padding-left: 20px; list-style: disc; }
+    .cc-user li { margin: 4px 0; color: #E4E4E0; }
 
-    /* Assistant turn = plain text, marked with the Claude logo */
-    .cc-agent { margin: 26px 0 13px; }
-    .cc-agent .cc-spark { width: 22px; height: 22px; }
+    /* Assistant turn = full-width plain text, marked with the Claude logo */
+    .cc-agent { margin: 24px 0 12px; }
+    .cc-agent .cc-spark { width: 21px; height: 21px; }
 
-    /* Attachment chips */
-    .cc-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+    /* Attachment chips (sit inside the user bubble) */
+    .cc-files { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 11px; }
     .cc-file {
-      display: flex; align-items: center; gap: 11px;
-      background: #2b2a27; border: 1px solid #423f3a; border-radius: 10px;
-      padding: 9px 14px 9px 11px;
+      display: flex; align-items: center; gap: 10px;
+      background: #47463f; border: 1px solid #565449; border-radius: 9px;
+      padding: 8px 13px 8px 10px;
     }
-    .cc-file-icon { color: #d97757; font-size: 25px; flex-shrink: 0; }
+    .cc-file-icon { color: #e08a64; font-size: 24px; flex-shrink: 0; }
     .cc-file-meta { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
     .cc-file-name {
-      font-size: 13px; color: #E9E6DE; font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px;
+      font-size: 13px; color: #ECECEA; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px;
     }
-    .cc-file-type { font-size: 10.5px; color: #9f9b92; letter-spacing: 0.06em; }
+    .cc-file-type { font-size: 10.5px; color: #aaa9a3; letter-spacing: 0.06em; }
 
-    .cc-say { margin: 0 0 15px; color: #EDEBE4; }
+    .cc-say { margin: 0 0 14px; color: #ECECEA; }
     .cc-say strong { color: #fff; font-weight: 600; }
     .cc-say ul { margin: 8px 0 0; padding-left: 21px; list-style: disc; }
-    .cc-say li { margin: 6px 0; color: #E3E0D8; }
+    .cc-say li { margin: 6px 0; color: #E4E4E0; }
     .cc-tool {
-      margin: 0 0 15px; font-size: 13.5px; color: #9f9b92;
+      margin: 0 0 14px; font-size: 13.5px; color: #9d9c96;
     }
-    .cc-tool .cc-verb { color: #cf8e6d; }
+    .cc-tool .cc-verb { color: #d18a6a; }
     .cc-tool.cc-create .cc-verb { color: #8fbf8f; }
-    .cc-note { font-style: italic; color: #9f9b92; font-size: 13px; margin: 0 0 15px; }
+    .cc-note { font-style: italic; color: #9d9c96; font-size: 13px; margin: 0 0 14px; }
     .cc-say code, .cc-user code, .cc-q code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85em;
-      background: #34332f; color: #e3ddd2; padding: 1.5px 5px; border-radius: 5px;
+      background: #3a3a37; color: #e6e6e2; padding: 1.5px 5px; border-radius: 5px;
     }
     .cc-think {
-      font-size: 13.5px; color: #9b968d; margin: 0 0 15px;
+      font-size: 13.5px; color: #9d9c96; margin: 0 0 14px;
     }
     .cc-q {
-      border-left: 2px solid #4a4843; padding: 2px 0 2px 15px; margin: 0 0 14px;
-      color: #cfcabf; font-style: italic;
+      border-left: 2px solid #4c4b45; padding: 2px 0 2px 15px; margin: 0 0 14px;
+      color: #cdccc6; font-style: italic;
     }
     .cc-q code { font-style: normal; }
     .cc-deliv {
-      background: #21211e; border: 1px solid #3a3935; border-radius: 10px;
-      padding: 15px 17px; margin: 8px 0 15px; color: #E0DDD4; white-space: pre-wrap;
-      font-size: 13.5px; line-height: 1.62;
+      background: #1f1f1e; border: 1px solid #3c3c39; border-radius: 10px;
+      padding: 15px 17px; margin: 8px 0 14px; color: #E2E2DE; white-space: pre-wrap;
+      font-size: 13.5px; line-height: 1.6;
     }
 
     /* ---- Embeds ---- */
