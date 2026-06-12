@@ -160,7 +160,8 @@
     .cc-deliv {
       background: #1f1f1f; border: 1px solid #3c3c3c; border-radius: 10px;
       padding: 15px 17px; margin: 8px 0 14px; color: #E2E2E2; white-space: pre-wrap;
-      font-size: 13.5px; line-height: 1.6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px; line-height: 1.65;
     }
 
     /* ---- Embeds ---- */
@@ -282,10 +283,8 @@
                   </div>
                 </div>
                 <p>After my interview today, I want to see how far we could get with the journey map we created. Here is the start of a prompt for Claude Code to build it. I don't want you to build it yet. Please help me refine the prompt.</p>
-                <div class="cc-q" style="font-style:normal;">
-                  <p style="margin:0 0 8px;">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
-                  <p style="margin:0;">Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
-                </div>
+                <p>Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
+                <p>Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
               </div>
 
               <!-- Turn 2: Claude -->
@@ -301,13 +300,13 @@
               <p class="cc-say">For a one-shot artifact to evaluate a flow, I'd lean single-file HTML. If you think you'll keep building on it, React. Tell me which and I'll fold it in.</p>
               <p class="cc-say"><strong>Surgical additions that will tighten the result:</strong></p>
               <p class="cc-say">A reading instruction up top, since two documents are involved:</p>
-              <p class="cc-q">Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
+              <p class="cc-say">&ldquo;Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green &lsquo;must have&rsquo; stickies only.&rdquo;</p>
               <p class="cc-say">A fidelity line, so it doesn't over-invest in polish:</p>
-              <p class="cc-q">This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
+              <p class="cc-say">&ldquo;This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.&rdquo;</p>
               <p class="cc-say">A definition of done, so screens actually connect:</p>
-              <p class="cc-q">Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
+              <p class="cc-say">&ldquo;Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.&rdquo;</p>
               <p class="cc-say">A gap-handling instruction, which maps directly to your stated goal of deciding where research goes next:</p>
-              <p class="cc-q">Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
+              <p class="cc-say">&ldquo;Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.&rdquo;</p>
               <p class="cc-say">That last one turns your known gaps into a visible map of where research and design need to go, which is the actual reason you're building this.</p>
               <p class="cc-say"><strong>One small thing in your existing text:</strong> the individual-flows clarification ("those were just for brainstorming, they have our names on them") is useful but currently mid-paragraph. Move it into the assumptions list as its own line so Claude Code treats it as a hard "ignore these" rule rather than narrative context.</p>
               <p class="cc-say">The health-info assumption reads clearly as written, so I'd leave it.</p>
@@ -355,7 +354,7 @@ Some assumptions to make that may not explicitly be mentioned in the provided do
               <!-- Turn 6: Claude -->
               <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
               <p class="cc-say">Here's the line:</p>
-              <p class="cc-q">I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
+              <p class="cc-say">&ldquo;I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.&rdquo;</p>
               <p class="cc-say">I'd drop it right after the build line (the "single self-contained HTML file" one), since they're both about how the file needs to be structured.</p>
 
             </div>
