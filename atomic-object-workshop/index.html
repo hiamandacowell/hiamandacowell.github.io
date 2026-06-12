@@ -121,9 +121,23 @@
     .cc-tool .cc-verb { color: #c98b6b; }
     .cc-tool.cc-create .cc-verb { color: #6FBF73; }
     .cc-note { font-style: italic; color: #8c857d; font-size: 12.5px; margin: 0 0 14px; }
-    .cc-say code, .cc-user code {
+    .cc-say code, .cc-user code, .cc-q code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em;
       background: #2c2925; color: #d9d4cc; padding: 1px 5px; border-radius: 4px;
+    }
+    .cc-think {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+      color: #8c857d; font-style: italic; margin: 0 0 14px;
+    }
+    .cc-q {
+      border-left: 2px solid #3a3631; padding: 2px 0 2px 14px; margin: 0 0 12px;
+      color: #cbc6be; font-style: italic;
+    }
+    .cc-q code { font-style: normal; }
+    .cc-deliv {
+      background: #232019; border: 1px solid #34302b; border-radius: 6px;
+      padding: 14px 16px; margin: 6px 0 14px; color: #ded9d1; white-space: pre-wrap;
+      font-size: 13px; line-height: 1.55;
     }
 
     /* ---- Embeds ---- */
@@ -204,41 +218,105 @@
         </a>
       </section>
 
-      <!-- 2. The prompt -->
-      <section aria-labelledby="prompt-heading" class="mb-14">
-        <h2 id="prompt-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">The prompt</h2>
+      <!-- 2. Refining the prompt -->
+      <section aria-labelledby="refine-heading" class="mb-14">
+        <h2 id="refine-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">Refining the prompt for Claude Code to build a clickable prototype</h2>
 
         <div class="cc-transcript">
           <div class="cc-bar">
             <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
-            <span class="cc-title">claude — the prompt</span>
+            <span class="cc-title">claude — refine-the-prompt</span>
           </div>
           <div class="cc-shell">
-            <div class="cc-body cc-teaser" id="promptBody">
+            <div class="cc-body cc-teaser" id="refineBody">
+
+              <!-- Turn 1: Me -->
               <div class="cc-user">
                 <p class="cc-role-me">Me</p>
-                <p>Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
-                <p>Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
-                <p>Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
-                <p>Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low-mid fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.</p>
-                <p>I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
-                <p>This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
-                <p>Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
-                <p>Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
-                <p>Some assumptions to make that may not explicitly be mentioned in the provided documents:</p>
-                <ul>
-                  <li>let's build for a mobile app first as the clickable prototype</li>
-                  <li>stick to the must-haves</li>
-                  <li>there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them</li>
-                  <li>we can use Dana as our user for signing up, see the assumed pseudo persona</li>
-                  <li>we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</li>
-                </ul>
+                <p>After my interview today, I want to see how far we could get with the journey map we created. Here is the start of a prompt for Claude Code to build it. I don't want you to build it yet. Please help me refine the prompt.</p>
+                <div class="cc-q" style="font-style:normal;">
+                  <p style="margin:0 0 8px;">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
+                  <p style="margin:0;">Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
+                </div>
               </div>
+
+              <!-- Turn 2: Claude -->
+              <p class="cc-role-claude">Claude</p>
+              <p class="cc-think">Identified gaps in Claude Code prompt and formulated targeted refinements &rsaquo;</p>
+              <p class="cc-say">Your prompt already has good bones. The framing is clear, the assumptions are doing real work, and pointing Claude Code at the green "must have" stickies as the scope boundary is exactly the right move. A few targeted additions will change the output meaningfully, plus one real decision you should make before you run it.</p>
+              <p class="cc-say"><strong>The one decision to make first: what should Claude Code actually build it in?</strong></p>
+              <p class="cc-say">You never name a stack, so Claude Code will pick one for you. Two sensible directions:</p>
+              <ul class="cc-say" style="list-style:disc;">
+                <li>A single self-contained HTML file. Opens in any browser, no build step, trivial to send to someone or click through on your phone. Best if the point is "look at this flow" and move on.</li>
+                <li>A small React + Vite project. Cleaner component reuse across the repeated screens, easier to extend if this becomes a thing you keep iterating on. Slightly more setup.</li>
+              </ul>
+              <p class="cc-say">For a one-shot artifact to evaluate a flow, I'd lean single-file HTML. If you think you'll keep building on it, React. Tell me which and I'll fold it in.</p>
+              <p class="cc-say"><strong>Surgical additions that will tighten the result:</strong></p>
+              <p class="cc-say">A reading instruction up top, since two documents are involved:</p>
+              <p class="cc-q">Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
+              <p class="cc-say">A fidelity line, so it doesn't over-invest in polish:</p>
+              <p class="cc-q">This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
+              <p class="cc-say">A definition of done, so screens actually connect:</p>
+              <p class="cc-q">Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
+              <p class="cc-say">A gap-handling instruction, which maps directly to your stated goal of deciding where research goes next:</p>
+              <p class="cc-q">Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
+              <p class="cc-say">That last one turns your known gaps into a visible map of where research and design need to go, which is the actual reason you're building this.</p>
+              <p class="cc-say"><strong>One small thing in your existing text:</strong> the individual-flows clarification ("those were just for brainstorming, they have our names on them") is useful but currently mid-paragraph. Move it into the assumptions list as its own line so Claude Code treats it as a hard "ignore these" rule rather than narrative context.</p>
+              <p class="cc-say">The health-info assumption reads clearly as written, so I'd leave it.</p>
+              <p class="cc-say">Want me to assemble the full refined prompt once you've picked HTML vs React? I'll keep your voice and just slot these in rather than rewriting it.</p>
+
+              <!-- Turn 3: Me -->
+              <div class="cc-user" style="margin-top:24px;">
+                <p class="cc-role-me">Me</p>
+                <p>HTML since I will create a new page on my personal website and add this clickable prototype as a low-mid fidelity element on that page. Please assemble the full refined prompt with your suggestions included.</p>
+              </div>
+
+              <!-- Turn 4: Claude -->
+              <p class="cc-role-claude">Claude</p>
+              <p class="cc-think">Synthesized refined prompt preserving user's voice and preferences &rsaquo;</p>
+              <p class="cc-say">Here's the full prompt with everything folded in. I kept your wording and voice, slotted the individual-flows note into the assumptions list, and added the stack, fidelity, done, and gap-handling instructions.</p>
+              <div class="cc-deliv">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.
+
+Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.
+
+Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.
+
+Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low-mid fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.
+
+This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.
+
+Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.
+
+Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.
+
+Some assumptions to make that may not explicitly be mentioned in the provided documents:
+- let's build for a mobile app first as the clickable prototype
+- stick to the must-haves
+- there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them
+- we can use Dana as our user for signing up, see the assumed pseudo persona
+- we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</div>
+              <p class="cc-say"><strong>A couple of notes on choices I made:</strong></p>
+              <p class="cc-say">I put the reading instruction and the build/fidelity/done lines between your two opening paragraphs and the assumptions list, so Claude Code reads the context, then gets its marching orders, then the hard constraints. That ordering tends to keep it from skimming the constraints.</p>
+              <p class="cc-say">The embed detail is in the build line ("run on its own in a browser and on mobile"), but one thing to watch: a self-contained file is easy to embed via an iframe on your site, which keeps its styles from colliding with your page styles. If Claude Code instead gives you a fragment meant to drop straight into the page body, you'll want to ask it to wrap the whole thing so it's iframe-ready. Worth a glance when the output comes back.</p>
+              <p class="cc-say">Want me to add an explicit "make this iframe-embeddable" line, or leave that to handle after you see what it produces?</p>
+
+              <!-- Turn 5: Me -->
+              <div class="cc-user" style="margin-top:24px;">
+                <p class="cc-role-me">Me</p>
+                <p>Yes, give me the "make this iframe-embeddable" line and I'll add it to the prompt before sending.</p>
+              </div>
+
+              <!-- Turn 6: Claude -->
+              <p class="cc-role-claude">Claude</p>
+              <p class="cc-say">Here's the line:</p>
+              <p class="cc-q">I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
+              <p class="cc-say">I'd drop it right after the build line (the "single self-contained HTML file" one), since they're both about how the file needs to be structured.</p>
+
             </div>
-            <div class="cc-fade" id="promptFade"></div>
+            <div class="cc-fade" id="refineFade"></div>
           </div>
-          <button class="cc-expand" type="button" data-target="promptBody" data-fade="promptFade" data-label="Show the full prompt">
-            <span class="cc-expand-text">Show the full prompt</span>
+          <button class="cc-expand" type="button" data-target="refineBody" data-fade="refineFade" data-label="Show the full conversation">
+            <span class="cc-expand-text">Show the full conversation</span>
             <span class="material-symbols-outlined cc-expand-icon">expand_more</span>
           </button>
         </div>
