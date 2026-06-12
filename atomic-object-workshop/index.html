@@ -20,42 +20,22 @@
             "surface-container-high": "#D8D3CB",
             "primary-fixed": "#b9ebf2",
             "on-surface": "#1C1714",
-            "on-secondary-fixed-variant": "#384b3c",
             "outline-variant": "#C5BFBA",
-            "on-secondary-container": "#546757",
             "surface-container-low": "#EDE9E2",
-            "on-secondary-fixed": "#0d1f12",
             "primary": "#26585d",
             "surface-container": "#E3DFD7",
-            "on-primary-container": "#c0f2f8",
             "on-primary": "#ffffff",
             "secondary": "#4f6353",
             "primary-container": "#407076",
             "surface": "#FAF7F2",
-            "primary-fixed-dim": "#9ecfd5",
-            "on-tertiary": "#ffffff",
-            "secondary-fixed": "#d2e8d3",
-            "surface-container-highest": "#CEC9C0",
             "secondary-container": "#cfe5d0",
-            "on-primary-fixed": "#001f23",
-            "secondary-fixed-dim": "#b6ccb8",
+            "on-secondary-fixed": "#0d1f12",
             "on-surface-variant": "#4A4440",
-            "tertiary": "#554d65",
-            "on-secondary": "#ffffff",
-            "tertiary-container": "#6d657e",
-            "on-primary-fixed-variant": "#1a4e53",
-            "inverse-primary": "#9ecfd5",
             "surface-container-lowest": "#F4F1EC",
             "outline": "#7A7470",
-            "surface-dim": "#D0CBC4",
             "accent": "#B05C1A"
           },
-          borderRadius: {
-            "DEFAULT": "0.125rem",
-            "lg": "0.25rem",
-            "xl": "0.5rem",
-            "full": "9999px"
-          },
+          borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px" },
           fontFamily: {
             "headline": ["Fraunces", "Georgia", "serif"],
             "body": ["Inter", "system-ui", "sans-serif"],
@@ -66,191 +46,123 @@
     }
   </script>
   <style>
-    html { scroll-behavior: smooth; scroll-padding-top: 128px; }
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     @media (max-width: 767px) {
       .nav-menu.is-open {
-        display: flex !important;
-        flex-direction: column;
-        align-items: flex-start;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #FAF7F2;
-        padding: 1.5rem;
-        gap: 1rem;
-        border-bottom: 1px solid rgba(197,191,186,0.4);
+        display: flex !important; flex-direction: column; align-items: flex-start;
+        position: absolute; top: 100%; left: 0; right: 0; background: #FAF7F2;
+        padding: 1.5rem; gap: 1rem; border-bottom: 1px solid rgba(197,191,186,0.4);
       }
     }
-
-    /* Skip to main content link */
     .skip-link {
-      position: absolute; top: -100px; left: 8px;
-      background: #26585d; color: #fff;
-      padding: 8px 16px; border-radius: 6px;
-      z-index: 100; text-decoration: none;
-      font-weight: 500; font-size: 14px;
-      transition: top 0.15s;
+      position: absolute; top: -100px; left: 8px; background: #26585d; color: #fff;
+      padding: 8px 16px; border-radius: 6px; z-index: 100; text-decoration: none;
+      font-weight: 500; font-size: 14px; transition: top 0.15s;
     }
     .skip-link:focus { top: 8px; }
-
-    /* Visible focus indicators */
-    a:focus-visible, button:focus-visible {
-      outline: 2px solid #26585d;
-      outline-offset: 2px;
-      border-radius: 4px;
+    a:focus-visible, button:focus-visible, summary:focus-visible {
+      outline: 2px solid #26585d; outline-offset: 2px; border-radius: 4px;
     }
 
-    /* Section progress nav */
-    .section-nav-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 6px 2px 4px;
-      text-decoration: none;
-      border-radius: 4px;
+    /* ---- Collapsible transcript ---- */
+    .cc-details {
+      border: 1px solid #2c2925; border-radius: 0.5rem; overflow: hidden; background: #1b1917;
     }
-    .section-nav-track {
-      display: block;
-      height: 4px;
-      background: rgba(122, 116, 112, 0.25);
-      border-radius: 9999px;
-      overflow: hidden;
+    .cc-summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+      padding: 13px 16px; background: #211e1b; user-select: none;
     }
-    .section-nav-fill {
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: #26585d;
-      border-radius: 9999px;
-      transition: width 120ms linear;
-    }
-    .section-nav-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #4A4440;
-      transition: color 150ms, font-weight 150ms;
-      text-align: left;
-    }
-    .section-nav-item:hover .section-nav-label { color: #26585d; }
-    .section-nav-item.is-active .section-nav-label {
-      color: #1C1714;
-      font-weight: 700;
-    }
-    @media (max-width: 767px) {
-      .section-nav-item { padding: 10px 2px 8px; }
-    }
-    @media (max-width: 380px) {
-      .section-nav-label { display: none; }
-    }
-
-    /* ---- Claude Code transcript ---- */
-    .cc-transcript {
-      background: #1b1917;
-      color: #E7E3DD;
-      border-radius: 0.5rem;
-      border: 1px solid #2c2925;
-      font-size: 14px;
-      line-height: 1.6;
-      overflow: hidden;
-    }
-    .cc-window-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      background: #211e1b;
-      border-bottom: 1px solid #2c2925;
-    }
+    .cc-summary::-webkit-details-marker { display: none; }
     .cc-dot { width: 11px; height: 11px; border-radius: 9999px; display: inline-block; }
-    .cc-dot-r { background: #E06C5A; }
-    .cc-dot-y { background: #E0B24A; }
-    .cc-dot-g { background: #6FBF73; }
-    .cc-window-title {
-      margin-left: 6px; font-size: 12px; color: #8c857d;
+    .cc-dot-r { background: #E06C5A; } .cc-dot-y { background: #E0B24A; } .cc-dot-g { background: #6FBF73; }
+    .cc-title {
+      margin-left: 6px; font-size: 12px; color: #8c857d; flex: 1;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
+    .cc-hint { font-size: 12px; color: #b6ada3; display: inline-flex; align-items: center; gap: 3px; }
+    .cc-chevron { transition: transform 0.2s; color: #8c857d; font-size: 20px; }
+    details[open] .cc-chevron { transform: rotate(180deg); }
+    details[open] .cc-hint-show { display: none; }
+    .cc-hint-hide { display: none; }
+    details[open] .cc-hint-hide { display: inline-flex; }
+
     .cc-scroll {
-      max-height: 560px;
-      overflow-y: auto;
-      padding: 22px 22px 26px;
-      transition: max-height 0.3s ease;
+      max-height: 600px; overflow-y: auto; padding: 22px 22px 26px;
+      color: #E7E3DD; font-size: 14px; line-height: 1.6; border-top: 1px solid #2c2925;
     }
-    .cc-scroll.is-expanded { max-height: none; }
     .cc-scroll::-webkit-scrollbar { width: 10px; }
     .cc-scroll::-webkit-scrollbar-track { background: #211e1b; }
     .cc-scroll::-webkit-scrollbar-thumb { background: #3a3631; border-radius: 9999px; }
 
-    .cc-user {
-      border: 1px solid #34302b;
-      background: #232019;
-      border-radius: 0.4rem;
-      padding: 16px 18px;
-      margin-bottom: 22px;
-    }
-    .cc-user-label {
+    .cc-user { border: 1px solid #34302b; background: #232019; border-radius: 0.4rem; padding: 16px 18px; }
+    .cc-role-me {
       font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-      color: #9ecfd5; margin-bottom: 10px;
+      color: #9ecfd5; margin: 0 0 10px;
+    }
+    .cc-role-claude {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #c98b6b; margin: 24px 0 10px;
     }
     .cc-user p { margin: 0 0 10px; color: #D9D4CC; }
     .cc-user p:last-child { margin-bottom: 0; }
     .cc-user ul { margin: 8px 0 0; padding-left: 18px; }
     .cc-user li { margin: 4px 0; color: #C9C4BC; }
 
-    .cc-say { margin: 0 0 4px; color: #E7E3DD; }
-    .cc-say + .cc-tool { margin-top: 2px; }
+    .cc-say { margin: 0 0 12px; color: #E7E3DD; }
+    .cc-say strong { color: #fff; font-weight: 600; }
+    .cc-say ul { margin: 6px 0 0; padding-left: 18px; }
+    .cc-say li { margin: 4px 0; color: #cfcac2; }
     .cc-tool {
-      margin: 0 0 14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12.5px;
-      color: #8c857d;
+      margin: 0 0 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px; color: #8c857d;
     }
     .cc-tool .cc-verb { color: #c98b6b; }
     .cc-tool.cc-create .cc-verb { color: #6FBF73; }
-    .cc-say { margin-top: 14px; }
-    .cc-say:first-child { margin-top: 0; }
-    .cc-note {
-      font-style: italic; color: #8c857d; font-size: 12.5px; margin: 0 0 14px;
+    .cc-note { font-style: italic; color: #8c857d; font-size: 12.5px; margin: 0 0 14px; }
+    .cc-say code, .cc-user code, .cc-q code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em;
+      background: #2c2925; color: #d9d4cc; padding: 1px 5px; border-radius: 4px;
     }
-    .cc-say code, .cc-user code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.86em; background: #2c2925; color: #d9d4cc;
-      padding: 1px 5px; border-radius: 4px;
+    .cc-q {
+      border-left: 2px solid #3a3631; padding: 2px 0 2px 14px; margin: 0 0 12px;
+      color: #cbc6be; font-style: italic;
     }
-    .cc-say strong { color: #fff; font-weight: 600; }
-    .cc-say ul { margin: 6px 0 0; padding-left: 18px; }
-    .cc-say li { margin: 3px 0; color: #cfcac2; }
+    .cc-deliv {
+      background: #232019; border: 1px solid #34302b; border-radius: 6px;
+      padding: 14px 16px; margin: 6px 0 14px; color: #ded9d1; white-space: pre-wrap;
+      font-size: 13px; line-height: 1.55;
+    }
     .cc-pre {
       background: #232019; border: 1px solid #34302b; border-radius: 6px;
       padding: 12px 14px; margin: 6px 0 14px; overflow-x: auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12.5px; color: #cfcac2; white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+      color: #cfcac2; white-space: pre-wrap;
     }
-    .cc-fade {
-      position: relative; margin-top: -64px; height: 64px;
-      background: linear-gradient(to bottom, rgba(27,25,23,0), #1b1917);
-      pointer-events: none;
-    }
-    .cc-fade.is-hidden { display: none; }
 
     /* ---- Embeds ---- */
-    .embed-frame {
-      width: 100%; border: 0; display: block; background: #EDE9E2;
-    }
+    .embed-frame { width: 100%; border: 0; display: block; background: #EDE9E2; }
     .miro-frame { aspect-ratio: 16 / 10; min-height: 380px; }
     .proto-frame { height: 860px; max-height: 90vh; }
-    .pw-chip {
+
+    /* ---- Miro password callout ---- */
+    .pw-callout {
+      display: flex; align-items: center; gap: 14px;
+      background: #cfe5d0; border: 1px solid #9bc6a0; border-radius: 0.6rem;
+      padding: 14px 20px;
+    }
+    .pw-callout .material-symbols-outlined { color: #2f5b3a; font-size: 26px; }
+    .pw-callout-label {
+      display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #2f5b3a;
+    }
+    .pw-callout-code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      background: #cfe5d0; color: #0d1f12; padding: 2px 10px; border-radius: 6px;
-      font-weight: 600; letter-spacing: 0.03em;
+      font-size: 22px; font-weight: 700; color: #0d1f12; letter-spacing: 0.02em;
     }
   </style>
 </head>
-<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary">
 
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -270,355 +182,319 @@
     </div>
   </nav>
 
-  <!-- Section progress nav -->
-  <nav id="section-nav" aria-label="Page sections" class="fixed left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40" style="top: 73px;">
-    <div class="max-w-7xl mx-auto px-6 py-2">
-      <div class="grid grid-cols-5 gap-1.5 md:gap-2">
-        <a href="#context" data-section="context" class="section-nav-item">
-          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
-          <span class="section-nav-label">Context</span>
-        </a>
-        <a href="#prompt" data-section="prompt" class="section-nav-item">
-          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
-          <span class="section-nav-label">Prompt</span>
-        </a>
-        <a href="#board" data-section="board" class="section-nav-item">
-          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
-          <span class="section-nav-label">Board</span>
-        </a>
-        <a href="#build" data-section="build" class="section-nav-item">
-          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
-          <span class="section-nav-label">Build</span>
-        </a>
-        <a href="#prototype" data-section="prototype" class="section-nav-item">
-          <span class="section-nav-track"><span class="section-nav-fill"></span></span>
-          <span class="section-nav-label">Prototype</span>
-        </a>
-      </div>
-    </div>
-  </nav>
+  <main id="main-content" class="pt-20 pb-20">
 
-  <main id="main-content" class="pb-20" style="padding-top: 132px;">
+    <div class="max-w-4xl mx-auto px-6">
 
-    <!-- Section 1: Context -->
-    <section id="context" aria-labelledby="context-heading" class="mb-20">
-      <h2 id="context-heading" class="sr-only">Context</h2>
-
-      <header class="max-w-5xl mx-auto px-6 pt-8 md:pt-10 pb-8 md:pb-10">
-        <p class="text-xs font-bold text-secondary uppercase tracking-[0.16em] mb-4">Facilitation · Workshop artifact</p>
-        <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-none mb-5">Atomic Object Workshop</h1>
-        <p class="text-xl md:text-2xl font-light text-on-surface-variant leading-relaxed mb-7">
-          A simulated Delivery Lead workshop for <em>Caring Health</em> — a story-mapping session I facilitated, then handed to Claude Code to turn the agreed beta scope into a clickable prototype. This page collects the prompt, the board, the build, and the result.
-        </p>
-
-        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-4 pt-5 border-t border-outline-variant/40">
-          <div>
-            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Role</dt>
-            <dd class="text-sm md:text-base text-on-surface">Facilitator (Delivery Lead candidate)</dd>
-          </div>
-          <div>
-            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Format</dt>
-            <dd class="text-sm md:text-base text-on-surface">~2-hour product backbone / journey-map workshop</dd>
-          </div>
-          <div>
-            <dt class="text-[11px] font-bold text-secondary uppercase tracking-[0.14em] mb-1.5">Then</dt>
-            <dd class="text-sm md:text-base text-on-surface">Beta scope &rarr; clickable prototype, built with Claude Code</dd>
-          </div>
-        </dl>
+      <!-- Title -->
+      <header class="pt-10 md:pt-14 pb-10 md:pb-14">
+        <h1 class="font-headline text-4xl md:text-6xl font-semibold text-primary tracking-tighter leading-[1.05]">
+          Atomic Object Workshop &mdash; Caring Health
+        </h1>
       </header>
 
-      <div class="max-w-5xl mx-auto px-6 text-base md:text-lg leading-relaxed text-on-surface-variant space-y-5">
-        <p>Atomic Object, a software consultancy, ran a final-round interview as a simulated workshop: they handed over a client brief and I had an hour to prepare and then facilitate a <strong class="text-on-surface font-semibold">product backbone</strong> exercise with a designer, a developer, and two delivery leads. The goal was to take a large, fuzzy list of features and organize it into a prioritized backbone the dev team could actually start from.</p>
-        <p>The client was <strong class="text-on-surface font-semibold">Caring Health</strong>, a HIPAA-compliant app that lets a caregiver request an at-home visit from a licensed nurse for a loved one — vitals, wound care, medication help, a home-safety check. The beta was scoped to three things: <em>set up &amp; login</em>, <em>request &amp; confirm a service</em>, and <em>track the nurse's arrival</em>. In my prep hour I set up a journey-map template in Miro and a basic flow for how we'd map features against it.</p>
-        <p>During the session we sorted features into rows — green "must have" stickies for the beta, yellow "should/could have" below, and a red "nopes" parking lot — across the activity backbone. Afterward, out of curiosity, I wanted to see what the agreed beta actually <em>felt</em> like as a flow. So I gave Claude Code the board and the brief and asked it to build a clickable prototype from the green must-haves only. Everything below is that artifact, start to finish.</p>
-      </div>
-    </section>
+      <!-- 1. Prompt refinement -->
+      <section aria-labelledby="refine-heading" class="mb-14">
+        <h2 id="refine-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">Refining the prompt with Claude</h2>
 
-    <!-- Section 2: Prompt -->
-    <section id="prompt" aria-labelledby="prompt-heading" class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 id="prompt-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">The prompt</h2>
-      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-10">
-        My first instinct was a loose, conversational ask. Before running it, I refined it into something a coding agent could execute against without guessing: clear inputs, a concrete definition of done, and an explicit instruction to <em>surface</em> its assumptions instead of silently inventing the parts we'd flagged as open. Both versions are below.
-      </p>
+        <details class="cc-details">
+          <summary class="cc-summary">
+            <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
+            <span class="cc-title">claude — refine-the-prompt</span>
+            <span class="cc-hint cc-hint-show">Show conversation</span>
+            <span class="cc-hint cc-hint-hide">Hide</span>
+            <span class="material-symbols-outlined cc-chevron">expand_more</span>
+          </summary>
+          <div class="cc-scroll">
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- First pass -->
-        <article class="bg-surface-container-low rounded-xl p-6 md:p-7">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-symbols-outlined text-outline" style="font-size:20px;">edit_note</span>
-            <h3 class="text-xs font-bold text-secondary uppercase tracking-[0.14em]">First pass</h3>
-          </div>
-          <div class="text-sm md:text-[15px] leading-relaxed text-on-surface-variant space-y-4">
-            <p>Hi, today I had an interview with a software consultancy for a Delivery Lead (PM) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
-            <p>Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
-          </div>
-        </article>
+            <!-- Turn 1: Me -->
+            <div class="cc-user">
+              <p class="cc-role-me">Me</p>
+              <p>After my interview today, I want to see how far we could get with the journey map we created. Here is the start of a prompt for Claude Code to build it. I don't want you to build it yet. Please help me refine the prompt.</p>
+              <div class="cc-q" style="font-style:normal;">
+                <p style="margin:0 0 8px;">Hi, today I had an interview with a software consultancy for a Delivery Lead (PM) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.</p>
+                <p style="margin:0;">Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.</p>
+              </div>
+            </div>
 
-        <!-- Refined -->
-        <article class="bg-surface-container-low rounded-xl p-6 md:p-7 border-l-4 border-primary">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-symbols-outlined text-primary" style="font-size:20px;">auto_awesome</span>
-            <h3 class="text-xs font-bold text-secondary uppercase tracking-[0.14em]">The refined prompt I ran</h3>
-          </div>
-          <div class="text-sm md:text-[15px] leading-relaxed text-on-surface-variant space-y-4">
-            <p>Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
-            <p>Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low-mid fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.</p>
-            <p>I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
-            <p>This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
-            <p><strong class="text-on-surface font-semibold">Done means:</strong> starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
-            <p>Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
-            <p class="text-on-surface-variant">Some assumptions to make that may not explicitly be mentioned in the provided documents:</p>
-            <ul class="list-disc pl-5 space-y-1.5">
-              <li>let's build for a mobile app first as the clickable prototype</li>
-              <li>stick to the must-haves</li>
-              <li>there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them</li>
-              <li>we can use Dana as our user for signing up, see the assumed pseudo persona</li>
-              <li>we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</li>
+            <!-- Turn 2: Claude -->
+            <p class="cc-role-claude">Claude</p>
+            <p class="cc-say">Your prompt already has good bones. The framing is clear, the assumptions are doing real work, and pointing Claude Code at the green "must have" stickies as the scope boundary is exactly the right move. A few targeted additions will change the output meaningfully, plus one real decision you should make before you run it.</p>
+            <p class="cc-say"><strong>The one decision to make first: what should Claude Code actually build it in?</strong></p>
+            <p class="cc-say">You never name a stack, so Claude Code will pick one for you. Two sensible directions:</p>
+            <ul class="cc-say" style="list-style:disc;">
+              <li>A single self-contained HTML file. Opens in any browser, no build step, trivial to send to someone or click through on your phone. Best if the point is "look at this flow" and move on.</li>
+              <li>A small React + Vite project. Cleaner component reuse across the repeated screens, easier to extend if this becomes a thing you keep iterating on. Slightly more setup.</li>
             </ul>
+            <p class="cc-say">For a one-shot artifact to evaluate a flow, I'd lean single-file HTML. If you think you'd keep building on it, React. Tell me which and I'll fold it in.</p>
+            <p class="cc-say"><strong>Surgical additions that will tighten the result:</strong></p>
+            <p class="cc-say">A reading instruction up top, since two documents are involved:</p>
+            <p class="cc-q">Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
+            <p class="cc-say">A fidelity line, so it doesn't over-invest in polish:</p>
+            <p class="cc-q">This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
+            <p class="cc-say">A definition of done, so screens actually render:</p>
+            <p class="cc-q">Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
+            <p class="cc-say">A gap-handling instruction, which maps directly to your stated goal of deciding where research goes next:</p>
+            <p class="cc-q">Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
+            <p class="cc-say">That last one turns your known gaps into a visible map of where research and design need to go, which is the actual reason you're building this.</p>
+            <p class="cc-say"><strong>One small thing in your existing text:</strong> the individual-flows clarification ("those were just for brainstorming, they have our names on them") is useful but currently mid-paragraph. Move it into the assumptions list as its own line so Claude Code treats it as a hard "ignore these" rule rather than narrative context.</p>
+            <p class="cc-say">The health-info assumption reads clearly as written, so I'd leave it.</p>
+            <p class="cc-say">Want me to assemble the full refined prompt once you've picked HTML vs React? I'll keep your voice and just slot these in rather than rewriting it.</p>
+
+            <!-- Turn 3: Me -->
+            <div class="cc-user" style="margin-top:24px;">
+              <p class="cc-role-me">Me</p>
+              <p>HTML since I will create a new page on my personal website and add this clickable prototype as a low-fidelity element on that page. Please assemble the full refined prompt with your suggestions included.</p>
+            </div>
+
+            <!-- Turn 4: Claude -->
+            <p class="cc-role-claude">Claude</p>
+            <p class="cc-say">Here's the full prompt with everything folded in. I kept your wording and voice, slotted the individual-flows note into the assumptions list, and added the stack, fidelity, done, and gap-handling instructions.</p>
+            <div class="cc-deliv">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.
+
+Out of curiosity, I am going to give you a printout of the Miro board (which isn't the exact format that it shows up, since it's restricted to pages) and a slightly-redacted version of the brief I was given to follow. I would like for you to make a quick clickable prototype of our decided beta version, which you'll see in the green stickies "must have" rows. We moved non-essential features out to other rows, so while we could add a lot more functionality, the goal is to see what this flow looks like as a next step for deciding where to go with research and design.
+
+Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.
+
+Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.
+
+This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.
+
+Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.
+
+Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.
+
+Some assumptions to make that may not explicitly be mentioned in the provided documents:
+- let's build for a mobile app first as the clickable prototype
+- stick to the must-haves
+- there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them
+- we can use Dana as our user for signing up, see the assumed pseudo persona
+- we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</div>
+            <p class="cc-say"><strong>A couple of notes on choices I made:</strong> I put the reading instruction and the build/fidelity/done lines between your two opening paragraphs and the assumptions list, so Claude Code reads the context, then gets its marching orders, then the hard constraints. That ordering tends to keep it from skimming the constraints.</p>
+            <p class="cc-say">The embed detail is in the build line ("run on its own in a browser and on mobile"), but one thing to watch: a self-contained file is easy to embed in an iframe on your site, which keeps its styles from colliding with your page styles. If Claude Code instead gives you a fragment meant to drop straight into the page body, you'll want to ask it to wrap the whole thing so it's iframe-ready. Worth a glance when the output comes back.</p>
+            <p class="cc-say">Want me to add an explicit "make this iframe-embeddable" line, or leave that to handle after you see what it produces?</p>
+
+            <!-- Turn 5: Me -->
+            <div class="cc-user" style="margin-top:24px;">
+              <p class="cc-role-me">Me</p>
+              <p>Yes, give me the "make this iframe-embeddable" line and I'll add it to the prompt before sending.</p>
+            </div>
+
+            <!-- Turn 6: Claude -->
+            <p class="cc-role-claude">Claude</p>
+            <p class="cc-say">Here's the line:</p>
+            <p class="cc-q">I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
+            <p class="cc-say">I'd drop it right after the build line (the "single self-contained HTML file" one), since they're both about how the file needs to be structured.</p>
+
           </div>
-        </article>
-      </div>
-    </section>
+        </details>
+      </section>
 
-    <!-- Section 3: Board -->
-    <section id="board" aria-labelledby="board-heading" class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 id="board-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">The Miro board</h2>
-      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-6">
-        The live journey map from the session. The blue backbone runs left-to-right through the user's activities; green stickies are the beta "must haves," yellow are "should/could have," and the red row is the "nopes" parking lot. Pan and zoom to explore.
-      </p>
+      <!-- 2. Miro board -->
+      <section aria-labelledby="board-heading" class="mb-14">
+        <h2 id="board-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">The Miro board</h2>
 
-      <div class="bg-surface-container-low rounded-xl p-4 md:p-5 mb-4">
+        <div class="pw-callout mb-4">
+          <span class="material-symbols-outlined">lock</span>
+          <div>
+            <span class="pw-callout-label">Board password</span>
+            <span class="pw-callout-code">GreatNotBig</span>
+          </div>
+        </div>
+
         <div class="rounded-lg overflow-hidden border border-outline-variant/50">
           <iframe
             class="embed-frame miro-frame"
             src="https://miro.com/app/live-embed/uXjVHGsok3o=/?share_link_id=288205809528"
             title="Caring Health journey map — Miro board"
-            frameborder="0"
-            scrolling="no"
-            allow="fullscreen; clipboard-read; clipboard-write"
-            allowfullscreen></iframe>
+            frameborder="0" scrolling="no"
+            allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
         </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 text-sm text-on-surface-variant">
-        <p class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary" style="font-size:20px;">lock</span>
-          This board is password-protected. Password: <span class="pw-chip">GreatNotBig</span>
-        </p>
-        <a href="https://miro.com/app/board/uXjVHGsok3o=/?share_link_id=288205809528" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-accent font-medium inline-flex items-center gap-1">
-          Open the board in Miro <span aria-hidden="true">&#8599;</span>
+        <a href="https://miro.com/app/board/uXjVHGsok3o=/?share_link_id=288205809528" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-accent font-medium text-sm inline-flex items-center gap-1 mt-3">
+          Open in Miro <span aria-hidden="true">&#8599;</span>
         </a>
-      </div>
-    </section>
+      </section>
 
-    <!-- Section 4: Build -->
-    <section id="build" aria-labelledby="build-heading" class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 id="build-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">The build</h2>
-      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-8">
-        The full Claude Code session, start to finish — reconstructing the board from 41 image slices, pulling scope from the green must-haves only, building the single-file prototype, and tap-testing the whole flow in a browser (catching and fixing two real bugs along the way). Scroll the panel to read it all.
-      </p>
+      <!-- 3. Claude Code build -->
+      <section aria-labelledby="build-heading" class="mb-14">
+        <h2 id="build-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">Building it with Claude Code</h2>
 
-      <div class="cc-transcript">
-        <div class="cc-window-bar">
-          <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
-          <span class="cc-window-title">claude code — caring-health-prototype</span>
-        </div>
-        <div id="cc-scroll" class="cc-scroll">
+        <details class="cc-details">
+          <summary class="cc-summary">
+            <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
+            <span class="cc-title">claude code — caring-health-prototype</span>
+            <span class="cc-hint cc-hint-show">Show conversation</span>
+            <span class="cc-hint cc-hint-hide">Hide</span>
+            <span class="material-symbols-outlined cc-chevron">expand_more</span>
+          </summary>
+          <div class="cc-scroll">
 
-          <!-- User turn -->
-          <div class="cc-user">
-            <p class="cc-user-label">Me</p>
-            <p>Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
-            <p>Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low-mid fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.</p>
-            <p>I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
-            <p>This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
-            <p>Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
-            <p>Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
-            <p>Some assumptions to make that may not explicitly be mentioned in the provided documents:</p>
-            <ul>
-              <li>let's build for a mobile app first as the clickable prototype</li>
-              <li>stick to the must-haves</li>
-              <li>there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them</li>
-              <li>we can use Dana as our user for signing up, see the assumed pseudo persona</li>
-              <li>we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</li>
+            <!-- Me -->
+            <div class="cc-user">
+              <p class="cc-role-me">Me</p>
+              <p>Two files are attached: a printout of a Miro journey map and a redacted brief. Read both before writing code. The board export got split across pages, so the page breaks aren't meaningful. Reconstruct the intended flow across them. Pull beta scope from the green "must have" stickies only.</p>
+              <p>Build this as a single self-contained HTML file (HTML, CSS, and JS all in one file, no build step). I'm going to embed it as a low-mid fidelity element on a page of my personal website, so it needs to run on its own in a browser and on mobile.</p>
+              <p>I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
+              <p>This is mid-fidelity, meant to test the flow and not the visual design. Clean, legible, shown in a mobile phone frame, with real tap-through navigation. Skip production assets and heavy styling.</p>
+              <p>Done means: starting from Dana signing up, I can tap through every must-have screen and reach the core loop. No screen dead-ends unless it's an obvious placeholder.</p>
+              <p>Where the board or brief leaves something undefined, make a reasonable choice and surface it. Leave a short visible note on the screen (or a running list at the end) flagging where we guessed and where we'd need to go back to the user. Don't silently invent the parts we knew were open questions.</p>
+              <p>Some assumptions to make that may not explicitly be mentioned in the provided documents:</p>
+              <ul>
+                <li>let's build for a mobile app first as the clickable prototype</li>
+                <li>stick to the must-haves</li>
+                <li>there are individual flows that have our names on them. Those were just for brainstorming, so ignore them and don't pull scope from them</li>
+                <li>we can use Dana as our user for signing up, see the assumed pseudo persona</li>
+                <li>we had a lot of gaps on connecting this to the actual user health info that we knew we'd need to go back and ask more questions about, so for this prototype, assume that the beta version's back-end knows the health info and we don't have to have them provide the Spectrum ID but they do need to add the basic info about themself and the person they are caring for</li>
+              </ul>
+            </div>
+
+            <!-- Claude -->
+            <p class="cc-role-claude">Claude</p>
+            <p class="cc-say">I'll read both documents carefully before building anything. Let me start with the brief and the first pages of the Miro board export.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 2 files &rsaquo;</p>
+
+            <p class="cc-say">The image renderer isn't available. Let me extract text directly. Let me check what tooling I have.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> Check Python and PDF libraries &rsaquo;</p>
+
+            <p class="cc-say">I have pymupdf and pdfplumber. Let me extract text from the brief first, and from the Miro board.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> 2 commands, read a file &rsaquo;</p>
+
+            <p class="cc-say">Now the Miro board. It's image-heavy — let me extract any text layer across all pages first.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> Extract Miro board text layer &rsaquo;</p>
+
+            <p class="cc-say">Pure image export. I'll render the pages to PNGs and read them visually. First, a contact sheet to understand how the board is tiled across the pages.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> Inspect page sizes &rsaquo;</p>
+
+            <p class="cc-say">41 pages, all 4500px wide strips of varying heights — horizontal slices of the board. Let me render them all and read through.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> a command, read 4 files &rsaquo;</p>
+
+            <p class="cc-say">This is a journey map with rows: Nopes (red), Should/Could Have (yellow), Must Have (green), User activities (blue backbone). Pages 1-4 are the four rows of the leftmost column band. Let me read the rest to reconstruct the full backbone left-to-right.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">Second band is Request &amp; confirm. Continuing to the next activity bands.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">Third band is Track Nurse. That's the three beta activities from the brief. Let me scan the remaining pages (the persona and the name-flows I'm told to ignore, plus possibly more).</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">Pages 13-16 are a refined purple "User tasks/activities" consolidation. My scope is the green must-haves (per your instruction). Let me find Dana's persona and confirm nothing else is in scope.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">These are alternate refined backbones (the brainstorm flows) — I'll ignore them for scope, but they confirm the overall order. Let me find Dana's persona.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">Page 28 confirms the named flows (note "Patrick Pale" labels). Let me find Dana's persona in the remaining slides.</p>
+            <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
+
+            <p class="cc-say">Found Dana's persona (49, family caregiver, caring for her dad post-discharge) and confirmed the constraints/scope. I now have everything:</p>
+            <p class="cc-say">Beta scope = green "must have" stickies, three activity bands:</p>
+            <p class="cc-say">
+              <strong>Set Up &amp; Onboarding:</strong> sign up w/ email · create password · enter caregiver name + phone · enter patient name, demographic info + main address · associate patient w/ Spectrum Health info · support number visible · logout<br>
+              <strong>Request &amp; Confirm:</strong> select one+ services · choose a patient · choose/input location · choose day + time · receive confirmation via notification · option to cancel<br>
+              <strong>Track Nurse:</strong> see status of nurse on way · notification nurse arrived · notification nurse completed/left
+            </p>
+
+            <p class="cc-say">Now building the single-file prototype.</p>
+            <p class="cc-tool cc-create"><span class="cc-verb">Created</span> caring-health-prototype.html +884 -0 &rsaquo;</p>
+
+            <p class="cc-say">The file is built and showing in the preview panel. Let me verify it renders and taps through correctly.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 2 tools &rsaquo;</p>
+
+            <p class="cc-say">I'll serve it so I can screenshot and tap through. Let me set up a static server.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> a command, used 2 tools &rsaquo;</p>
+
+            <p class="cc-say">Renders cleanly, but there's a character-encoding problem — emoji and dashes show as mojibake because the file has no charset declaration. Let me fix that (add a proper doctype + UTF-8 meta) and swap the fullwidth <code>+</code> for a normal <code>+</code>.</p>
+            <p class="cc-tool"><span class="cc-verb">Edited</span> caring-health-prototype.html +8 -0 &rsaquo;</p>
+
+            <p class="cc-say">Now replace the fullwidth <code>+</code> characters and close the document tags.</p>
+            <p class="cc-tool"><span class="cc-verb">Edited</span> caring-health-prototype.html +6 -4 &rsaquo;</p>
+
+            <p class="cc-say">Now let me copy the updated file to the served dir and verify the full tap-through.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> a command, used a tool &rsaquo;</p>
+
+            <p class="cc-say">Still showing mojibake and the old <code>+</code> logo — the preview is serving a cached page. Let me confirm the file on disk is correct, then force a fresh load.</p>
+            <p class="cc-tool"><span class="cc-verb">Ran</span> Verify served file head and logo &rsaquo;</p>
+
+            <p class="cc-say">File on disk is correct — the preview just served a cached copy. Let me force a reload.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 2 tools &rsaquo;</p>
+
+            <p class="cc-say">Confirmed — old page was windows-1252. Reloaded; let me screenshot the fresh page.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview eval &rsaquo;</p>
+
+            <p class="cc-say">Now UTF-8. Let me screenshot and then tap through the full must-have flow.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview screenshot &rsaquo;</p>
+            <p class="cc-note">[screenshot — the Caring Health welcome screen, rendered in the phone frame]</p>
+
+            <p class="cc-say">Clean now — proper <code>+</code> logo, em-dash, and "&#9873; Where we guessed" flag all correct. Let me tap through the core path: sign up &rarr; onboarding &rarr; home &rarr; request &rarr; review.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 5 tools &rsaquo;</p>
+
+            <p class="cc-say">Good — onboarding works and the Spectrum-ID note shows. One layout bug: the two-column row (DOB / Relationship) overflows horizontally (note the scrollbar, "Father" is clipped). Flex children need <code>min-width:0</code>. Let me fix.</p>
+            <p class="cc-tool"><span class="cc-verb">Edited</span> a file, ran a command, used 7 tools &rsaquo;</p>
+
+            <p class="cc-say">Overflow fixed. Let me continue through the request flow and verify the screens render. I'll select services and date/time via the UI, then check review.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
+
+            <p class="cc-say">Found a real bug: the "Visit in progress" card shows on Home before any visit exists. The <code>.ch-card { display:flex }</code> rule overrides the <code>hidden</code> attribute. Let me add a <code>[hidden]</code> guard.</p>
+            <p class="cc-tool"><span class="cc-verb">Edited</span> a file, ran a command, used 8 tools &rsaquo;</p>
+
+            <p class="cc-say">Active card is now correctly hidden on a fresh home. Now let me run the request flow: start request &rarr; patient &rarr; services (pick two) &rarr; location &rarr; date/time (pick day + time) &rarr; review.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 5 tools &rsaquo;</p>
+
+            <p class="cc-say">Multi-select works (checkmarks, personalized "What does Walter need?"). Continuing through location &rarr; date/time &rarr; review &rarr; confirm &rarr; track.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 6 tools &rsaquo;</p>
+
+            <p class="cc-say">Review screen correctly carries all the entered data (patient, both services, address, "Today, Afternoon"). Now confirm and check the tracking flow with its timed status updates.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
+
+            <p class="cc-say">Tracking flow works — live timeline, "Nurse arrived" push notification, and cancel correctly disappears after arrival. Let me confirm the final completed state and that Home logs the visit.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview eval &rsaquo;</p>
+
+            <p class="cc-say">Visit completes, Done button appears. Let me confirm Home logs the completed visit (closing the loop), then verify the menu (support number + logout) and the guesses sheet.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
+
+            <p class="cc-say">Full loop verified: Home now logs the completed visit in Recent, the in-progress card cleared, and the menu shows the support number (green must-have) and logout. Let me do a quick responsive check at a small viewport, since it must work embedded on mobile.</p>
+            <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
+
+            <p class="cc-say">Verified end-to-end and responsive. The prototype is done.</p>
+
+            <p class="cc-say"><strong>What I built</strong></p>
+            <p class="cc-say"><code>caring-health-prototype.html</code> — one self-contained file (HTML/CSS/JS, no build step, no external assets). I rendered all 41 board slices to reconstruct the journey map, read the brief and Dana's persona, and pulled scope only from the green "must have" stickies across the three activity bands. Named brainstorm flows, yellow should/could, and red "nopes" were excluded.</p>
+            <p class="cc-say">I tap-tested the whole path in a browser: Dana signs up &rarr; creates password &rarr; enters caregiver info &rarr; enters patient (Walter) info &rarr; home &rarr; request a visit &rarr; pick services &rarr; location &rarr; day/time &rarr; review &rarr; confirm &rarr; live nurse tracking &rarr; back home with the visit logged. No dead-ends; the core loop closes.</p>
+            <p class="cc-say"><strong>Where we guessed</strong> (also surfaced in-app via the &#9873; footer + inline note chips):</p>
+            <ul class="cc-say" style="list-style:disc;">
+              <li><strong>Spectrum Health link</strong> — per your instruction, no Spectrum ID is collected; we assume the back-end already holds the health record. Caregiver enters basic info only. Flagged as an open client question.</li>
+              <li><strong>Service list &amp; multi-select</strong> — services taken from the brief; the board tagged "how multi-select works" as R&amp;D.</li>
+              <li><strong>Confirmation method</strong> — board said "method TBD"; simulated as in-app push.</li>
+              <li><strong>Nurse status feed</strong> — comes from the nurse API in the real build; simulated on a timer here.</li>
+              <li><strong>Home hub + day/time picker</strong> — not their own stickies; added so the flow loops. ASAP/now and recurring visits were should-haves, left out.</li>
+              <li><strong>One patient per caregiver</strong> in beta ("add another" is a placeholder).</li>
             </ul>
+            <p class="cc-say">One real bug I caught and fixed during testing: the "visit in progress" card was leaking onto a fresh Home screen (a <code>display:flex</code> rule was overriding the <code>hidden</code> attribute) — fixed with a <code>[hidden]</code> guard.</p>
+
           </div>
+        </details>
+      </section>
 
-          <!-- Assistant turn -->
-          <p class="cc-say">I'll read both documents carefully before building anything. Let me start with the brief and the first pages of the Miro board export.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 2 files &rsaquo;</p>
+      <!-- 4. Prototype -->
+      <section aria-labelledby="proto-heading" class="mb-4">
+        <h2 id="proto-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-5">The clickable prototype</h2>
 
-          <p class="cc-say">The image renderer isn't available. Let me extract text directly. Let me check what tooling I have.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> Check Python and PDF libraries &rsaquo;</p>
-
-          <p class="cc-say">I have pymupdf and pdfplumber. Let me extract text from the brief first, and from the Miro board.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> 2 commands, read a file &rsaquo;</p>
-
-          <p class="cc-say">Now the Miro board. It's image-heavy — let me extract any text layer across all pages first.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> Extract Miro board text layer &rsaquo;</p>
-
-          <p class="cc-say">Pure image export. I'll render the pages to PNGs and read them visually. First, a contact sheet to understand how the board is tiled across the pages.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> Inspect page sizes &rsaquo;</p>
-
-          <p class="cc-say">41 pages, all 4500px wide strips of varying heights — horizontal slices of the board. Let me render them all and read through.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> a command, read 4 files &rsaquo;</p>
-
-          <p class="cc-say">This is a journey map with rows: Nopes (red), Should/Could Have (yellow), Must Have (green), User activities (blue backbone). Pages 1-4 are the four rows of the leftmost column band. Let me read the rest to reconstruct the full backbone left-to-right.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">Second band is Request &amp; confirm. Continuing to the next activity bands.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">Third band is Track Nurse. That's the three beta activities from the brief. Let me scan the remaining pages (the persona and the name-flows I'm told to ignore, plus possibly more).</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">Pages 13-16 are a refined purple "User tasks/activities" consolidation. My scope is the green must-haves (per your instruction). Let me find Dana's persona and confirm nothing else is in scope.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">These are alternate refined backbones (the brainstorm flows) — I'll ignore them for scope, but they confirm the overall order. Let me find Dana's persona.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">Page 28 confirms the named flows (note "Patrick Pale" labels). Let me find Dana's persona in the remaining slides.</p>
-          <p class="cc-tool"><span class="cc-verb">Read</span> 4 files &rsaquo;</p>
-
-          <p class="cc-say">Found Dana's persona (49, family caregiver, caring for her dad post-discharge) and confirmed the constraints/scope. I now have everything:</p>
-          <p class="cc-say">Beta scope = green "must have" stickies, three activity bands:</p>
-          <p class="cc-say">
-            <strong>Set Up &amp; Onboarding:</strong> sign up w/ email · create password · enter caregiver name + phone · enter patient name, demographic info + main address · associate patient w/ Spectrum Health info · support number visible · logout<br>
-            <strong>Request &amp; Confirm:</strong> select one+ services · choose a patient · choose/input location · choose day + time · receive confirmation via notification · option to cancel<br>
-            <strong>Track Nurse:</strong> see status of nurse on way · notification nurse arrived · notification nurse completed/left
-          </p>
-
-          <p class="cc-say">Now building the single-file prototype.</p>
-          <p class="cc-tool cc-create"><span class="cc-verb">Created</span> caring-health-prototype.html +884 -0 &rsaquo;</p>
-
-          <p class="cc-say">The file is built and showing in the preview panel. Let me verify it renders and taps through correctly.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 2 tools &rsaquo;</p>
-
-          <p class="cc-say">I'll serve it so I can screenshot and tap through. Let me set up a static server.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> a command, used 2 tools &rsaquo;</p>
-
-          <p class="cc-say">Renders cleanly, but there's a character-encoding problem — emoji and dashes show as mojibake because the file has no charset declaration. Let me fix that (add a proper doctype + UTF-8 meta) and swap the fullwidth <code>+</code> for a normal <code>+</code>.</p>
-          <p class="cc-tool"><span class="cc-verb">Edited</span> caring-health-prototype.html +8 -0 &rsaquo;</p>
-
-          <p class="cc-say">Now replace the fullwidth <code>+</code> characters and close the document tags.</p>
-          <p class="cc-tool"><span class="cc-verb">Edited</span> caring-health-prototype.html +6 -4 &rsaquo;</p>
-
-          <p class="cc-say">Now let me copy the updated file to the served dir and verify the full tap-through.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> a command, used a tool &rsaquo;</p>
-
-          <p class="cc-say">Still showing mojibake and the old <code>+</code> logo — the preview is serving a cached page. Let me confirm the file on disk is correct, then force a fresh load.</p>
-          <p class="cc-tool"><span class="cc-verb">Ran</span> Verify served file head and logo &rsaquo;</p>
-
-          <p class="cc-say">File on disk is correct — the preview just served a cached copy. Let me force a reload.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 2 tools &rsaquo;</p>
-
-          <p class="cc-say">Confirmed — old page was windows-1252. Reloaded; let me screenshot the fresh page.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview eval &rsaquo;</p>
-
-          <p class="cc-say">Now UTF-8. Let me screenshot and then tap through the full must-have flow.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview screenshot &rsaquo;</p>
-          <p class="cc-note">[screenshot — the Caring Health welcome screen, rendered in the phone frame]</p>
-
-          <p class="cc-say">Clean now — proper <code>+</code> logo, em-dash, and "&#9873; Where we guessed" flag all correct. Let me tap through the core path: sign up &rarr; onboarding &rarr; home &rarr; request &rarr; review.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 5 tools &rsaquo;</p>
-
-          <p class="cc-say">Good — onboarding works and the Spectrum-ID note shows. One layout bug: the two-column row (DOB / Relationship) overflows horizontally (note the scrollbar, "Father" is clipped). Flex children need <code>min-width:0</code>. Let me fix.</p>
-          <p class="cc-tool"><span class="cc-verb">Edited</span> a file, ran a command, used 7 tools &rsaquo;</p>
-
-          <p class="cc-say">Overflow fixed. Let me continue through the request flow and verify the screens render. I'll select services and date/time via the UI, then check review.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
-
-          <p class="cc-say">Found a real bug: the "Visit in progress" card shows on Home before any visit exists. The <code>.ch-card { display:flex }</code> rule overrides the <code>hidden</code> attribute. Let me add a <code>[hidden]</code> guard.</p>
-          <p class="cc-tool"><span class="cc-verb">Edited</span> a file, ran a command, used 8 tools &rsaquo;</p>
-
-          <p class="cc-say">Active card is now correctly hidden on a fresh home. Now let me run the request flow: start request &rarr; patient &rarr; services (pick two) &rarr; location &rarr; date/time (pick day + time) &rarr; review.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 5 tools &rsaquo;</p>
-
-          <p class="cc-say">Multi-select works (checkmarks, personalized "What does Walter need?"). Continuing through location &rarr; date/time &rarr; review &rarr; confirm &rarr; track.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 6 tools &rsaquo;</p>
-
-          <p class="cc-say">Review screen correctly carries all the entered data (patient, both services, address, "Today, Afternoon"). Now confirm and check the tracking flow with its timed status updates.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
-
-          <p class="cc-say">Tracking flow works — live timeline, "Nurse arrived" push notification, and cancel correctly disappears after arrival. Let me confirm the final completed state and that Home logs the visit.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> Claude Preview: preview eval &rsaquo;</p>
-
-          <p class="cc-say">Visit completes, Done button appears. Let me confirm Home logs the completed visit (closing the loop), then verify the menu (support number + logout) and the guesses sheet.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
-
-          <p class="cc-say">Full loop verified: Home now logs the completed visit in Recent, the in-progress card cleared, and the menu shows the support number (green must-have) and logout. Let me do a quick responsive check at a small viewport, since it must work embedded on mobile.</p>
-          <p class="cc-tool"><span class="cc-verb">Used</span> 3 tools &rsaquo;</p>
-
-          <p class="cc-say">Verified end-to-end and responsive. The prototype is done.</p>
-
-          <p class="cc-say"><strong>What I built</strong></p>
-          <p class="cc-say"><code>caring-health-prototype.html</code> — one self-contained file (HTML/CSS/JS, no build step, no external assets). I rendered all 41 board slices to reconstruct the journey map, read the brief and Dana's persona, and pulled scope only from the green "must have" stickies across the three activity bands. Named brainstorm flows, yellow should/could, and red "nopes" were excluded.</p>
-          <p class="cc-say">I tap-tested the whole path in a browser: Dana signs up &rarr; creates password &rarr; enters caregiver info &rarr; enters patient (Walter) info &rarr; home &rarr; request a visit &rarr; pick services &rarr; location &rarr; day/time &rarr; review &rarr; confirm &rarr; live nurse tracking &rarr; back home with the visit logged. No dead-ends; the core loop closes.</p>
-          <p class="cc-say"><strong>Must-haves covered:</strong></p>
-          <ul>
-            <li><strong>Set Up &amp; Onboarding</strong> — email signup, password, caregiver name+phone, patient name/DOB/relationship/address, support number (in menu), logout</li>
-            <li><strong>Request &amp; Confirm</strong> — select one+ services, choose patient, choose/confirm location, pick day + time, confirmation via notification, cancel option</li>
-            <li><strong>Track Nurse</strong> — "on the way" status, "arrived" notification, "completed/left" notification (simulated push toasts + a live timeline)</li>
-          </ul>
-          <p class="cc-say"><strong>Where we guessed</strong> (also surfaced in-app via the &#9873; footer + inline note chips):</p>
-          <ul>
-            <li><strong>Spectrum Health link</strong> — per your instruction, no Spectrum ID is collected; we assume the back-end already holds the health record. Caregiver enters basic info only. Flagged as an open client question.</li>
-            <li><strong>Service list &amp; multi-select</strong> — services taken from the brief; the board tagged "how multi-select works" as R&amp;D.</li>
-            <li><strong>Confirmation method</strong> — board said "method TBD"; simulated as in-app push.</li>
-            <li><strong>Nurse status feed</strong> — comes from the nurse API in the real build; simulated on a timer here.</li>
-            <li><strong>Home hub + day/time picker</strong> — not their own stickies; added so the flow loops. ASAP/now and recurring visits were should-haves, left out.</li>
-            <li><strong>One patient per caregiver</strong> in beta ("add another" is a placeholder).</li>
-          </ul>
-          <p class="cc-say"><strong>Embedding</strong></p>
-          <p class="cc-say">It's a full standalone document with <code>&lt;meta charset&gt;</code> and viewport set, styles scoped under <code>#ch-app</code>, and a phone frame that fills its container (<code>min(412px, 94vw)</code> &times; <code>min(860px, 94vh)</code>). Drop it in an iframe:</p>
-          <div class="cc-pre">&lt;iframe src="caring-health-prototype.html" style="width:100%;height:780px;border:0" title="Caring Health prototype"&gt;&lt;/iframe&gt;</div>
-          <p class="cc-say">One real bug I caught and fixed during testing: the "visit in progress" card was leaking onto a fresh Home screen (a <code>display:flex</code> rule was overriding the <code>hidden</code> attribute) — fixed with a <code>[hidden]</code> guard.</p>
-          <p class="cc-say">Want me to fold in a basic visit summary screen after completion, or a phone-number login path? Both were on the board as should-haves and would be quick next steps if you want to show range beyond strict must-haves.</p>
-
+        <div class="bg-surface-container-low rounded-xl p-4 md:p-6 flex justify-center">
+          <iframe
+            class="embed-frame proto-frame rounded-lg"
+            src="prototype.html"
+            title="Caring Health — clickable beta prototype"
+            style="max-width: 440px;"
+            loading="lazy"></iframe>
         </div>
-        <div id="cc-fade" class="cc-fade"></div>
-      </div>
+      </section>
 
-      <div class="mt-4 flex justify-center">
-        <button id="cc-toggle" type="button" class="inline-flex items-center gap-1.5 text-primary hover:text-accent font-medium text-sm transition-colors">
-          <span id="cc-toggle-label">Expand full transcript</span>
-          <span id="cc-toggle-icon" class="material-symbols-outlined" style="font-size:20px;">expand_more</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Section 5: Prototype -->
-    <section id="prototype" aria-labelledby="prototype-heading" class="max-w-5xl mx-auto px-6 mb-12">
-      <h2 id="prototype-heading" class="font-headline text-3xl md:text-4xl font-semibold text-primary tracking-tight mb-6">The prototype</h2>
-      <p class="text-base md:text-lg leading-relaxed text-on-surface-variant mb-8">
-        The result — a live, tap-through mid-fidelity prototype of the Caring Health beta. Start at the welcome screen and sign up as Dana: onboard, request a nurse visit for Walter, confirm, and watch the nurse-tracking timeline play out. The <span class="font-medium text-on-surface">&#9873; Where we guessed</span> button (bottom of the phone) lists every open question the board left undecided.
-      </p>
-
-      <div class="bg-surface-container-low rounded-xl p-4 md:p-6 flex justify-center">
-        <iframe
-          class="embed-frame proto-frame rounded-lg"
-          src="prototype.html"
-          title="Caring Health — clickable beta prototype"
-          style="max-width: 440px;"
-          loading="lazy"></iframe>
-      </div>
-      <p class="text-sm text-on-surface-variant italic mt-4 text-center">
-        Built by Claude Code from the green "must have" stickies only. Mid-fidelity — meant to test the flow, not the visual design.
-      </p>
-    </section>
-
-    <!-- Back home CTA -->
-    <section aria-label="Continue browsing" class="max-w-7xl mx-auto px-6 pt-6 md:pt-8 pb-2 flex justify-center">
-      <a href="/" class="inline-flex items-center gap-2 bg-primary text-on-primary px-7 py-3 rounded-full text-base font-medium hover:opacity-90 transition-opacity">
-        Back to home
-      </a>
-    </section>
+    </div>
 
   </main>
 
   <!-- Footer -->
-  <footer class="bg-teal-900 w-full py-12 mt-16">
+  <footer class="bg-teal-900 w-full py-12 mt-12">
     <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
       <a href="/" class="text-lg font-bold font-headline text-teal-50 hover:text-teal-200 transition-colors">&#8592; Home</a>
       <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
@@ -630,84 +506,6 @@
     document.getElementById('nav-toggle').addEventListener('click', function() {
       document.getElementById('nav-menu').classList.toggle('is-open');
     });
-  </script>
-
-  <!-- Transcript expand/collapse -->
-  <script>
-  (function () {
-    const scroll = document.getElementById('cc-scroll');
-    const fade = document.getElementById('cc-fade');
-    const btn = document.getElementById('cc-toggle');
-    const label = document.getElementById('cc-toggle-label');
-    const icon = document.getElementById('cc-toggle-icon');
-    if (!scroll || !btn) return;
-    btn.addEventListener('click', function () {
-      const expanded = scroll.classList.toggle('is-expanded');
-      fade.classList.toggle('is-hidden', expanded);
-      label.textContent = expanded ? 'Collapse transcript' : 'Expand full transcript';
-      icon.textContent = expanded ? 'expand_less' : 'expand_more';
-      if (!expanded) scroll.scrollTop = 0;
-    });
-    // Hide the bottom fade once the user scrolls to the end of the panel.
-    scroll.addEventListener('scroll', function () {
-      const atEnd = scroll.scrollTop + scroll.clientHeight >= scroll.scrollHeight - 8;
-      if (!scroll.classList.contains('is-expanded')) fade.classList.toggle('is-hidden', atEnd);
-    }, { passive: true });
-  })();
-  </script>
-
-  <!-- Section progress nav (scroll-spy) -->
-  <script id="section-progress-nav-script">
-  (function () {
-    const SECTIONS = [
-      { id: 'context',   label: 'Context'   },
-      { id: 'prompt',    label: 'Prompt'    },
-      { id: 'board',     label: 'Board'     },
-      { id: 'build',     label: 'Build'     },
-      { id: 'prototype', label: 'Prototype' }
-    ];
-    const HEADER_HEIGHT = 128;
-
-    const items = SECTIONS.map(s => ({
-      id: s.id,
-      section: document.getElementById(s.id),
-      navEl: document.querySelector('[data-section="' + s.id + '"]'),
-      fillEl: document.querySelector('[data-section="' + s.id + '"] .section-nav-fill')
-    })).filter(x => x.section && x.navEl && x.fillEl);
-
-    let raf = null;
-
-    function update() {
-      raf = null;
-      const scrollPos = window.scrollY + HEADER_HEIGHT;
-      const atDocBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 4);
-      let activeIdx = -1;
-
-      items.forEach((item, i) => {
-        const top = item.section.offsetTop;
-        const next = i + 1 < items.length ? items[i + 1].section : null;
-        const bottom = next ? next.offsetTop : (item.section.offsetTop + item.section.offsetHeight);
-
-        let pct;
-        if (scrollPos < top) pct = 0;
-        else if (scrollPos >= bottom) pct = 100;
-        else pct = ((scrollPos - top) / (bottom - top)) * 100;
-
-        if (i === items.length - 1 && atDocBottom && scrollPos >= top) pct = 100;
-
-        item.fillEl.style.width = pct.toFixed(2) + '%';
-        if (scrollPos >= top) activeIdx = i;
-      });
-
-      if (activeIdx === -1) activeIdx = 0;
-      items.forEach((item, i) => item.navEl.classList.toggle('is-active', i === activeIdx));
-    }
-
-    function schedule() { if (raf == null) raf = requestAnimationFrame(update); }
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule, { passive: true });
-    update();
-  })();
   </script>
 
 </body>
