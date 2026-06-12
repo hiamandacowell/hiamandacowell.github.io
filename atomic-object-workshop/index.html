@@ -63,95 +63,98 @@
     .skip-link:focus { top: 8px; }
     a:focus-visible, button:focus-visible { outline: 2px solid #26585d; outline-offset: 2px; border-radius: 4px; }
 
-    /* ---- Transcript (teaser + expand) ---- */
-    .cc-transcript { border: 1px solid #2c2925; border-radius: 0.5rem; overflow: hidden; background: #1b1917; }
-    .cc-bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; background: #211e1b; }
-    .cc-dot { width: 11px; height: 11px; border-radius: 9999px; display: inline-block; }
-    .cc-dot-r { background: #E06C5A; } .cc-dot-y { background: #E0B24A; } .cc-dot-g { background: #6FBF73; }
-    .cc-title {
-      margin-left: 6px; font-size: 12px; color: #8c857d;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* ---- Chat transcript (Claude-style) ---- */
+    .cc-transcript {
+      border: 1px solid #322f2b; border-radius: 0.75rem; overflow: hidden; background: #1d1a17;
+    }
+    .cc-bar {
+      display: flex; align-items: center; gap: 9px; padding: 12px 16px;
+      background: #232019; border-bottom: 1px solid #322f2b;
+    }
+    .cc-spark { display: block; flex-shrink: 0; }
+    .cc-app { font-size: 13px; font-weight: 600; color: #ece8e1; }
+    .cc-model {
+      font-size: 11px; color: #a59c91; background: #2c2925; border: 1px solid #3a3631;
+      border-radius: 9999px; padding: 2px 9px; margin-left: 2px;
     }
     .cc-shell { position: relative; }
     .cc-body {
-      padding: 22px; color: #E7E3DD; font-size: 14px; line-height: 1.6;
-      border-top: 1px solid #2c2925;
+      padding: 20px 22px 24px; color: #ECE6DD; font-size: 14.5px; line-height: 1.62;
     }
     .cc-body.cc-teaser { max-height: var(--cc-teaser, 300px); overflow: hidden; }
     .cc-body.is-open { max-height: 640px; overflow-y: auto; }
     .cc-body.is-open::-webkit-scrollbar { width: 10px; }
-    .cc-body.is-open::-webkit-scrollbar-track { background: #211e1b; }
+    .cc-body.is-open::-webkit-scrollbar-track { background: #232019; }
     .cc-body.is-open::-webkit-scrollbar-thumb { background: #3a3631; border-radius: 9999px; }
     .cc-fade {
       position: absolute; left: 0; right: 0; bottom: 0; height: 110px; pointer-events: none;
-      background: linear-gradient(to bottom, rgba(27,25,23,0), #1b1917 88%);
+      background: linear-gradient(to bottom, rgba(29,26,23,0), #1d1a17 90%);
     }
     .cc-fade.is-hidden { display: none; }
     .cc-expand {
-      width: 100%; text-align: center; padding: 12px; background: #211e1b; border: 0;
-      border-top: 1px solid #2c2925; color: #d99e7e; font-weight: 600; font-size: 13px;
+      width: 100%; text-align: center; padding: 12px; background: #232019; border: 0;
+      border-top: 1px solid #322f2b; color: #cf9c80; font-weight: 500; font-size: 13px;
       cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
       font-family: 'Inter', system-ui, sans-serif;
     }
-    .cc-expand:hover { background: #262320; color: #e9b596; }
+    .cc-expand:hover { background: #29251f; color: #e0b094; }
     .cc-expand .material-symbols-outlined { font-size: 19px; }
 
-    .cc-user { border: 1px solid #34302b; background: #232019; border-radius: 0.4rem; padding: 16px 18px; }
-    .cc-role-me {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-      color: #9ecfd5; margin: 0 0 10px;
+    /* User turn = rounded bubble, no label */
+    .cc-user {
+      background: #302c27; border-radius: 14px; padding: 15px 18px; margin: 0 0 4px;
     }
-    .cc-role-claude {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-      color: #c98b6b; margin: 24px 0 10px;
-    }
-    .cc-user p { margin: 0 0 10px; color: #D9D4CC; }
+    .cc-user p { margin: 0 0 10px; color: #E4DFD7; }
     .cc-user p:last-child { margin-bottom: 0; }
     .cc-user ul { margin: 8px 0 0; padding-left: 18px; }
-    .cc-user li { margin: 4px 0; color: #C9C4BC; }
+    .cc-user li { margin: 4px 0; color: #D2CCC3; }
+
+    /* Assistant turn = plain text, marked with the Claude logo */
+    .cc-agent { margin: 22px 0 12px; }
+    .cc-agent .cc-spark { width: 19px; height: 19px; }
 
     /* Attachment chips */
-    .cc-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+    .cc-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 13px; }
     .cc-file {
       display: flex; align-items: center; gap: 10px;
-      background: #2c2925; border: 1px solid #3a3631; border-radius: 9px;
+      background: #262320; border: 1px solid #3a3631; border-radius: 9px;
       padding: 8px 14px 8px 10px;
     }
-    .cc-file-icon { color: #e0726a; font-size: 24px; flex-shrink: 0; }
+    .cc-file-icon { color: #d97757; font-size: 24px; flex-shrink: 0; }
     .cc-file-meta { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
     .cc-file-name {
-      font-size: 13px; color: #e7e3dd; font-weight: 500;
+      font-size: 13px; color: #e7e2da; font-weight: 500;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;
     }
-    .cc-file-type { font-size: 10px; color: #8c857d; letter-spacing: 0.08em; }
+    .cc-file-type { font-size: 10px; color: #8f877d; letter-spacing: 0.08em; }
 
-    .cc-say { margin: 0 0 12px; color: #E7E3DD; }
+    .cc-say { margin: 0 0 12px; color: #ECE6DD; }
     .cc-say strong { color: #fff; font-weight: 600; }
     .cc-say ul { margin: 6px 0 0; padding-left: 18px; }
-    .cc-say li { margin: 4px 0; color: #cfcac2; }
+    .cc-say li { margin: 4px 0; color: #d7d1c8; }
     .cc-tool {
-      margin: 0 0 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12.5px; color: #8c857d;
+      margin: 0 0 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px; color: #8f877d;
     }
-    .cc-tool .cc-verb { color: #c98b6b; }
-    .cc-tool.cc-create .cc-verb { color: #6FBF73; }
-    .cc-note { font-style: italic; color: #8c857d; font-size: 12.5px; margin: 0 0 14px; }
+    .cc-tool .cc-verb { color: #cf9c80; }
+    .cc-tool.cc-create .cc-verb { color: #87b98a; }
+    .cc-note { font-style: italic; color: #8f877d; font-size: 12.5px; margin: 0 0 13px; }
     .cc-say code, .cc-user code, .cc-q code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em;
-      background: #2c2925; color: #d9d4cc; padding: 1px 5px; border-radius: 4px;
+      background: #2c2925; color: #ddd6cc; padding: 1px 5px; border-radius: 4px;
     }
     .cc-think {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
-      color: #8c857d; font-style: italic; margin: 0 0 14px;
+      font-size: 12.5px; color: #8f877d; font-style: italic; margin: 0 0 13px;
+      display: inline-flex; align-items: center; gap: 5px;
     }
     .cc-q {
-      border-left: 2px solid #3a3631; padding: 2px 0 2px 14px; margin: 0 0 12px;
-      color: #cbc6be; font-style: italic;
+      border-left: 2px solid #3d3934; padding: 2px 0 2px 14px; margin: 0 0 12px;
+      color: #cfc9bf; font-style: italic;
     }
     .cc-q code { font-style: normal; }
     .cc-deliv {
-      background: #232019; border: 1px solid #34302b; border-radius: 6px;
-      padding: 14px 16px; margin: 6px 0 14px; color: #ded9d1; white-space: pre-wrap;
+      background: #262320; border: 1px solid #38342f; border-radius: 8px;
+      padding: 14px 16px; margin: 6px 0 14px; color: #ddd7cd; white-space: pre-wrap;
       font-size: 13px; line-height: 1.55;
     }
 
@@ -179,6 +182,13 @@
 <body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary">
 
   <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Reusable Claude logo (sparkle) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="claude-spark" viewBox="0 0 24 24">
+      <path d="M12 2 C12.6 8 16 11.4 22 12 C16 12.6 12.6 16 12 22 C11.4 16 8 12.6 2 12 C8 11.4 11.4 8 12 2 Z" fill="#d97757"/>
+    </symbol>
+  </svg>
 
   <!-- Site nav -->
   <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
@@ -210,7 +220,7 @@
       <!-- 1. Prototype -->
       <section aria-labelledby="proto-heading" class="mb-14">
         <h2 id="proto-heading" class="font-headline text-2xl md:text-3xl font-semibold text-on-surface tracking-tight mb-3">The clickable prototype</h2>
-        <p class="text-on-surface-variant mb-5">Tap through it as Dana &mdash; sign up, request a nurse visit for a loved one, and watch the tracking play out. The <span class="font-medium text-on-surface">&#9873; Where we guessed</span> button at the bottom of the phone lists every open question the board left undecided, and inline note chips flag the choices made along the way.</p>
+        <p class="text-on-surface-variant mb-5">Tap through it as Dana. The <span class="font-medium text-on-surface">&#9873; Where we guessed</span> button at the bottom of the phone lists every open question the board left undecided, and inline note chips flag the choices made along the way.</p>
 
         <div class="bg-surface-container-low rounded-xl p-4 md:p-6 flex justify-center">
           <iframe
@@ -227,15 +237,15 @@
 
         <div class="cc-transcript">
           <div class="cc-bar">
-            <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
-            <span class="cc-title">claude — refine-the-prompt</span>
+            <svg class="cc-spark" width="17" height="17" aria-hidden="true"><use href="#claude-spark"/></svg>
+            <span class="cc-app">Claude</span>
+            <span class="cc-model">Opus 4.8</span>
           </div>
           <div class="cc-shell">
-            <div class="cc-body cc-teaser" id="refineBody" style="--cc-teaser: 232px;">
+            <div class="cc-body cc-teaser" id="refineBody">
 
               <!-- Turn 1: Me -->
               <div class="cc-user">
-                <p class="cc-role-me">Me</p>
                 <div class="cc-files">
                   <div class="cc-file">
                     <span class="material-symbols-outlined cc-file-icon">picture_as_pdf</span>
@@ -260,8 +270,8 @@
               </div>
 
               <!-- Turn 2: Claude -->
-              <p class="cc-role-claude">Claude</p>
-              <p class="cc-think">Identified gaps in Claude Code prompt and formulated targeted refinements &rsaquo;</p>
+              <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
+              <p class="cc-think"><svg width="13" height="13" aria-hidden="true" style="opacity:.7"><use href="#claude-spark"/></svg> Identified gaps in Claude Code prompt and formulated targeted refinements &rsaquo;</p>
               <p class="cc-say">Your prompt already has good bones. The framing is clear, the assumptions are doing real work, and pointing Claude Code at the green "must have" stickies as the scope boundary is exactly the right move. A few targeted additions will change the output meaningfully, plus one real decision you should make before you run it.</p>
               <p class="cc-say"><strong>The one decision to make first: what should Claude Code actually build it in?</strong></p>
               <p class="cc-say">You never name a stack, so Claude Code will pick one for you. Two sensible directions:</p>
@@ -286,13 +296,12 @@
 
               <!-- Turn 3: Me -->
               <div class="cc-user" style="margin-top:24px;">
-                <p class="cc-role-me">Me</p>
                 <p>HTML since I will create a new page on my personal website and add this clickable prototype as a low-mid fidelity element on that page. Please assemble the full refined prompt with your suggestions included.</p>
               </div>
 
               <!-- Turn 4: Claude -->
-              <p class="cc-role-claude">Claude</p>
-              <p class="cc-think">Synthesized refined prompt preserving user's voice and preferences &rsaquo;</p>
+              <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
+              <p class="cc-think"><svg width="13" height="13" aria-hidden="true" style="opacity:.7"><use href="#claude-spark"/></svg> Synthesized refined prompt preserving user's voice and preferences &rsaquo;</p>
               <p class="cc-say">Here's the full prompt with everything folded in. I kept your wording and voice, slotted the individual-flows note into the assumptions list, and added the stack, fidelity, done, and gap-handling instructions.</p>
               <div class="cc-deliv">Hi, today I had an interview with a software consultancy for a Delivery Lead (pm) role. The interview involved a simulated workshop, where they sent over a brief for an upcoming project and I was tasked with running a "product backbone" workshop with a designer, developer, and two delivery leads. The workshop was open-ended, so in my 1-hour prep time, I chose a journey map template on Miro and created a basic flow for how we would approach mapping out features.
 
@@ -321,12 +330,11 @@ Some assumptions to make that may not explicitly be mentioned in the provided do
 
               <!-- Turn 5: Me -->
               <div class="cc-user" style="margin-top:24px;">
-                <p class="cc-role-me">Me</p>
                 <p>Yes, give me the "make this iframe-embeddable" line and I'll add it to the prompt before sending.</p>
               </div>
 
               <!-- Turn 6: Claude -->
-              <p class="cc-role-claude">Claude</p>
+              <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
               <p class="cc-say">Here's the line:</p>
               <p class="cc-q">I'll embed this on my site via an iframe, so make it fully self-contained and iframe-ready: all styles scoped inside the file so nothing leaks in or out, no reliance on the parent page, and a sensible default size that still adapts to the iframe's dimensions.</p>
               <p class="cc-say">I'd drop it right after the build line (the "single self-contained HTML file" one), since they're both about how the file needs to be structured.</p>
@@ -347,15 +355,15 @@ Some assumptions to make that may not explicitly be mentioned in the provided do
 
         <div class="cc-transcript">
           <div class="cc-bar">
-            <span class="cc-dot cc-dot-r"></span><span class="cc-dot cc-dot-y"></span><span class="cc-dot cc-dot-g"></span>
-            <span class="cc-title">claude code — caring-health-prototype</span>
+            <svg class="cc-spark" width="17" height="17" aria-hidden="true"><use href="#claude-spark"/></svg>
+            <span class="cc-app">Claude Code</span>
+            <span class="cc-model">Opus 4.8</span>
           </div>
           <div class="cc-shell">
             <div class="cc-body cc-teaser" id="buildBody">
 
               <!-- Me -->
               <div class="cc-user">
-                <p class="cc-role-me">Me</p>
                 <div class="cc-files">
                   <div class="cc-file">
                     <span class="material-symbols-outlined cc-file-icon">picture_as_pdf</span>
@@ -389,7 +397,7 @@ Some assumptions to make that may not explicitly be mentioned in the provided do
               </div>
 
               <!-- Claude -->
-              <p class="cc-role-claude">Claude</p>
+              <div class="cc-agent"><svg class="cc-spark" aria-hidden="true"><use href="#claude-spark"/></svg></div>
               <p class="cc-say">I'll read both documents carefully before building anything. Let me start with the brief and the first pages of the Miro board export.</p>
               <p class="cc-tool"><span class="cc-verb">Read</span> 2 files &rsaquo;</p>
 
