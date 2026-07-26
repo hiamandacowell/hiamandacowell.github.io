@@ -108,19 +108,32 @@
     .tile-fallback-presentation { background: #B8796A; }
     .tile-fallback-project     { background: #26585d; }
 
-    /* Tile tag chips */
-    .tile-tag {
-      display: inline-block;
-      padding: 0.15rem 0.55rem;
-      border-radius: 0.25rem;
-      font-size: 0.6875rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      background: rgba(28,35,51,0.06);
-      color: #4A4440;
+    /* Tile row */
+    .tile-row { position: relative; }
+    .tile-thumb { position: relative; overflow: hidden; }
+    .tile-play-badge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .tile-play-badge span { width: 32px; height: 32px; border-radius: 50%; background: rgba(28,23,20,0.55); display: flex; align-items: center; justify-content: center; }
+
+    /* Hover overlay: whole card darkens, CTA + pills fade in */
+    .tile-hover-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;
+      padding: 1.5rem; text-align: center;
+      background: rgba(28,23,20,0.88);
+      opacity: 0; transition: opacity 180ms ease;
+      pointer-events: none;
     }
-    .tile-tag.tile-tag-type { color: #26585d; background: rgba(38,88,93,0.10); }
+    .tile-row:hover .tile-hover-overlay { opacity: 1; }
+    .tile-hover-cta {
+      font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.0625rem; color: #FAF7F2;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .tile-hover-pills { display: flex; flex-wrap: wrap; gap: 0.375rem; justify-content: center; }
+    .tile-hover-pill {
+      padding: 0.1875rem 0.5625rem; border-radius: 0.25rem;
+      font-size: 0.65625rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+      color: #FAF7F2; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3);
+    }
 
     /* Skip to main content link */
     .skip-link {
@@ -320,7 +333,7 @@
         id: 'chalk-talk',
         title: 'Chalk Talk',
         types: ['video', 'presentation'],
-        subjects: ['teaching'],
+        subjects: [],
         description: 'A short, personal talk in the FordLabs Passion Talks tradition. Awarded Most Passionate Talker.',
         thumbnail: 'https://img.youtube.com/vi/GLHKsd4zJtE/maxresdefault.jpg',
         link: '/more/chalk-talk/',
@@ -331,8 +344,8 @@
         title: 'Behind the Keys: Designing Piano Lab Pro',
         types: ['video', 'presentation'],
         subjects: ['xr', 'teaching'],
-        description: "A talk given at the University of Michigan's Enriching Scholarship 2026 conference on the design process behind Piano Lab Pro, a mixed reality app for piano students.",
-        thumbnail: 'https://img.youtube.com/vi/lpnRygEDetU/maxresdefault.jpg',
+        description: "A conference presentation on the design process behind Piano Lab Pro, a mixed reality app for student performance anxiety.",
+        thumbnail: '/assets/behind-the-keys-thumb.jpg',
         link: '/more/behind-the-keys/',
         external: false
       },
@@ -343,6 +356,7 @@
         subjects: ['teaching', 'xr'],
         description: 'A presentation with panel session at EDUCAUSE Annual Conference 2025 on how Georgia Tech and the University of Michigan use XR to support student success in higher education.',
         thumbnail: '/assets/educause-2025-podium.jpg',
+        thumbnailPosition: 'top',
         link: '/more/enabling-student-success-xr/',
         external: false
       },
@@ -351,7 +365,7 @@
         title: 'Training for Tomorrow: Concussion Assessment in Virtual Reality',
         types: ['video', 'presentation'],
         subjects: ['xr'],
-        description: "A talk given at the University of Michigan's Enriching Scholarship 2025 conference on the development of a VR experience for training aspiring clinicians in concussion assessment.",
+        description: "A conference presentation on the development of a VR experience for training aspiring clinicians in concussion assessment.",
         thumbnail: 'https://img.youtube.com/vi/JoN833ErDRI/maxresdefault.jpg',
         link: '/more/training-for-tomorrow/',
         external: false
@@ -394,32 +408,41 @@
 
     function tileHtml(item) {
       const primaryType = item.types[0] || 'project';
+      const isVideo = item.types.includes('video');
+
+      const objectPosition = item.thumbnailPosition === 'top' ? ' object-top' : '';
       const thumbBlock = item.thumbnail
-        ? `<img src="${escapeHtml(item.thumbnail)}" alt="" class="w-full h-full object-cover" loading="lazy">`
-        : `<div class="tile-fallback tile-fallback-${primaryType}"><span class="tile-fallback-text">${escapeHtml(item.title)}</span></div>`;
+        ? `<img src="${escapeHtml(item.thumbnail)}" alt="" class="w-full h-full object-cover${objectPosition}" loading="lazy">`
+        : `<div class="tile-fallback-${primaryType} w-full h-full"></div>`;
 
-      const tags = [
-        ...item.types.map(t => `<span class="tile-tag tile-tag-type">${escapeHtml(TYPE_LABELS[t] || t)}</span>`),
-        ...item.subjects.map(s => `<span class="tile-tag">${escapeHtml(SUBJECT_LABELS[s] || s)}</span>`)
-      ].join('');
+      const playBadge = isVideo
+        ? `<div class="tile-play-badge" aria-hidden="true"><span><span class="material-symbols-outlined" style="font-size:16px;color:#fff;">play_arrow</span></span></div>`
+        : '';
 
-      const arrow = item.link
-        ? `<span class="text-primary font-medium text-sm inline-flex items-center gap-1 mt-4">${item.external ? 'Visit' : 'View'} <span aria-hidden="true">${item.external ? '↗' : '→'}</span></span>`
-        : `<span class="text-on-surface-variant text-sm italic mt-4 inline-block">Coming soon</span>`;
+      const hoverPills = [...item.types, ...item.subjects]
+        .map(key => `<span class="tile-hover-pill">${escapeHtml(TYPE_LABELS[key] || SUBJECT_LABELS[key] || key)}</span>`)
+        .join('');
+
+      const ctaLabel = item.external ? 'Visit' : (isVideo ? 'Watch the talk' : 'Learn more');
 
       const card = `
-        <div class="aspect-video overflow-hidden bg-surface-container-highest">${thumbBlock}</div>
-        <div class="p-6 md:p-7 flex flex-col flex-1">
-          <div class="flex flex-wrap gap-1.5 mb-3">${tags}</div>
-          <h2 class="font-headline text-xl md:text-2xl font-semibold text-on-surface tracking-tight mb-3">${escapeHtml(item.title)}</h2>
-          <p class="text-sm leading-relaxed text-on-surface-variant flex-1">${escapeHtml(item.description)}</p>
-          ${arrow}
+        <div class="tile-thumb bg-surface-container-highest" style="height:140px;">
+          ${thumbBlock}
+          ${playBadge}
+        </div>
+        <div class="p-4 md:p-5">
+          <h2 class="font-headline text-lg md:text-xl font-semibold text-on-surface tracking-tight mb-2">${escapeHtml(item.title)}</h2>
+          <p class="text-sm leading-relaxed text-on-surface-variant">${escapeHtml(item.description)}</p>
+        </div>
+        <div class="tile-hover-overlay" aria-hidden="true">
+          <span class="tile-hover-cta">${escapeHtml(ctaLabel)} <span aria-hidden="true">&rarr;</span></span>
+          <div class="tile-hover-pills">${hoverPills}</div>
         </div>
       `;
 
       if (item.link) {
         const target = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-        return `<a href="${escapeHtml(item.link)}"${target} class="group flex flex-col rounded-xl overflow-hidden bg-surface-container-low hover:bg-surface-container transition-colors">${card}</a>`;
+        return `<a href="${escapeHtml(item.link)}"${target} class="tile-row group flex flex-col rounded-xl overflow-hidden bg-surface-container-low">${card}</a>`;
       } else {
         return `<div class="flex flex-col rounded-xl overflow-hidden bg-surface-container-low opacity-90">${card}</div>`;
       }
