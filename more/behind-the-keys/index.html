@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Behind the Keys: Designing Piano Lab Pro — Amanda L. Cowell</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#D8D3CB",
+            "primary-fixed": "#b9ebf2",
+            "on-surface": "#1C1714",
+            "on-secondary-fixed-variant": "#384b3c",
+            "outline-variant": "#C5BFBA",
+            "on-secondary-container": "#546757",
+            "surface-container-low": "#EDE9E2",
+            "on-secondary-fixed": "#0d1f12",
+            "primary": "#26585d",
+            "surface-container": "#E3DFD7",
+            "on-primary-container": "#c0f2f8",
+            "on-primary": "#ffffff",
+            "secondary": "#4f6353",
+            "primary-container": "#407076",
+            "surface": "#FAF7F2",
+            "primary-fixed-dim": "#9ecfd5",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#d2e8d3",
+            "surface-container-highest": "#CEC9C0",
+            "secondary-container": "#cfe5d0",
+            "on-primary-fixed": "#001f23",
+            "secondary-fixed-dim": "#b6ccb8",
+            "on-surface-variant": "#4A4440",
+            "tertiary": "#554d65",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#6d657e",
+            "on-primary-fixed-variant": "#1a4e53",
+            "inverse-primary": "#9ecfd5",
+            "surface-container-lowest": "#F4F1EC",
+            "outline": "#7A7470",
+            "surface-dim": "#D0CBC4",
+            "accent": "#B05C1A",
+            "logo-blue": "#2A4E6A"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            "headline": ["Fraunces", "Georgia", "serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+            "label": ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    @media (max-width: 767px) {
+      .nav-menu.is-open {
+        display: flex !important;
+        flex-direction: column;
+        align-items: flex-start;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #FAF7F2;
+        padding: 1.5rem;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(197,191,186,0.4);
+      }
+      .nav-menu.is-open > span { display: none; }
+      .nav-menu.is-open > a.ml-5,
+      .nav-menu.is-open > a.ml-3 { margin-left: 0 !important; }
+    }
+
+    /* Skip to main content link */
+    .skip-link {
+      position: absolute; top: -100px; left: 8px;
+      background: #26585d; color: #fff;
+      padding: 8px 16px; border-radius: 6px;
+      z-index: 100; text-decoration: none;
+      font-weight: 500; font-size: 14px;
+      transition: top 0.15s;
+    }
+    .skip-link:focus { top: 8px; }
+
+    /* Visible focus indicators */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #26585d;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/logo.png" alt="" aria-hidden="true" class="h-10 w-10 object-contain">
+        <span class="font-headline text-xl font-semibold text-primary tracking-tight">Amanda L. Cowell</span>
+      </a>
+      <div id="nav-menu" class="nav-menu hidden md:flex items-center gap-8">
+        <a href="/work/" class="text-on-surface-variant hover:text-primary transition-colors text-sm border-b-2 border-transparent pb-0.5">Work</a>
+        <a href="/more/" class="text-primary font-medium border-b-2 border-primary pb-0.5 text-sm">More</a>
+        <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">LinkedIn</a>
+      </div>
+      <button id="nav-toggle" type="button" aria-label="Toggle menu" class="md:hidden material-symbols-outlined text-primary cursor-pointer bg-transparent border-0 p-0">menu</button>
+    </div>
+  </nav>
+
+  <main id="main-content" class="pt-24 pb-20">
+
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto px-6 py-10 md:py-24">
+
+      <!-- Title + subheading -->
+      <h1 class="font-headline text-5xl md:text-7xl font-semibold text-primary tracking-tighter leading-[1.05] mb-6 max-w-5xl">
+        Behind the Keys: Designing Piano Lab Pro
+      </h1>
+      <p class="text-lg md:text-xl text-on-surface-variant font-light leading-relaxed max-w-3xl mb-12">
+        Enriching Scholarship 2026, University of Michigan. Co-presented by Amanda Cowell, Aya Hagelhorn, Raymond Majewski, and Eric Schreffler.
+      </p>
+
+      <!-- Video (full width, primary visual) -->
+      <div class="rounded-xl overflow-hidden aspect-video shadow-2xl mb-12 bg-surface-container-highest">
+        <iframe
+          class="w-full h-full"
+          src="https://www.youtube.com/embed/lpnRygEDetU"
+          title="Behind the Keys: Designing Piano Lab Pro"
+          frameborder="0"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+
+      <!-- Description + case study callout -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-start">
+
+        <!-- Description (left) -->
+        <div class="md:col-span-8">
+          <p class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">
+            About the talk
+          </p>
+          <div class="space-y-5 text-lg leading-relaxed text-on-surface-variant">
+            <p>A behind-the-scenes talk on designing Piano Lab Pro, a mixed reality app for Apple Vision Pro that lets piano students rehearse in front of a virtual audience before they ever perform for a real one.</p>
+            <p>I walk through how the design process actually unfolded: the research that shaped it, the tradeoffs we made along the way, and what it took to turn a promising idea into something faculty and students genuinely wanted to use.</p>
+          </div>
+        </div>
+
+        <!-- Case study callout (right) -->
+        <aside class="md:col-span-4">
+          <div class="border border-outline-variant rounded-xl p-5">
+            <p class="text-[10px] font-medium uppercase tracking-[0.1em] text-outline mb-2.5">See the project</p>
+            <a href="/piano-lab-pro/" class="block font-headline text-[16px] font-semibold text-logo-blue hover:text-on-surface transition-colors leading-[1.3] mb-2">Piano Lab Pro</a>
+            <p class="text-[12.5px] leading-[1.5] text-on-surface-variant">The full case study behind this talk, including the design process and research in more depth.</p>
+          </div>
+        </aside>
+
+      </div>
+
+    </header>
+
+    <!-- See more CTA -->
+    <section aria-label="Continue browsing" class="max-w-7xl mx-auto px-6 pt-8 md:pt-10 pb-2 flex justify-center">
+      <a href="/more/#get-to-know-me" class="inline-flex items-center gap-2 bg-primary text-on-primary px-7 py-3 rounded-full text-base font-medium hover:opacity-90 transition-opacity">
+        Get to know more about me
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-teal-900 w-full py-12">
+    <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <p class="text-teal-100/50 text-sm">Powered by coffee.</p>
+      <a href="https://linkedin.com/in/amanda-lynn-cowell" target="_blank" rel="noopener noreferrer" class="text-teal-100/70 hover:text-teal-50 text-sm uppercase tracking-wide transition-colors">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      document.getElementById('nav-menu').classList.toggle('is-open');
+    });
+  </script>
+
+</body>
+</html>
