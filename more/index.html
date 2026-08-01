@@ -98,20 +98,49 @@
       padding: 2.5rem 0 4rem;
     }
     .fan-card {
+      position: relative;
       display: block;
       width: 190px;
       height: 240px;
       margin-right: -65px;
-      background: #EDE9E2;
-      border: 1px solid rgba(122,116,112,0.35);
-      box-shadow: 0 8px 18px rgba(28,23,20,0.16);
-      border-radius: 0.75rem;
-      overflow: hidden;
       text-decoration: none;
       color: inherit;
       transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .fan-card:last-child { margin-right: 0; }
+    .fan-card-inner {
+      width: 100%; height: 100%;
+      background: #EDE9E2;
+      border: 1px solid rgba(122,116,112,0.35);
+      box-shadow: 0 8px 18px rgba(28,23,20,0.16);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    /* Type/subject tags: float above the card on desktop (there's open
+       space above the row), shown only while that card is focused. */
+    .card-tags {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      margin-bottom: 8px;
+      display: flex; flex-wrap: wrap; gap: 4px;
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .card-tag {
+      padding: 2px 9px;
+      border-radius: 9999px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #FAF7F2;
+      background: #1C1714;
+      white-space: nowrap;
+    }
     .fan-card-thumb { height: 110px; overflow: hidden; }
     .fan-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .fan-card-body { padding: 0.875rem; }
@@ -129,6 +158,7 @@
     .wheel-list { display: block; }
     .wheel-spacer { height: 0; }
     .wheel-card {
+      position: relative;
       scroll-snap-align: center;
       display: flex; align-items: stretch;
       width: calc(100% - 32px);
@@ -153,19 +183,43 @@
     .wheel-card-thumb > div { width: 100%; height: 100%; object-fit: cover; display: block; }
     .wheel-card-body {
       flex: 1; min-width: 0;
-      display: flex; align-items: center;
+      display: flex; flex-direction: column; justify-content: center; gap: 4px;
       padding: 0 0.875rem;
+    }
+    /* Type/subject tags: mobile cards are stacked too tightly for a
+       floating-above spot without colliding with the receded card
+       behind, so these sit in the description's old spot below the
+       title instead, fading in only while the card is focused.
+       Opacity is driven by a --tags-opacity custom property set in
+       the parent's own @keyframes wheelCard (below) and inherited
+       down — NOT by giving this element its own animation-timeline:
+       view(). A separate view() timeline here measures this element's
+       own rendered position, which the ANCESTOR's transform (scale/
+       translate) shifts throughout the scroll, so its progress
+       diverges from the parent's and never lines up with when the
+       card actually looks focused. Confirmed broken in testing. */
+    .wheel-card-tags {
+      position: static;
+      bottom: auto;
+      margin-bottom: 0;
+      z-index: auto;
+      pointer-events: auto;
+      display: flex; flex-wrap: wrap; gap: 4px;
+      opacity: var(--tags-opacity, 0);
+      transition: opacity 200ms ease;
     }
     .wheel-card-title {
       font-family: 'Fraunces', serif; font-weight: 600; font-size: 1rem; color: #1C1714;
       margin: 0; line-height: 1.3;
     }
     @keyframes wheelCard {
-      0%   { transform: translateX(46px) rotate(-9deg) scale(0.62); opacity: 0.5; z-index: 1; box-shadow: 0 2px 6px rgba(28,23,20,0.08); }
+      0%   { transform: translateX(46px) rotate(-9deg) scale(0.62); opacity: 0.5; z-index: 1; box-shadow: 0 2px 6px rgba(28,23,20,0.08); --tags-opacity: 0; }
       53%  { z-index: 1; }
-      55%  { transform: translateX(16px) rotate(-3deg) scale(0.86); opacity: 0.85; z-index: 20; box-shadow: 0 8px 16px rgba(28,23,20,0.14); }
+      55%  { transform: translateX(16px) rotate(-3deg) scale(0.86); opacity: 0.85; z-index: 20; box-shadow: 0 8px 16px rgba(28,23,20,0.14); --tags-opacity: 0; }
+      62%  { --tags-opacity: 1; }
       65%  { transform: translateX(0) rotate(0deg) scale(1.06); opacity: 1; z-index: 20; box-shadow: 0 16px 30px rgba(28,23,20,0.24); }
-      75%  { transform: translateX(-16px) rotate(3deg) scale(0.86); opacity: 0.85; z-index: 20; box-shadow: 0 8px 16px rgba(28,23,20,0.14); }
+      68%  { --tags-opacity: 1; }
+      75%  { transform: translateX(-16px) rotate(3deg) scale(0.86); opacity: 0.85; z-index: 20; box-shadow: 0 8px 16px rgba(28,23,20,0.14); --tags-opacity: 0; }
       77%  { z-index: 1; }
       100% { transform: translateX(-46px) rotate(9deg) scale(0.62); opacity: 0.5; z-index: 1; box-shadow: 0 2px 6px rgba(28,23,20,0.08); }
     }
@@ -181,6 +235,10 @@
       z-index: 999 !important;
       box-shadow: 0 20px 36px rgba(28,23,20,0.28) !important;
       transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 260ms ease;
+    }
+    .wheel-card.is-held .wheel-card-tags { opacity: 1 !important; }
+    @supports not (animation-timeline: view()) {
+      .wheel-card-tags { animation: none; opacity: 0; }
     }
 
     /* Fan on desktop, wheel on mobile */
@@ -384,54 +442,13 @@
   <script>
     const items = [
       {
-        id: 'behind-the-keys',
-        title: 'Designing Piano Lab Pro',
-        types: ['video', 'presentation'],
-        subjects: ['xr', 'teaching'],
-        description: "A conference presentation on the design process behind Piano Lab Pro, a mixed reality app for student performance anxiety.",
-        thumbnail: '/assets/behind-the-keys-thumb.jpg',
-        link: '/more/behind-the-keys/',
-        external: false
-      },
-      {
-        id: 'enabling-student-success-xr',
-        title: 'Enabling Student Success with XR',
-        types: ['presentation'],
-        subjects: ['teaching', 'xr'],
-        description: 'A presentation with panel session at EDUCAUSE Annual Conference 2025 on how Georgia Tech and the University of Michigan use XR to support student success in higher education.',
-        thumbnail: '/assets/educause-2025-podium.jpg',
-        thumbnailPosition: 'top',
-        link: '/more/enabling-student-success-xr/',
-        external: false
-      },
-      {
-        id: 'training-for-tomorrow',
-        title: 'Concussion Assessment in VR',
-        types: ['video', 'presentation'],
-        subjects: ['xr'],
-        description: "A conference presentation on the development of a VR experience for training aspiring clinicians in concussion assessment.",
-        thumbnail: 'https://img.youtube.com/vi/JoN833ErDRI/maxresdefault.jpg',
-        link: '/more/training-for-tomorrow/',
-        external: false
-      },
-      {
-        id: 'chalk-talk',
-        title: 'Chalk Talk',
-        types: ['video', 'presentation'],
-        subjects: [],
-        description: 'A short, personal talk in the FordLabs Passion Talks tradition. Awarded Most Passionate Talker.',
-        thumbnail: 'https://img.youtube.com/vi/GLHKsd4zJtE/maxresdefault.jpg',
-        link: '/more/chalk-talk/',
-        external: false
-      },
-      {
-        id: 'puzzles',
-        title: 'Puzzles & Warm Up Games',
-        types: [],
-        subjects: ['personal', 'culture', 'team'],
-        description: 'A daily ritual that started at FordLabs, became a personal habit, and now opens every standup with my current team.',
-        thumbnail: '/assets/puzzles-queens.jpg',
-        link: '/more/puzzles/',
+        id: 'difference-maker',
+        title: 'Difference Maker, UM-Dearborn',
+        types: ['video'],
+        subjects: ['math'],
+        description: 'A 2019 recognition for math teaching and mentorship work as an undergrad.',
+        thumbnail: 'https://img.youtube.com/vi/yGrccBf9x88/maxresdefault.jpg',
+        link: '/more/difference-maker/',
         external: false
       },
       {
@@ -445,13 +462,54 @@
         external: false
       },
       {
-        id: 'difference-maker',
-        title: 'Difference Maker, UM-Dearborn',
+        id: 'puzzles',
+        title: 'Puzzles & Warm Up Games',
+        types: [],
+        subjects: ['culture', 'team'],
+        description: 'A daily ritual that started at FordLabs, became a personal habit, and now opens every standup with my current team.',
+        thumbnail: '/assets/puzzles-queens.jpg',
+        link: '/more/puzzles/',
+        external: false
+      },
+      {
+        id: 'chalk-talk',
+        title: 'Chalk Talk',
         types: ['video'],
-        subjects: ['teaching', 'math'],
-        description: 'A 2019 recognition for math teaching and mentorship work as an undergrad.',
-        thumbnail: 'https://img.youtube.com/vi/yGrccBf9x88/maxresdefault.jpg',
-        link: '/more/difference-maker/',
+        subjects: ['personal'],
+        description: 'A short, personal talk in the FordLabs Passion Talks tradition. Awarded Most Passionate Talker.',
+        thumbnail: 'https://img.youtube.com/vi/GLHKsd4zJtE/maxresdefault.jpg',
+        link: '/more/chalk-talk/',
+        external: false
+      },
+      {
+        id: 'training-for-tomorrow',
+        title: 'Concussion Assessment in VR',
+        types: ['video'],
+        subjects: ['xr'],
+        description: "A conference presentation on the development of a VR experience for training aspiring clinicians in concussion assessment.",
+        thumbnail: 'https://img.youtube.com/vi/JoN833ErDRI/maxresdefault.jpg',
+        link: '/more/training-for-tomorrow/',
+        external: false
+      },
+      {
+        id: 'enabling-student-success-xr',
+        title: 'Enabling Student Success with XR',
+        types: ['presentation'],
+        subjects: ['xr'],
+        description: 'A presentation with panel session at EDUCAUSE Annual Conference 2025 on how Georgia Tech and the University of Michigan use XR to support student success in higher education.',
+        thumbnail: '/assets/educause-2025-podium.jpg',
+        thumbnailPosition: 'top',
+        link: '/more/enabling-student-success-xr/',
+        external: false
+      },
+      {
+        id: 'behind-the-keys',
+        title: 'Designing Piano Lab Pro',
+        types: ['video'],
+        subjects: ['xr'],
+        description: "A conference presentation on the design process behind Piano Lab Pro, a mixed reality app for student performance anxiety.",
+        thumbnail: '/assets/behind-the-keys-thumb.jpg',
+        link: '/more/behind-the-keys/',
         external: false
       }
     ];
@@ -460,11 +518,21 @@
       return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
+    const TYPE_LABELS = { video: 'Video', writing: 'Writing', presentation: 'Presentation', project: 'Project' };
+    const SUBJECT_LABELS = { math: 'Math', xr: 'XR', ai: 'AI', teaching: 'Teaching', personal: 'Personal', culture: 'Culture', team: 'Team' };
+
     function thumbBlock(item) {
       const primaryType = item.types[0] || 'project';
       if (!item.thumbnail) return `<div class="card-fallback-${primaryType} w-full h-full"></div>`;
       const posStyle = item.thumbnailPosition === 'top' ? ' style="object-position: top;"' : '';
       return `<img src="${escapeHtml(item.thumbnail)}" alt=""${posStyle}>`;
+    }
+
+    function tagsHtml(item, extraClass) {
+      const pills = [...item.types, ...item.subjects]
+        .map(key => `<span class="card-tag">${escapeHtml(TYPE_LABELS[key] || SUBJECT_LABELS[key] || key)}</span>`)
+        .join('');
+      return pills ? `<div class="card-tags${extraClass ? ' ' + extraClass : ''}">${pills}</div>` : '';
     }
 
     function linkAttrs(item) {
@@ -474,10 +542,13 @@
     function fanCardHtml(item) {
       return `
         <a href="${escapeHtml(item.link)}"${linkAttrs(item)} class="fan-card">
-          <div class="fan-card-thumb">${thumbBlock(item)}</div>
-          <div class="fan-card-body">
-            <p class="fan-card-title">${escapeHtml(item.title)}</p>
-            <p class="fan-card-desc">${escapeHtml(item.description)}</p>
+          ${tagsHtml(item)}
+          <div class="fan-card-inner">
+            <div class="fan-card-thumb">${thumbBlock(item)}</div>
+            <div class="fan-card-body">
+              <p class="fan-card-title">${escapeHtml(item.title)}</p>
+              <p class="fan-card-desc">${escapeHtml(item.description)}</p>
+            </div>
           </div>
         </a>`;
     }
@@ -488,6 +559,7 @@
           <div class="wheel-card-thumb">${thumbBlock(item)}</div>
           <div class="wheel-card-body">
             <p class="wheel-card-title">${escapeHtml(item.title)}</p>
+            ${tagsHtml(item, 'wheel-card-tags')}
           </div>
         </a>`;
     }
@@ -495,8 +567,11 @@
     const fanRow = document.getElementById('fan-row');
     fanRow.innerHTML = items.map(fanCardHtml).join('');
     const wheelStack = document.getElementById('wheel-stack');
+    // items is oldest-first (desktop reads it left-to-right that way). Mobile wants
+    // newest-first top-to-bottom, so it renders a reversed copy rather than the
+    // shared array itself — reversing the array directly would flip desktop too.
     wheelStack.innerHTML =
-      '<div class="wheel-spacer"></div>' + items.map(wheelCardHtml).join('') + '<div class="wheel-spacer"></div>';
+      '<div class="wheel-spacer"></div>' + [...items].reverse().map(wheelCardHtml).join('') + '<div class="wheel-spacer"></div>';
 
     wheelStack.querySelectorAll('.wheel-card').forEach(card => {
       const hold = () => card.classList.add('is-held');
@@ -538,6 +613,7 @@
       }
       for (let h = 1; h <= n; h++) {
         css += `.fan-row[data-hover="${h}"] .fan-card:nth-child(${h}) { transform: rotate(0deg); }\n`;
+        css += `.fan-row[data-hover="${h}"] .fan-card:nth-child(${h}) .card-tags { opacity: 1; }\n`;
         for (let d = 1; d <= 3; d++) {
           const t = h + d;
           if (t > n) break;
