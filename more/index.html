@@ -187,24 +187,26 @@
       padding: 0 0.875rem;
     }
     /* Type/subject tags: mobile cards are stacked too tightly for a
-       floating-above spot without colliding with the receded card
-       behind, so these sit in the description's old spot below the
-       title instead, fading in only while the card is focused.
-       Opacity is driven by a --tags-opacity custom property set in
-       the parent's own @keyframes wheelCard (below) and inherited
-       down — NOT by giving this element its own animation-timeline:
-       view(). A separate view() timeline here measures this element's
-       own rendered position, which the ANCESTOR's transform (scale/
-       translate) shifts throughout the scroll, so its progress
-       diverges from the parent's and never lines up with when the
-       card actually looks focused. Confirmed broken in testing. */
+       spot floating OUTSIDE the card without colliding with the
+       receded card behind, so these stay inside the card bounds —
+       pinned top-right, above the title via `order` — fading in only
+       while the card is focused. Opacity is driven by a
+       --tags-opacity custom property set in the parent's own
+       @keyframes wheelCard (below) and inherited down — NOT by giving
+       this element its own animation-timeline: view(). A separate
+       view() timeline here measures this element's own rendered
+       position, which the ANCESTOR's transform (scale/translate)
+       shifts throughout the scroll, so its progress diverges from the
+       parent's and never lines up with when the card actually looks
+       focused. Confirmed broken in testing. */
     .wheel-card-tags {
       position: static;
       bottom: auto;
       margin-bottom: 0;
       z-index: auto;
       pointer-events: auto;
-      display: flex; flex-wrap: wrap; gap: 4px;
+      order: -1;
+      display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px;
       opacity: var(--tags-opacity, 0);
       transition: opacity 200ms ease;
     }
