@@ -53,10 +53,10 @@
   .ui p{margin:.55em auto 0;max-width:34em;font-size:clamp(12px,1.5vw,14px);color:#9FBCBB;
     font-family:Inter,'Segoe UI',system-ui,sans-serif;line-height:1.5;padding:0 16px}
   .bar{position:fixed;bottom:6vh;left:50%;transform:translateX(-50%);
-    width:min(470px,88vw);pointer-events:none;display:flex;align-items:flex-end;
-    gap:16px;flex-wrap:wrap;
-    font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:12px;color:#9FBCBB}
-  .bar .slider{flex:1 1 210px;min-width:0}
+    width:min(420px,88vw);pointer-events:none;display:flex;align-items:center;
+    gap:18px;
+    font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:11px;color:#9FBCBB}
+  .bar .slider{flex:1 1 auto;min-width:0}
   .bar .labels{display:flex;justify-content:space-between;letter-spacing:.06em}
   .bar .track{height:6px;background:rgba(239,232,219,0.20);border-radius:6px;margin-top:9px;
     position:relative;pointer-events:auto;cursor:ew-resize}
@@ -65,30 +65,33 @@
   .bar .fill::after{content:"";position:absolute;right:-10px;top:50%;transform:translateY(-50%);
     width:20px;height:20px;border-radius:50%;background:#EFE8DB;
     border:1px solid rgba(0,0,0,0.10);box-shadow:0 2px 8px rgba(0,0,0,0.40)}
-  .bar .btns{display:flex;gap:8px;pointer-events:auto;padding-bottom:1px}
-  .bar button{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;
-    border-radius:999px;border:1px solid rgba(239,232,219,0.45);background:rgba(239,232,219,0.14);
-    color:#EFE8DB;font-family:inherit;font-size:11px;letter-spacing:.03em;
-    cursor:pointer;white-space:nowrap}
+  .bar button{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+    width:38px;height:38px;pointer-events:auto;
+    border-radius:50%;border:1px solid rgba(239,232,219,0.45);background:rgba(239,232,219,0.14);
+    color:#EFE8DB;cursor:pointer;padding:0}
   .bar button:hover{background:rgba(239,232,219,0.28)}
-  .bar button .ic{font-size:9px;line-height:1}
+  .bar button:focus-visible{outline:2px solid #8FB6B8;outline-offset:2px}
+  .bar button .ic{font-size:11px;line-height:1}
   .foot{position:fixed;bottom:1.4vh;left:0;right:0;text-align:center;font-size:11px;
     color:#7FA3A4;font-family:Inter,'Segoe UI',system-ui,sans-serif;pointer-events:none}
   .err{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:2em}
-  /* ?embed — compact card mode, for placing inside another page */
+  /* ?embed — compact card mode, for placing inside another page.
+     Canvas and bar are laid out with flexbox, not fixed-pixel math, so the
+     bar can never grow into the card's space — at any width or content size. */
   html.embed, html.embed body{background:none}
   html.embed .ui, html.embed .foot{display:none}
-  /* the card is inset so its shadow has room to fall off inside the iframe.
-     NB: width/height must be explicit — `auto` on a <canvas> means "use the
-     bitmap's intrinsic size", which collapses the card instead of stretching. */
-  html.embed canvas{top:8px;left:24px;width:calc(100% - 48px);height:calc(100% - 94px);
+  html.embed body{display:flex;flex-direction:column;padding:8px 24px 22px;
+    box-sizing:border-box;gap:16px}
+  html.embed canvas{position:static;inset:auto;flex:1 1 auto;min-height:0;
+    width:100%;height:auto;
     border-radius:22px;
     background:
       radial-gradient(90% 70% at 68% 18%, rgba(126,196,190,0.30), rgba(126,196,190,0) 62%),
       radial-gradient(80% 65% at 18% 82%, rgba(52,86,130,0.38), rgba(52,86,130,0) 65%),
       linear-gradient(165deg, #2E6B71 0%, #26585D 46%, #142F34 100%);
     box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}   /* = the site cards' shadow-2xl */
-  html.embed .bar{bottom:22px;left:24px;right:24px;width:auto;transform:none;color:#8a7f71}
+  html.embed .bar{position:static;bottom:auto;left:auto;right:auto;transform:none;
+    width:100%;flex:0 0 auto;color:#8a7f71}
   html.embed .bar .track{background:#DCD2C3}
   html.embed .bar .fill{background:#26585D}
   html.embed .bar .fill::after{background:#fff;border-color:#C9BFAE;
@@ -110,10 +113,7 @@
     <div class="labels"><span>mug</span><span>torus</span></div>
     <div class="track"><div class="fill" id="fill"></div></div>
   </div>
-  <div class="btns">
-    <button id="play" type="button"><span class="ic">&#10074;&#10074;</span><span class="tx">pause melt</span></button>
-    <button id="spinBtn" type="button"><span class="ic">&#10074;&#10074;</span><span class="tx">pause spin</span></button>
-  </div>
+  <button id="freeze" type="button" aria-label="pause" title="pause"><span class="ic" aria-hidden="true">&#10074;&#10074;</span></button>
 </div>
 <div class="foot">a homeomorphism you can hold &middot; MIT &middot; view source</div>
 <div class="err" id="err"><p>This demo needs WebGL, which your browser has turned off.</p></div>
@@ -689,23 +689,54 @@ addEventListener("resize", resize); resize();
 const view = lookAt(EYE.x, EYE.y, EYE.z, PIVOT.x, 0, PIVOT.z);
 const pv = () => mul(proj, view);
 
-let tTarget = 1, tShow = 1, spin = 0.1, pitch = 0.0, autoSpin = true, dragging = false;
+let tTarget = 1, tShow = 1, spin = 0.1, pitch = 0.0, phase = 0,
+    autoSpin = true, autoMorph = true, dragging = false, barDrag = false, frozen = false;
 const fill = document.getElementById("fill");
+
+// it plays on its own; touching it just borrows control for a while, then it
+// settles back into motion — like nudging a spinning top, not a setting to
+// remember. the ONE thing a visitor can pin down on purpose is "stopped".
+const IDLE_MS = 2500;
+let lastInteract = performance.now();
+const touch = () => { lastInteract = performance.now(); };
+const pauseSpin = () => { autoSpin = false; };
+const pauseMorph = () => { autoMorph = false; };
+function resumeSpin() { autoSpin = true; }
+function resumeMorph() {
+  autoMorph = true;
+  phase = Math.acos(2 * Math.min(1, Math.max(0, tTarget)) - 1);   // pick up where it left off, no jump
+}
+
+const freezeBtn = document.getElementById("freeze");
+function setFrozen(on) {
+  frozen = on;
+  if (on) { pauseSpin(); pauseMorph(); }
+  else { touch(); resumeSpin(); resumeMorph(); }
+  freezeBtn.querySelector(".ic").innerHTML = on ? "&#9654;" : "&#10074;&#10074;";
+  const t = on ? "play" : "pause";
+  freezeBtn.title = t; freezeBtn.setAttribute("aria-label", t);
+}
+freezeBtn.addEventListener("click", () => setFrozen(!frozen));
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) setFrozen(true);
 
 canvas.addEventListener("pointerdown", e => {
   dragging = true; canvas.classList.add("dragging");
   canvas.setPointerCapture(e.pointerId);
+  if (!frozen) pauseSpin();
+  touch();
 });
 canvas.addEventListener("pointermove", e => {
   if (!dragging) return;                       // dragging tumbles the glass freely
   spin += (e.movementX || 0) * 0.008;
   pitch = Math.min(1.35, Math.max(-1.35, pitch + (e.movementY || 0) * 0.008));
+  touch();
 });
-const drop = () => { dragging = false; canvas.classList.remove("dragging"); };
+const drop = () => { dragging = false; canvas.classList.remove("dragging"); touch(); };
 canvas.addEventListener("pointerup", drop);
 canvas.addEventListener("pointercancel", drop);
 addEventListener("keydown", e => {
-  if (e.key === "ArrowRight" || e.key === "ArrowLeft") setPlay(false);
+  if (frozen || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+  pauseMorph(); touch();
   if (e.key === "ArrowRight") tTarget = Math.max(0, tTarget - 0.05);
   if (e.key === "ArrowLeft")  tTarget = Math.min(1, tTarget + 0.05);
 });
@@ -713,50 +744,32 @@ addEventListener("keydown", e => {
 // the slider is the morph control now that dragging tumbles the mug
 const track = document.querySelector(".bar .track");
 function barSet(e) {
-  if (autoMorph) setPlay(false);            // hands on the slider = you drive
+  if (!frozen) pauseMorph();               // hands on the slider = you drive
+  touch();
   const r = track.getBoundingClientRect();
   tTarget = Math.min(1, Math.max(0, 1 - (e.clientX - r.left) / r.width));
 }
-// the melt and the spin each play until the visitor takes over,
-// and each has its own toggle
-const playBtn = document.getElementById("play");
-const spinBtn = document.getElementById("spinBtn");
-let autoMorph = true, phase = 0;
-// each button says in words what clicking it will do
-function label(btn, playing, what) {
-  btn.querySelector(".ic").innerHTML = playing ? "&#10074;&#10074;" : "&#9654;";
-  btn.querySelector(".tx").textContent = (playing ? "pause " : "play ") + what;
-  btn.title = (playing ? "pause the " : "play the ") + what;
-}
-function setPlay(on) {
-  autoMorph = on;
-  if (on) phase = Math.acos(2 * Math.min(1, Math.max(0, tTarget)) - 1);
-  label(playBtn, on, "melt");
-}
-function setSpinning(on) {
-  autoSpin = on;
-  label(spinBtn, on, "spin");
-}
-playBtn.addEventListener("click", () => setPlay(!autoMorph));
-spinBtn.addEventListener("click", () => setSpinning(!autoSpin));
-let barDrag = false;
 track.addEventListener("pointerdown", e => {
   barDrag = true; track.setPointerCapture(e.pointerId); barSet(e);
 });
 track.addEventListener("pointermove", e => { if (barDrag) barSet(e); });
-track.addEventListener("pointerup", () => { barDrag = false; });
+track.addEventListener("pointerup", () => { barDrag = false; touch(); });
 
 // hooks for scripted control (useful for testing / embedding)
 window.__morph = {
-  setT: v => { setPlay(false); tTarget = tShow = Math.min(1, Math.max(0, v)); },
-  setSpin: a => { spin = a; setSpinning(false); },
+  setT: v => { pauseMorph(); touch(); tTarget = tShow = Math.min(1, Math.max(0, v)); },
+  setSpin: a => { spin = a; pauseSpin(); touch(); },
   setPitch: a => { pitch = a; },
-  auto: () => { setSpinning(true); }
+  auto: () => setFrozen(false)
 };
 
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (!frozen && !dragging && !barDrag && now - lastInteract > IDLE_MS) {
+    if (!autoSpin) resumeSpin();
+    if (!autoMorph) resumeMorph();
+  }
   if (autoSpin) spin += dt * 0.22;
   if (autoMorph) { phase += dt * 0.45; tTarget = 0.5 + 0.5 * Math.cos(phase); }
   tShow += (tTarget - tShow) * Math.min(1, dt * 9);
