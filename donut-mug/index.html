@@ -53,39 +53,48 @@
   .ui p{margin:.55em auto 0;max-width:34em;font-size:clamp(12px,1.5vw,14px);color:#9FBCBB;
     font-family:Inter,'Segoe UI',system-ui,sans-serif;line-height:1.5;padding:0 16px}
   .bar{position:fixed;bottom:6vh;left:50%;transform:translateX(-50%);
-    width:min(340px,70vw);pointer-events:none;
+    width:min(470px,88vw);pointer-events:none;display:flex;align-items:flex-end;
+    gap:16px;flex-wrap:wrap;
     font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:12px;color:#9FBCBB}
-  .bar .labels{display:flex;justify-content:space-between;letter-spacing:.06em;margin-right:96px}
-  .bar .track{height:4px;background:rgba(239,232,219,0.22);border-radius:4px;margin-top:8px;margin-right:96px;position:relative;pointer-events:auto;cursor:ew-resize}
-  .bar .track::before{content:"";position:absolute;left:0;right:0;top:-14px;bottom:-14px}
-  .bar .fill{position:absolute;left:0;top:0;bottom:0;background:#8FB6B8;border-radius:4px;width:0%}
-  .bar .fill::after{content:"";position:absolute;right:-9px;top:50%;transform:translateY(-50%);
-    width:18px;height:18px;border-radius:50%;background:#EFE8DB;box-shadow:0 1px 8px rgba(0,0,0,0.45)}
-  .bar button{position:absolute;top:8px;width:34px;height:34px;border-radius:50%;
-    border:1px solid rgba(239,232,219,0.45);background:rgba(239,232,219,0.16);color:#EFE8DB;
-    font-size:11px;line-height:1;cursor:pointer;pointer-events:auto;padding:0}
-  .bar button:hover{background:rgba(239,232,219,0.30)}
-  .bar button::after{content:attr(data-label);position:absolute;top:36px;left:50%;transform:translateX(-50%);
-    font-size:9px;letter-spacing:.08em;opacity:0.8}
-  #play{right:46px}
-  #spinBtn{right:0}
+  .bar .slider{flex:1 1 210px;min-width:0}
+  .bar .labels{display:flex;justify-content:space-between;letter-spacing:.06em}
+  .bar .track{height:6px;background:rgba(239,232,219,0.20);border-radius:6px;margin-top:9px;
+    position:relative;pointer-events:auto;cursor:ew-resize}
+  .bar .track::before{content:"";position:absolute;left:0;right:0;top:-16px;bottom:-16px}
+  .bar .fill{position:absolute;left:0;top:0;bottom:0;background:#8FB6B8;border-radius:6px;width:0%}
+  .bar .fill::after{content:"";position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+    width:20px;height:20px;border-radius:50%;background:#EFE8DB;
+    border:1px solid rgba(0,0,0,0.10);box-shadow:0 2px 8px rgba(0,0,0,0.40)}
+  .bar .btns{display:flex;gap:8px;pointer-events:auto;padding-bottom:1px}
+  .bar button{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;
+    border-radius:999px;border:1px solid rgba(239,232,219,0.45);background:rgba(239,232,219,0.14);
+    color:#EFE8DB;font-family:inherit;font-size:11px;letter-spacing:.03em;
+    cursor:pointer;white-space:nowrap}
+  .bar button:hover{background:rgba(239,232,219,0.28)}
+  .bar button .ic{font-size:9px;line-height:1}
   .foot{position:fixed;bottom:1.4vh;left:0;right:0;text-align:center;font-size:11px;
     color:#7FA3A4;font-family:Inter,'Segoe UI',system-ui,sans-serif;pointer-events:none}
   .err{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:2em}
   /* ?embed — compact card mode, for placing inside another page */
   html.embed, html.embed body{background:none}
   html.embed .ui, html.embed .foot{display:none}
-  html.embed canvas{top:10px;left:32px;right:32px;bottom:76px;width:auto;height:auto;border-radius:22px;
+  /* the card is inset so its shadow has room to fall off inside the iframe.
+     NB: width/height must be explicit — `auto` on a <canvas> means "use the
+     bitmap's intrinsic size", which collapses the card instead of stretching. */
+  html.embed canvas{top:8px;left:24px;width:calc(100% - 48px);height:calc(100% - 94px);
+    border-radius:22px;
     background:
       radial-gradient(90% 70% at 68% 18%, rgba(126,196,190,0.30), rgba(126,196,190,0) 62%),
       radial-gradient(80% 65% at 18% 82%, rgba(52,86,130,0.38), rgba(52,86,130,0) 65%),
       linear-gradient(165deg, #2E6B71 0%, #26585D 46%, #142F34 100%);
     box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}   /* = the site cards' shadow-2xl */
-  html.embed .bar{bottom:30px;color:#8a7f71}
+  html.embed .bar{bottom:22px;left:24px;right:24px;width:auto;transform:none;color:#8a7f71}
   html.embed .bar .track{background:#DCD2C3}
   html.embed .bar .fill{background:#26585D}
-  html.embed .bar .fill::after{background:#26585D;box-shadow:0 1px 6px rgba(0,0,0,0.25)}
-  html.embed .bar button{border-color:#C9BFAE;background:#EFE8DC;color:#26585D}
+  html.embed .bar .fill::after{background:#fff;border-color:#C9BFAE;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25)}
+  html.embed .bar button{border-color:#26585D;background:transparent;color:#26585D}
+  html.embed .bar button:hover{background:rgba(38,88,93,0.10)}
 </style>
 </head>
 <body>
@@ -97,10 +106,14 @@
      whole time — the donut&rsquo;s hole and the handle&rsquo;s hole are the same hole.</p>
 </div>
 <div class="bar">
-  <div class="labels"><span>mug</span><span>torus</span></div>
-  <div class="track"><div class="fill" id="fill"></div></div>
-  <button id="play" aria-label="pause the melt" data-label="melt">&#10074;&#10074;</button>
-  <button id="spinBtn" aria-label="pause the spin" data-label="spin">&#10074;&#10074;</button>
+  <div class="slider">
+    <div class="labels"><span>mug</span><span>torus</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <div class="btns">
+    <button id="play" type="button"><span class="ic">&#10074;&#10074;</span><span class="tx">pause melt</span></button>
+    <button id="spinBtn" type="button"><span class="ic">&#10074;&#10074;</span><span class="tx">pause spin</span></button>
+  </div>
 </div>
 <div class="foot">a homeomorphism you can hold &middot; MIT &middot; view source</div>
 <div class="err" id="err"><p>This demo needs WebGL, which your browser has turned off.</p></div>
@@ -709,14 +722,20 @@ function barSet(e) {
 const playBtn = document.getElementById("play");
 const spinBtn = document.getElementById("spinBtn");
 let autoMorph = true, phase = 0;
+// each button says in words what clicking it will do
+function label(btn, playing, what) {
+  btn.querySelector(".ic").innerHTML = playing ? "&#10074;&#10074;" : "&#9654;";
+  btn.querySelector(".tx").textContent = (playing ? "pause " : "play ") + what;
+  btn.title = (playing ? "pause the " : "play the ") + what;
+}
 function setPlay(on) {
   autoMorph = on;
   if (on) phase = Math.acos(2 * Math.min(1, Math.max(0, tTarget)) - 1);
-  playBtn.innerHTML = on ? "&#10074;&#10074;" : "&#9654;";
+  label(playBtn, on, "melt");
 }
 function setSpinning(on) {
   autoSpin = on;
-  spinBtn.innerHTML = on ? "&#10074;&#10074;" : "&#9654;";
+  label(spinBtn, on, "spin");
 }
 playBtn.addEventListener("click", () => setPlay(!autoMorph));
 spinBtn.addEventListener("click", () => setSpinning(!autoSpin));
