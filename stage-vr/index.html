@@ -175,8 +175,10 @@
        will move. The menu folds itself away if you stop using it.</p>
     <p>Inside: <b>piano</b>, <b>music window</b> and <b>sound</b>, never more than four choices on
        screen. Pick <b>move it</b> to pick a window up; it then follows your head, so look where you
-       want it and <b>hold still for a moment</b> to set it down. Once placed, it stays put in the room
-       while you look around.</p>
+       want it and <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to
+       drop it at once. Holding still means not turning your head, not being a statue: a wobble costs
+       you a moment, it does not start you over. Once placed, it stays put in the room while you look
+       around.</p>
     <p><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari, turn on Motion
        &amp; Orientation Access, then reload.</p>
   </details>
@@ -244,13 +246,22 @@ function bootPracticeSpace() {
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, lastT = 0;
-  var steady = 0, lastDir = new THREE.Vector3();
+  var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   // seconds of gaze to ignore after something fires. without it the stare that
   // chose a menu item carries straight on into whatever replaces it.
   var cooldown = 0, COOLDOWN = 0.7, mustLeave = null;
   // nothing in the scene except the menu answers to your gaze. you can stare at
   // your own keys through the piano window for as long as you like.
-  var DWELL = 0.85, REPEAT_DELAY = 0.28, PLACE_DWELL = 0.9, STEADY_LIMIT = 6;
+  var DWELL = 0.85, REPEAT_DELAY = 0.28, PLACE_DWELL = 0.9;
+  // How still "still" has to be, in degrees per second. A phone's orientation
+  // stream jitters by a fraction of a degree between frames even on a head that
+  // is not moving, and at 60fps a tenth of a degree already reads as 6 deg/sec,
+  // so a tight limit measures noise rather than you. Turning to look at
+  // something runs into the hundreds, so this still tells the two apart.
+  var STEADY_LIMIT = 25;
+  var SWING_SMOOTH = 0.12;   // seconds of smoothing on the speed estimate
+  var STEADY_DECAY = 2;      // a wobble costs progress at this rate, never all of it
+  var MIN_MOVE = 0.6;        // seconds before a placement can complete at all
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
@@ -1011,12 +1022,20 @@ function bootPracticeSpace() {
       hintPlate.visible = true;
 
       // holding your head still is how you put it down when there is no button
-      var swing = lastDir.lengthSq() ? THREE.MathUtils.radToDeg(lastDir.angleTo(vDir)) / Math.max(dt, 1e-4) : 999;
+      moveAge += dt;
+      var raw = lastDir.lengthSq()
+        ? THREE.MathUtils.radToDeg(lastDir.angleTo(vDir)) / Math.max(dt, 1e-4)
+        : 0;
       lastDir.copy(vDir);
-      if (swing > STEADY_LIMIT) steady = 0; else steady += dt;
+      swingAvg += (raw - swingAvg) * Math.min(1, dt / SWING_SMOOTH);
+
+      // a wobble takes progress back rather than wiping it, so a twitch a second
+      // into holding still costs you a moment, not the whole attempt
+      if (swingAvg > STEADY_LIMIT) steady = Math.max(0, steady - dt * STEADY_DECAY);
+      else steady += dt;
 
       setReticle(steady / PLACE_DWELL, 0xC9913F);
-      if (steady >= PLACE_DWELL) drop();
+      if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) drop();
       return;
     }
     hintPlate.visible = false;
@@ -1067,6 +1086,8 @@ function bootPracticeSpace() {
     active = which;
     movingRig = which;
     steady = 0;
+    moveAge = 0;
+    swingAvg = 0;
     lastDir.set(0, 0, 0);
     layoutMenu();
   }
