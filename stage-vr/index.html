@@ -164,13 +164,15 @@
   <button class="ghost" id="peek">Look around on this screen first</button>
 
   <details>
-    <summary>Moving things once you are inside</summary>
-    <p>A ring sits at the centre of your view, aimed with your head. Look at a window for about a second
-       and a half to pick it up, or <b>press the viewer button</b> if yours has one. Then look where you
-       want it and <b>hold still for a moment</b> to set it down.</p>
-    <p>Buttons float under whichever window you last touched: nearer, farther, smaller, bigger, and for
-       the piano also lower and higher. <b>Lock</b> stops a window being picked up by accident. When room
-       tone is on, quieter and louder sit on the bottom row.</p>
+    <summary>Changing things once you are inside</summary>
+    <p>Everything lives behind one small <b>menu</b> tab parked off to your left. Look at it for a moment
+       to open it, or <b>press the viewer button</b> if yours has one. Nothing else answers to your gaze,
+       so you can watch your own hands through the piano window for as long as you like and nothing
+       will move. The menu folds itself away if you stop using it.</p>
+    <p>Inside: <b>piano</b>, <b>music window</b> and <b>sound</b>, never more than four choices on
+       screen. Pick <b>move it</b> to pick a window up; it then follows your head, so look where you
+       want it and <b>hold still for a moment</b> to set it down. Once placed, it stays put in the room
+       while you look around.</p>
     <p><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari, turn on Motion
        &amp; Orientation Access, then reload.</p>
   </details>
@@ -206,7 +208,7 @@ function bootPracticeSpace() {
 
   var renderer, scene, camera, sky, skyTex, videoEl, videoTex;
   var reticle, reticleRing, hintPlate = null;
-  var toolbar = [], pickables = [];
+  var pickables = [];
   var mode = 'flat';
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
@@ -218,16 +220,14 @@ function bootPracticeSpace() {
   // real keybed is, so its body can be built around it in the right orientation.
   var rigs = {
     music: {
-      kind: 'plate', on: false, locked: false,
+      kind: 'plate', on: false,
       azim: 0, elev: THREE.MathUtils.degToRad(-14), dist: 1.05, width: 1.05,
-      group: null, grab: null,
-      tools: ['nearer', 'farther', 'smaller', 'bigger', 'lock']
+      group: null
     },
     piano: {
-      kind: 'deck', on: false, locked: false,
+      kind: 'deck', on: false,
       yaw: 0, drop: 0.46, dist: 0.44, width: 1.0,
-      group: null, grab: null,
-      tools: ['nearer', 'farther', 'lower', 'higher', 'smaller', 'bigger', 'lock']
+      group: null
     }
   };
   var active = 'piano';
@@ -235,10 +235,12 @@ function bootPracticeSpace() {
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3();
-  var lockTex = null, unlockTex = null;
-  // grabbing is slower than the other targets on purpose: without a button,
-  // a short dwell would re-grab a window every time you rested your eyes on it
-  var DWELL = 1.4, REPEAT_DELAY = 0.28, PLACE_DWELL = 0.9, STEADY_LIMIT = 6;
+  // seconds of gaze to ignore after something fires. without it the stare that
+  // chose a menu item carries straight on into whatever replaces it.
+  var cooldown = 0, COOLDOWN = 0.7, mustLeave = null;
+  // nothing in the scene except the menu answers to your gaze. you can stare at
+  // your own keys through the piano window for as long as you like.
+  var DWELL = 0.85, REPEAT_DELAY = 0.28, PLACE_DWELL = 0.9, STEADY_LIMIT = 6;
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
@@ -274,7 +276,7 @@ function bootPracticeSpace() {
 
     buildMusicRig();
     buildPianoRig();
-    buildToolbar();
+    buildMenu();
     buildReticle();
     placeAll();
 
@@ -360,7 +362,14 @@ function bootPracticeSpace() {
     g.strokeStyle = 'rgba(201,145,63,0.55)'; g.lineWidth = 3;
     roundRect(g, 5, 5, 246, 118, 24); g.stroke();
     g.fillStyle = '#EFE9DF';
-    g.font = '600 40px system-ui, sans-serif';
+    // shrink to fit rather than run off the plate: "hold still to place" and
+    // "music window" are both wider than the label at the nominal size
+    var size = 40;
+    g.font = '600 ' + size + 'px system-ui, sans-serif';
+    while (size > 17 && g.measureText(text).width > 212) {
+      size -= 2;
+      g.font = '600 ' + size + 'px system-ui, sans-serif';
+    }
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(text, 128, 66);
     return new THREE.CanvasTexture(c);
@@ -377,14 +386,6 @@ function bootPracticeSpace() {
     r.group.add(r.win);
     r.group.visible = false;
     scene.add(r.group);
-
-    r.grab = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 0.56),
-      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
-    );
-    r.grab.userData.rig = 'music';
-    r.grab.userData.action = 'grab';
-    scene.add(r.grab);
   }
 
   function buildPianoRig() {
@@ -459,15 +460,6 @@ function bootPracticeSpace() {
     g.visible = false;
     r.group = g;
     scene.add(g);
-
-    r.grab = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.06, 0.30),
-      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
-    );
-    r.grab.rotation.x = -Math.PI / 2;
-    r.grab.userData.rig = 'piano';
-    r.grab.userData.action = 'grab';
-    scene.add(r.grab);
   }
 
   // when the camera arrives after the rigs are already built, hand it to both windows
@@ -499,10 +491,6 @@ function bootPracticeSpace() {
     r.group.position.copy(p);
     r.group.scale.set(r.width, r.width, 1);
     r.group.lookAt(h);
-    r.grab.position.copy(p);
-    r.grab.scale.set(r.width, r.width, 1);
-    r.grab.lookAt(h);
-    r.anchor = p;
   }
 
   function placePiano() {
@@ -515,80 +503,47 @@ function bootPracticeSpace() {
     r.group.position.copy(p);
     r.group.rotation.y = r.yaw;
     r.group.scale.setScalar(r.width);
-    r.grab.position.copy(p);
-    r.grab.position.y += 0.01;
-    r.grab.rotation.set(-Math.PI / 2, 0, 0);
-    r.grab.rotation.z = -r.yaw;
-    r.grab.scale.set(r.width, r.width, 1);
-    // buttons take their aim from just above the fallboard, not from the keys
-    r.anchor = p.clone();
-    r.anchor.y += 0.30 * r.width;
-    r.anchor.z -= 0.16 * r.width * Math.cos(r.yaw);
-    r.anchor.x += 0.16 * r.width * Math.sin(r.yaw);
   }
 
   function placeAll() {
     placeMusic();
     placePiano();
-    layoutToolbar();
-    refreshPickables();
   }
 
   function refreshPickables() {
     pickables = [];
-    for (var i = 0; i < toolbar.length; i++) if (toolbar[i].visible) pickables.push(toolbar[i]);
-    ['music', 'piano'].forEach(function (k) {
-      var r = rigs[k];
-      r.grab.visible = r.on && !r.locked;
-      if (r.on && !r.locked) pickables.push(r.grab);
-    });
+    if (menu.tab.visible) pickables.push(menu.tab);
+    for (var i = 0; i < menu.slots.length; i++) {
+      if (menu.slots[i].visible) pickables.push(menu.slots[i]);
+    }
   }
 
-  // ---------- toolbar ----------
+  // ---------- menu ----------
 
-  var TOOL_DEFS = [
-    { action: 'nearer',  label: 'nearer',  repeat: true },
-    { action: 'farther', label: 'farther', repeat: true },
-    { action: 'lower',   label: 'lower',   repeat: true },
-    { action: 'higher',  label: 'higher',  repeat: true },
-    { action: 'smaller', label: 'smaller', repeat: true },
-    { action: 'bigger',  label: 'bigger',  repeat: true },
-    { action: 'lock',    label: 'lock',    repeat: false },
-    { action: 'quieter', label: 'quieter', repeat: true },
-    { action: 'louder',  label: 'louder',  repeat: true }
-  ];
-  var toolByAction = {};
+  // one small tab parked off to the left, well away from the keys and from
+  // anything you would look at on purpose. it is the only thing gaze can hit.
+  var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
+  var menu = {
+    open: false, page: 'root', idle: 0,
+    yaw: THREE.MathUtils.degToRad(-34),
+    pitch: THREE.MathUtils.degToRad(-8),
+    tab: null, slots: []
+  };
+  var texCache = {};
 
-  function buildToolbar() {
-    lockTex = labelTexture('lock');
-    unlockTex = labelTexture('unlock');
-    TOOL_DEFS.forEach(function (def) {
-      var tex = def.action === 'lock' ? lockTex : labelTexture(def.label);
-      var m = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.13, 0.065),
-        new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthTest: false })
-      );
-      m.renderOrder = 10;
-      m.userData.action = def.action;
-      m.userData.repeat = def.repeat;
-      m.visible = false;
-      scene.add(m);
-      toolbar.push(m);
-      toolByAction[def.action] = m;
-    });
+  function cachedLabel(text) {
+    if (!texCache[text]) texCache[text] = labelTexture(text);
+    return texCache[text];
+  }
 
-    hintPlate = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.30, 0.075),
-      new THREE.MeshBasicMaterial({ map: labelTexture('hold still to place'), transparent: true, depthTest: false })
+  function plate(w, h, tex) {
+    var m = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ map: tex || null, transparent: true, depthTest: false })
     );
-    hintPlate.renderOrder = 12;
-    hintPlate.visible = false;
-    scene.add(hintPlate);
+    m.renderOrder = 10;
+    return m;
   }
-
-  // buttons always sit the same reach from your eyes, whatever the rig is doing.
-  // hanging them off the rig itself made them balloon when the piano came close.
-  var TOOL_REACH = 0.80, ROW_STEP = 0.135, FIRST_ROW = 0.20, COL_STEP = 0.155;
 
   function aimAt(obj, yawA, pitchA, radius) {
     var h = head();
@@ -600,52 +555,81 @@ function bootPracticeSpace() {
     obj.lookAt(h);
   }
 
-  function rigAim(r) {
-    var d = r.anchor.clone().sub(head());
-    var len = d.length() || 1;
-    return {
-      yaw: Math.atan2(d.x, -d.z),
-      pitch: Math.asin(THREE.MathUtils.clamp(d.y / len, -1, 1))
-    };
+  function buildMenu() {
+    menu.tab = plate(0.115, 0.058, cachedLabel('menu'));
+    menu.tab.userData.id = 'open';
+    menu.tab.visible = false;
+    scene.add(menu.tab);
+
+    for (var i = 0; i < 4; i++) {
+      var s = plate(0.175, 0.088, null);
+      s.visible = false;
+      scene.add(s);
+      menu.slots.push(s);
+    }
+
+    hintPlate = plate(0.30, 0.075, cachedLabel('hold still to place'));
+    hintPlate.renderOrder = 12;
+    hintPlate.visible = false;
+    scene.add(hintPlate);
   }
 
-  // rows of at most four, under whichever rig you last touched
-  function layoutToolbar() {
+  // never more than four things on screen at once
+  function menuItems() {
+    if ((menu.page === 'piano' && !rigs.piano.on) ||
+        (menu.page === 'music' && !rigs.music.on) ||
+        (menu.page === 'sound' && !audio.on)) menu.page = 'root';
+
+    if (menu.page === 'piano' || menu.page === 'music') {
+      return [
+        { id: 'move', label: 'move it' },
+        { id: 'smaller', label: 'smaller', repeat: true },
+        { id: 'bigger', label: 'bigger', repeat: true },
+        { id: 'page:root', label: 'back' }
+      ];
+    }
+    if (menu.page === 'sound') {
+      return [
+        { id: 'quieter', label: 'quieter', repeat: true },
+        { id: 'louder', label: 'louder', repeat: true },
+        { id: 'page:root', label: 'back' }
+      ];
+    }
+    var items = [];
+    if (rigs.piano.on) items.push({ id: 'page:piano', label: 'piano' });
+    if (rigs.music.on) items.push({ id: 'page:music', label: 'music window' });
+    if (audio.on) items.push({ id: 'page:sound', label: 'sound' });
+    items.push({ id: 'close', label: 'close' });
+    return items;
+  }
+
+  function layoutMenu() {
     var inSpace = (mode === 'stereo' || mode === 'xr');
-    for (var i = 0; i < toolbar.length; i++) toolbar[i].visible = false;
-    if (!inSpace) return;
+    menu.tab.visible = false;
+    for (var i = 0; i < menu.slots.length; i++) menu.slots[i].visible = false;
 
-    var r = rigs[active];
-    if (!r || !r.on) {
-      var other = active === 'piano' ? 'music' : 'piano';
-      if (rigs[other].on) { active = other; r = rigs[other]; } else { return; }
+    if (!inSpace || movingRig) { refreshPickables(); return; }
+
+    if (!menu.open) {
+      menu.tab.visible = true;
+      aimAt(menu.tab, menu.yaw, menu.pitch, MENU_REACH);
+      refreshPickables();
+      return;
     }
 
-    var names = r.tools.slice();
-    if (audio.on) names = names.concat(['quieter', 'louder']);
-
-    var rows = [];
-    for (var n = 0; n < names.length;) {
-      var take = Math.min(4, names.length - n);
-      rows.push(names.slice(n, n + take));
-      n += take;
+    var items = menuItems();
+    for (var j = 0; j < items.length && j < menu.slots.length; j++) {
+      var s = menu.slots[j];
+      s.visible = true;
+      s.userData.id = items[j].id;
+      s.userData.repeat = !!items[j].repeat;
+      s.material.map = cachedLabel(items[j].label);
+      s.material.needsUpdate = true;
+      // the list unfurls below the tab, never on top of it, so the stare that
+      // opened the menu is left sitting on nothing and picks nothing
+      aimAt(s, menu.yaw, menu.pitch - (j + 1) * MENU_STEP, MENU_REACH);
     }
-
-    var aim = rigAim(r);
-    for (var row = 0; row < rows.length; row++) {
-      var rowPitch = aim.pitch - FIRST_ROW - row * ROW_STEP;
-      for (var c = 0; c < rows[row].length; c++) {
-        var m = toolByAction[rows[row][c]];
-        if (!m) continue;
-        m.visible = true;
-        aimAt(m, aim.yaw, rowPitch, TOOL_REACH);
-        m.translateX((c - (rows[row].length - 1) / 2) * COL_STEP);
-        if (m.userData.action === 'lock') {
-          m.material.map = r.locked ? unlockTex : lockTex;
-          m.material.needsUpdate = true;
-        }
-      }
-    }
+    refreshPickables();
   }
 
   function buildReticle() {
@@ -789,7 +773,7 @@ function bootPracticeSpace() {
     audio.on = true;
     setLevel(audio.level);
     scheduleStir();
-    layoutToolbar();
+    layoutMenu();
   }
 
   // a seat creaking, a shoe on the boards, a cough three rows back.
@@ -851,7 +835,7 @@ function bootPracticeSpace() {
     audio.master = null;
     audio.verb = null;
     audio.on = false;
-    layoutToolbar();
+    layoutMenu();
   }
 
   // ---------- head tracking ----------
@@ -922,11 +906,7 @@ function bootPracticeSpace() {
   function updateGaze(dt) {
     var inSpace = (mode === 'stereo' || mode === 'xr');
     reticle.visible = inSpace;
-    if (!inSpace) {
-      for (var i = 0; i < toolbar.length; i++) toolbar[i].visible = false;
-      gazeHit = null;
-      return;
-    }
+    if (!inSpace) { gazeHit = null; return; }
 
     var vc = viewCamera();
     vc.updateMatrixWorld();
@@ -949,8 +929,9 @@ function bootPracticeSpace() {
         r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
       }
       placeAll();
-      var aim = rigAim(r);
-      aimAt(hintPlate, aim.yaw, aim.pitch + 0.20, TOOL_REACH);
+      var gYaw = Math.atan2(vDir.x, -vDir.z);
+      var gPitch = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
+      aimAt(hintPlate, gYaw, gPitch + 0.19, MENU_REACH);
       hintPlate.visible = true;
 
       // holding your head still is how you put it down when there is no button
@@ -964,21 +945,43 @@ function bootPracticeSpace() {
     }
     hintPlate.visible = false;
 
+    if (cooldown > 0) {
+      cooldown = Math.max(0, cooldown - dt);
+      setReticle(0, 0xEFE9DF);
+      gazeHit = null; gazeHeld = 0;
+      return;
+    }
+
     raycaster.set(vPos, vDir);
     var hits = raycaster.intersectObjects(pickables, false);
     var obj = hits.length ? hits[0].object : null;
 
-    if (obj !== gazeHit) { gazeHit = obj; gazeHeld = 0; }
-    if (!obj) { setReticle(0, 0xEFE9DF); return; }
+    // a slot you just used will not fire again until your gaze has left it.
+    // menu pages reuse the same four meshes, so without this the stare that
+    // opened a page runs straight on into the item that lands in its place.
+    if (obj !== mustLeave) mustLeave = null;
+    else if (obj) { gazeHit = obj; gazeHeld = 0; setReticle(0, 0xEFE9DF); return; }
 
+    if (obj !== gazeHit) { gazeHit = obj; gazeHeld = 0; }
+    if (!obj) {
+      setReticle(0, 0xEFE9DF);
+      // a menu you have stopped using folds itself back down to the tab
+      if (menu.open) {
+        menu.idle += dt;
+        if (menu.idle > MENU_IDLE) { menu.open = false; menu.idle = 0; layoutMenu(); }
+      }
+      return;
+    }
+    menu.idle = 0;
     gazeHeld += dt;
 
     if (obj.userData.repeat) {
-      if (gazeHeld > REPEAT_DELAY) { doAction(obj.userData.action, dt, obj); setReticle(1, 0xC9913F); }
+      if (gazeHeld > REPEAT_DELAY) { activate(obj.userData.id, dt); setReticle(1, 0xC9913F); }
       else setReticle(gazeHeld / REPEAT_DELAY, 0xC9913F);
     } else if (gazeHeld > DWELL) {
-      doAction(obj.userData.action, dt, obj);
-      gazeHeld = -99;
+      activate(obj.userData.id, dt);
+      mustLeave = obj;
+      cooldown = COOLDOWN;
     } else {
       setReticle(Math.max(0, gazeHeld) / DWELL, 0xC9913F);
     }
@@ -989,62 +992,46 @@ function bootPracticeSpace() {
     movingRig = which;
     steady = 0;
     lastDir.set(0, 0, 0);
-    layoutToolbar();
-    refreshPickables();
+    layoutMenu();
   }
 
   function drop() {
-    var was = movingRig;
     movingRig = null;
     steady = 0;
     hintPlate.visible = false;
     placeAll();
-    // do not let the same stare immediately pick it back up
-    if (was) { gazeHit = rigs[was].grab; gazeHeld = -99; }
+    layoutMenu();
+    // do not let the stare that placed it fall straight onto the menu
+    cooldown = COOLDOWN;
   }
 
-  function doAction(action, dt, obj) {
+  function activate(id, dt) {
     var step = dt || 0.016;
+    if (!id) return;
 
-    if (action === 'grab') {
-      var which = obj && obj.userData.rig;
-      if (!which) return;
-      if (movingRig === which) drop(); else grab(which);
-      return;
-    }
+    if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); return; }
+    if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
+    if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
 
-    if (action === 'quieter') { setLevel(audio.level - step * 0.55); return; }
-    if (action === 'louder')  { setLevel(audio.level + step * 0.55); return; }
+    if (id === 'quieter') { setLevel(audio.level - step * 0.55); return; }
+    if (id === 'louder')  { setLevel(audio.level + step * 0.55); return; }
 
-    var r = rigs[active];
-    if (!r) return;
+    var which = (menu.page === 'piano' || menu.page === 'music') ? menu.page : null;
+    if (!which) return;
+    var r = rigs[which];
 
-    if (action === 'lock') {
-      r.locked = !r.locked;
-      if (r.locked && movingRig === active) drop();
-      placeAll();
-      return;
-    }
-
-    if (action === 'smaller') r.width = Math.max(0.40, r.width - step * 0.8);
-    if (action === 'bigger')  r.width = Math.min(2.40, r.width + step * 0.8);
-
-    if (r.kind === 'plate') {
-      if (action === 'nearer')  r.dist = Math.max(0.35, r.dist - step * 0.55);
-      if (action === 'farther') r.dist = Math.min(1.80, r.dist + step * 0.55);
-    } else {
-      if (action === 'nearer')  r.dist = Math.max(0.20, r.dist - step * 0.45);
-      if (action === 'farther') r.dist = Math.min(1.20, r.dist + step * 0.45);
-      if (action === 'lower')   r.drop = Math.min(1.10, r.drop + step * 0.45);
-      if (action === 'higher')  r.drop = Math.max(0.10, r.drop - step * 0.45);
-    }
+    if (id === 'move') { menu.open = false; grab(which); return; }
+    if (id === 'smaller') r.width = Math.max(0.40, r.width - step * 0.8);
+    if (id === 'bigger')  r.width = Math.min(2.40, r.width + step * 0.8);
     placeAll();
   }
 
   function onTrigger() {
     if (mode === 'flat') return;
     if (movingRig) { drop(); return; }
-    if (gazeHit) { doAction(gazeHit.userData.action, 0.08, gazeHit); gazeHeld = 0; }
+    if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
+    // button pressed while looking at nothing opens the menu at its parked spot
+    if (!menu.open) { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); }
   }
 
   // ---------- render ----------
@@ -1130,13 +1117,13 @@ function bootPracticeSpace() {
     if (document.getElementById('optTone').checked) audioOn(); else audioOff();
     setLevel(parseFloat(volEl.value));
     placeAll();
+    layoutMenu();
   }
 
   function showChrome(on) {
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
-    layoutToolbar();
-    refreshPickables();
+    layoutMenu();
   }
 
   function enterVR() {
