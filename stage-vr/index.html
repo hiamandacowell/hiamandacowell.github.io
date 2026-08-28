@@ -132,22 +132,26 @@
 
     <label class="row"><input type="checkbox" id="optCam">
       <span>Music window
-        <small>A camera window at eye level, for glancing at your score.</small>
+        <small>A window on the real room at eye level, for glancing at your score.</small>
       </span></label>
 
     <label class="row"><input type="checkbox" id="optPiano">
       <span>Piano
-        <small>A second camera window down on your real keys, framed by a 3D piano body.</small>
+        <small>A second window, down where your real keys are, framed by a 3D piano body.</small>
       </span></label>
 
     <details>
       <summary>How the windows work</summary>
-      <p>Both windows share one rear camera and each shows a different band of the frame, so the music
-         window sits at eye level while the keys window looks down at the keybed. One camera feeding two
-         eyes reads flat and runs about a tenth of a second behind. Fine for glancing, wrong for reaching.</p>
-      <p>If the camera is unavailable the keys window falls back to a drawn keybed, which is a placeholder
-         and not your keys. Trim the bottom edge of the cardboard and look down at your real keyboard
-         through the gap.</p>
+      <p>Each window is a hole showing what the rear camera can actually see behind it, worked out from
+         where you put the window and where your head is pointed. Both share the one camera, so they show
+         different parts of the room, not the same picture twice.</p>
+      <p><b>Where the camera cannot reach, the window is black.</b> A phone lens sees about 65 degrees
+         across, so the keys window is usually dark while you are looking out at the house, and fills in
+         as you tilt your head down towards it. That is the lens telling the truth, not a fault.</p>
+      <p>One camera feeding two eyes reads flat and runs about a tenth of a second behind. Fine for
+         glancing, wrong for reaching. If the camera is unavailable the keys window falls back to a drawn
+         keybed, which is a placeholder and not your keys; trim the bottom edge of the cardboard and look
+         down at your real keyboard through the gap.</p>
     </details>
   </fieldset>
 
@@ -286,19 +290,78 @@ function bootPracticeSpace() {
 
   // ---------- geometry helpers ----------
 
-  // one video texture, several meshes, each looking at a different slice of the
-  // frame. this is how you get more than one camera window without more cameras.
-  function remapUV(geo, u0, v0, u1, v1) {
-    var uv = geo.attributes.uv;
-    for (var i = 0; i < uv.count; i++) {
-      uv.setXY(i, u0 + uv.getX(i) * (u1 - u0), v0 + uv.getY(i) * (v1 - v0));
-    }
-    uv.needsUpdate = true;
-    return geo;
-  }
+  // Both windows are holes in the panorama showing whatever the rear camera can
+  // actually see behind them. Rather than crop the frame, each fragment is
+  // projected back through a virtual camera sitting at your head and pointed
+  // where you are pointed, which is where the phone's lens really is. Wherever
+  // that projection lands outside the frame, the window is black, because the
+  // camera genuinely cannot see there.
+  //
+  // Both meshes share one material, so the projection is computed once a frame.
+  var PHONE_FOV_H = 65;   // degrees across, about what a phone rear camera gives back
+  var winMat = null;
+  var phoneCam = new THREE.PerspectiveCamera();
 
   function windowMaterial() {
-    return new THREE.MeshBasicMaterial({ color: videoTex ? 0xffffff : 0x0A0A0B, map: videoTex || null });
+    if (winMat) return winMat;
+    winMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uVideo:    { value: null },
+        uHasVideo: { value: 0 },
+        uCamProj:  { value: new THREE.Matrix4() }
+      },
+      vertexShader: [
+        'uniform mat4 uCamProj;',
+        'varying vec4 vProj;',
+        'void main() {',
+        '  vec4 wp = modelMatrix * vec4(position, 1.0);',
+        '  vProj = uCamProj * wp;',
+        '  gl_Position = projectionMatrix * viewMatrix * wp;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D uVideo;',
+        'uniform float uHasVideo;',
+        'varying vec4 vProj;',
+        'void main() {',
+        '  if (uHasVideo < 0.5 || vProj.w <= 0.0) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }',
+        // the divide happens per fragment, so the mapping stays correct on a
+        // plane lying flat under you as well as one square to your face
+        '  vec2 uv = (vProj.xy / vProj.w) * 0.5 + 0.5;',
+        '  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {',
+        '    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return;',
+        '  }',
+        '  gl_FragColor = vec4(texture2D(uVideo, uv).rgb, 1.0);',
+        '}'
+      ].join('\n')
+    });
+    return winMat;
+  }
+
+  // the lens rides on your head, so the virtual camera takes the head pose. in
+  // stereo both eyes get the same projection, which is honest: there is one lens.
+  function updateWindowProjection() {
+    if (!winMat) return;
+    var vc = viewCamera();
+    vc.updateMatrixWorld();
+    phoneCam.position.setFromMatrixPosition(vc.matrixWorld);
+    vc.getWorldQuaternion(phoneCam.quaternion);
+
+    var aspect = (videoEl && videoEl.videoWidth && videoEl.videoHeight)
+      ? videoEl.videoWidth / videoEl.videoHeight : 4 / 3;
+    // phone cameras are quoted across; three wants the vertical angle
+    phoneCam.fov = 2 * THREE.MathUtils.radToDeg(
+      Math.atan(Math.tan(THREE.MathUtils.degToRad(PHONE_FOV_H) / 2) / aspect)
+    );
+    phoneCam.aspect = aspect;
+    phoneCam.near = 0.05;
+    phoneCam.far = 100;
+    phoneCam.updateProjectionMatrix();
+    phoneCam.updateMatrixWorld(true);
+
+    winMat.uniforms.uCamProj.value.multiplyMatrices(
+      phoneCam.projectionMatrix, phoneCam.matrixWorldInverse
+    );
   }
 
   // a drawn keybed, sitting in the piano window until the camera hands over a
@@ -380,9 +443,7 @@ function bootPracticeSpace() {
   function buildMusicRig() {
     var r = rigs.music;
     r.group = new THREE.Group();
-    // upper band of the camera frame, roughly what is straight ahead of the phone
-    var geo = remapUV(new THREE.PlaneGeometry(1, 0.56), 0.04, 0.46, 0.96, 1.0);
-    r.win = new THREE.Mesh(geo, windowMaterial());
+    r.win = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.56), windowMaterial());
     r.group.add(r.win);
     r.group.visible = false;
     scene.add(r.group);
@@ -398,10 +459,9 @@ function bootPracticeSpace() {
     var brass = new THREE.MeshStandardMaterial({ color: 0x5A4420, roughness: 0.68, metalness: 0.45 });
     var felt = new THREE.MeshStandardMaterial({ color: 0x5A1F24, roughness: 0.95 });
 
-    // the window on your real keys: lower band of the same frame, lying flat
-    // where the keybed is, so you look down into it rather than at it
-    var keysGeo = remapUV(new THREE.PlaneGeometry(1.06, 0.30), 0.06, 0.0, 0.94, 0.40);
-    r.win = new THREE.Mesh(keysGeo, windowMaterial());
+    // the window on your real keys, lying flat where the keybed is, so you look
+    // down into it rather than at it
+    r.win = new THREE.Mesh(new THREE.PlaneGeometry(1.06, 0.30), windowMaterial());
     r.win.rotation.x = -Math.PI / 2;
     r.win.position.y = 0.001;
     r.win.visible = false;
@@ -464,13 +524,10 @@ function bootPracticeSpace() {
 
   // when the camera arrives after the rigs are already built, hand it to both windows
   function attachVideo() {
+    winMat.uniforms.uVideo.value = videoTex;
+    winMat.uniforms.uHasVideo.value = 1;
     ['music', 'piano'].forEach(function (k) {
-      var w = rigs[k].win;
-      if (!w) return;
-      w.material.map = videoTex;
-      w.material.color.setHex(0xffffff);
-      w.material.needsUpdate = true;
-      w.visible = true;
+      if (rigs[k].win) rigs[k].win.visible = true;
       if (rigs[k].fallback) rigs[k].fallback.visible = false;
     });
   }
@@ -1047,6 +1104,7 @@ function bootPracticeSpace() {
     if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
 
     updateGaze(dt);
+    updateWindowProjection();
 
     if (mode === 'stereo') {
       var w = renderer.domElement.width, h = renderer.domElement.height;
