@@ -66,16 +66,24 @@
   label.row{display:flex;gap:11px;padding:9px 2px;font-size:15px;cursor:pointer;align-items:flex-start;}
   label.row input{width:17px;height:17px;margin-top:2px;accent-color:var(--brass);flex:none;}
   label.row small{display:block;color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:3px;}
-  label.row.lead{border-left:2px solid var(--velvet);padding-left:10px;margin-left:-2px;}
 
   .slider{padding:6px 2px 10px;font-size:12.5px;color:var(--muted);}
   .slider input{width:100%;accent-color:var(--brass);margin-top:5px;}
-  .hint{font-size:12.5px;color:var(--muted);line-height:1.55;padding:2px 2px 12px;margin:0;}
-  .hint b{color:var(--brass);font-weight:600;}
   select{
     width:100%;padding:11px 10px;border-radius:7px;background:var(--surface-2);
     color:var(--text);border:1px solid var(--line);font-family:var(--ui);font-size:14.5px;
   }
+
+  details{margin:2px 0 6px;}
+  details summary{
+    font-size:12.5px;color:var(--brass);cursor:pointer;padding:6px 2px;list-style:none;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:"+ ";font-weight:600;}
+  details[open] summary::before{content:"- ";}
+  details p{font-size:12.8px;line-height:1.6;color:var(--muted);margin:2px 2px 10px;}
+  details p b{color:var(--text);font-weight:600;}
+
   button{font-family:var(--ui);}
   button.go{
     width:100%;padding:15px;font-size:15.5px;font-weight:600;letter-spacing:.01em;
@@ -108,8 +116,8 @@
   <p class="eyebrow">Piano bench, downstage center</p>
   <h1>Hill Auditorium Practice Space</h1>
   <div class="rule"></div>
-  <p class="sub">A 360 capture of the Hill stage, seen from where you sit to play, with 3,500 empty seats in front of you.
-     Runs in a <b>Google Cardboard viewer with any phone</b>. No app, no headset, no account.</p>
+  <p class="sub">The Hill stage in 360, from where you sit to play. Runs in a
+     <b>Google Cardboard viewer with any phone</b>.</p>
 
   <fieldset>
     <legend>Where you are</legend>
@@ -120,56 +128,54 @@
   </fieldset>
 
   <fieldset>
-    <legend>Seeing your hands</legend>
-
-    <label class="row lead"><input type="checkbox" id="optFloor" checked>
-      <span>Darken the floor
-        <small>Blanks the bottom of the view so a cut in the viewer is not fighting a bright virtual floor.
-        This is the one that works: trim the bottom edge of the cardboard and look down at your real keyboard.
-        No lag, real depth, costs nothing.</small>
-      </span></label>
+    <legend>Windows on the real room</legend>
 
     <label class="row"><input type="checkbox" id="optCam">
-      <span>Camera cutout
-        <small>Paints the rear camera onto a window where the keys are. Needs a viewer with a camera hole.
-        One camera feeding both eyes, so it reads flat and runs about a tenth of a second behind.
-        Fine for glancing at music, wrong for reaching.</small>
+      <span>Music window
+        <small>A camera window at eye level, for glancing at your score.</small>
       </span></label>
 
-    <label class="row"><input type="checkbox" id="optKeys">
-      <span>Keyboard outline
-        <small>Draws 61 keys where the real ones would be. No camera. Only lines up if the phone
-        and the piano stay put relative to each other.</small>
+    <label class="row"><input type="checkbox" id="optPiano">
+      <span>Piano
+        <small>A second camera window down on your real keys, framed by a 3D piano body.</small>
       </span></label>
-  </fieldset>
 
-  <fieldset>
-    <legend>Placing it, from inside</legend>
-    <p class="hint">A ring sits at the centre of your view, aimed with your head. Look at the cutout for about a
-       second and a half to pick it up, or <b>press the viewer button</b> if yours has one. Once it is stuck to
-       your head, look where you want it and <b>hold still for a moment</b> to set it down. Five controls float
-       underneath: nearer, farther, smaller, bigger, and <b>lock</b>, which stops the cutout being picked up by
-       accident once it is where you want it. The sliders below are only the starting position.</p>
-    <div class="slider">Starting angle below the horizon<input type="range" id="cutElev" min="-75" max="5" step="1" value="-38"></div>
-    <div class="slider">Starting distance<input type="range" id="cutDist" min="0.35" max="1.6" step="0.02" value="0.9"></div>
-    <div class="slider">Starting width<input type="range" id="cutW" min="0.4" max="2" step="0.05" value="1.3"></div>
+    <details>
+      <summary>How the windows work</summary>
+      <p>Both windows share one rear camera and each shows a different band of the frame, so the music
+         window sits at eye level while the keys window looks down at the keybed. One camera feeding two
+         eyes reads flat and runs about a tenth of a second behind. Fine for glancing, wrong for reaching.</p>
+      <p>If the camera is unavailable the keys window falls back to a drawn keybed, which is a placeholder
+         and not your keys. Trim the bottom edge of the cardboard and look down at your real keyboard
+         through the gap.</p>
+    </details>
   </fieldset>
 
   <fieldset>
     <legend>Sound</legend>
     <label class="row"><input type="checkbox" id="optTone">
       <span>Room tone
-        <small>Synthesized hall hush, standing in for the real thing. A recording of the actual room,
-        with shuffling and a cough in it, does more for nerves than any amount of extra pixels.</small>
+        <small>A hall that breathes, with the odd shuffle out in the seats. Adjustable from inside.</small>
       </span></label>
+    <div class="slider">Level<input type="range" id="vol" min="0" max="1" step="0.02" value="0.5"></div>
   </fieldset>
 
   <button class="go" id="enter">Enter</button>
   <button class="ghost" id="peek">Look around on this screen first</button>
 
+  <details>
+    <summary>Moving things once you are inside</summary>
+    <p>A ring sits at the centre of your view, aimed with your head. Look at a window for about a second
+       and a half to pick it up, or <b>press the viewer button</b> if yours has one. Then look where you
+       want it and <b>hold still for a moment</b> to set it down.</p>
+    <p>Buttons float under whichever window you last touched: nearer, farther, smaller, bigger, and for
+       the piano also lower and higher. <b>Lock</b> stops a window being picked up by accident. When room
+       tone is on, quieter and louder sit on the bottom row.</p>
+    <p><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari, turn on Motion
+       &amp; Orientation Access, then reload.</p>
+  </details>
+
   <p class="note" id="modeNote"></p>
-  <p class="note"><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari,
-     turn on Motion &amp; Orientation Access, then reload this page.</p>
   <p id="err" role="status"></p>
 </div></div>
 
@@ -196,26 +202,42 @@ function bootPracticeSpace() {
   var ui = document.getElementById('ui');
   var hud = document.getElementById('hud');
   var errEl = document.getElementById('err');
-  var elevEl = document.getElementById('cutElev');
-  var distEl = document.getElementById('cutDist');
-  var widthEl = document.getElementById('cutW');
+  var volEl = document.getElementById('vol');
 
-  var renderer, scene, camera, sky, skyTex, floorDisc, camMesh, keysGroup, grabPlate, videoEl;
-  var reticle, reticleRing, toolbar = [], pickables = [];
+  var renderer, scene, camera, sky, skyTex, videoEl, videoTex;
+  var reticle, reticleRing, hintPlate = null;
+  var toolbar = [], pickables = [];
   var mode = 'flat';
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
-  var toneNode = null;
 
-  var azim = 0, elev = THREE.MathUtils.degToRad(-38), dist = 0.9, width = 1.3;
   var EYE = 1.15;
 
+  // two independent windows on the real room, both fed by the one rear camera.
+  // the music window hangs in front of your face; the piano lies flat where the
+  // real keybed is, so its body can be built around it in the right orientation.
+  var rigs = {
+    music: {
+      kind: 'plate', on: false, locked: false,
+      azim: 0, elev: THREE.MathUtils.degToRad(-14), dist: 1.05, width: 1.05,
+      group: null, grab: null,
+      tools: ['nearer', 'farther', 'smaller', 'bigger', 'lock']
+    },
+    piano: {
+      kind: 'deck', on: false, locked: false,
+      yaw: 0, drop: 0.46, dist: 0.44, width: 1.0,
+      group: null, grab: null,
+      tools: ['nearer', 'farther', 'lower', 'higher', 'smaller', 'bigger', 'lock']
+    }
+  };
+  var active = 'piano';
+
   var raycaster = new THREE.Raycaster();
-  var gazeHit = null, gazeHeld = 0, moving = false, locked = false, lastT = 0;
-  var steady = 0, lastDir = new THREE.Vector3(), hintPlate = null;
-  var lockTex = null, unlockTex = null, lockBtn = null;
+  var gazeHit = null, gazeHeld = 0, movingRig = null, lastT = 0;
+  var steady = 0, lastDir = new THREE.Vector3();
+  var lockTex = null, unlockTex = null;
   // grabbing is slower than the other targets on purpose: without a button,
-  // a short dwell would re-grab the cutout every time you rested your eyes on it
+  // a short dwell would re-grab a window every time you rested your eyes on it
   var DWELL = 1.4, REPEAT_DELAY = 0.28, PLACE_DWELL = 0.9, STEADY_LIMIT = 6;
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
@@ -235,68 +257,88 @@ function bootPracticeSpace() {
     geo.scale(-1, 1, 1);
     sky = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x14110f }));
     scene.add(sky);
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-    floorDisc = new THREE.Mesh(
-      new THREE.CircleGeometry(6, 48),
-      new THREE.MeshBasicMaterial({ map: radialFade(), transparent: true, depthWrite: false })
-    );
-    floorDisc.rotation.x = -Math.PI / 2;
-    floorDisc.position.y = -0.35;
-    floorDisc.visible = false;
-    scene.add(floorDisc);
+    // the panorama is unlit basic material; these lights exist only so the
+    // piano body has some shape to it instead of reading as a black silhouette
+    scene.add(new THREE.AmbientLight(0xffffff, 0.30));
+    var key = new THREE.DirectionalLight(0xFFE6C2, 1.15);
+    key.position.set(-1.4, 2.0, 0.5);
+    scene.add(key);
+    var fill = new THREE.DirectionalLight(0x9FB6D4, 0.45);
+    fill.position.set(1.2, 0.7, -0.8);
+    scene.add(fill);
+    // a hard light almost overhead is what puts the long streak down a polished lid
+    var sheen = new THREE.DirectionalLight(0xFFF4E2, 0.7);
+    sheen.position.set(0.4, 3.0, -2.0);
+    scene.add(sheen);
 
-    keysGroup = buildKeyboard();
-    keysGroup.visible = false;
-    scene.add(keysGroup);
-
-    grabPlate = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 0.56),
-      new THREE.MeshBasicMaterial({ color: 0xC9913F, transparent: true, opacity: 0, depthWrite: false })
-    );
-    grabPlate.userData.action = 'grab';
-    scene.add(grabPlate);
-
+    buildMusicRig();
+    buildPianoRig();
     buildToolbar();
     buildReticle();
-    place();
+    placeAll();
 
     window.addEventListener('resize', onResize);
     renderer.setAnimationLoop(render);
   }
 
-  function radialFade() {
-    var c = document.createElement('canvas'); c.width = c.height = 256;
-    var g = c.getContext('2d');
-    var grad = g.createRadialGradient(128, 128, 18, 128, 128, 128);
-    grad.addColorStop(0, 'rgba(0,0,0,1)');
-    grad.addColorStop(0.62, 'rgba(0,0,0,0.96)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    g.fillStyle = grad; g.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(c);
+  // ---------- geometry helpers ----------
+
+  // one video texture, several meshes, each looking at a different slice of the
+  // frame. this is how you get more than one camera window without more cameras.
+  function remapUV(geo, u0, v0, u1, v1) {
+    var uv = geo.attributes.uv;
+    for (var i = 0; i < uv.count; i++) {
+      uv.setXY(i, u0 + uv.getX(i) * (u1 - u0), v0 + uv.getY(i) * (v1 - v0));
+    }
+    uv.needsUpdate = true;
+    return geo;
   }
 
-  function buildKeyboard() {
-    var g = new THREE.Group();
-    var whiteMat = new THREE.MeshBasicMaterial({ color: 0xdfe3ee, transparent: true, opacity: 0.5 });
-    var blackMat = new THREE.MeshBasicMaterial({ color: 0x11131a, transparent: true, opacity: 0.72 });
-    var wW = 0.0236, wL = 0.145, n = 36, totalW = wW * n;
-    for (var i = 0; i < n; i++) {
-      var k = new THREE.Mesh(new THREE.BoxGeometry(wW * 0.92, 0.012, wL), whiteMat);
-      k.position.set(-totalW / 2 + wW * (i + 0.5), 0, 0);
-      g.add(k);
+  function windowMaterial() {
+    return new THREE.MeshBasicMaterial({ color: videoTex ? 0xffffff : 0x0A0A0B, map: videoTex || null });
+  }
+
+  // a drawn keybed, sitting in the piano window until the camera hands over a
+  // picture, and left there if it never does. it is a placeholder, not your keys.
+  function keybedTexture() {
+    var c = document.createElement('canvas');
+    c.width = 1024; c.height = 300;
+    var g = c.getContext('2d');
+    g.fillStyle = '#08080A'; g.fillRect(0, 0, 1024, 300);
+
+    var n = 36, w = 1024 / n, i;
+    for (i = 0; i < n; i++) {
+      var grd = g.createLinearGradient(0, 44, 0, 300);
+      grd.addColorStop(0, '#7C786F');
+      grd.addColorStop(0.35, '#B4AEA3');
+      grd.addColorStop(1, '#DAD5CA');
+      g.fillStyle = grd;
+      g.fillRect(i * w + 1.6, 44, w - 3.2, 254);
     }
+
     var pattern = [0, 1, 3, 4, 5];
     for (var oct = 0; oct < 6; oct++) {
       for (var p = 0; p < pattern.length; p++) {
         var idx = oct * 7 + pattern[p];
         if (idx >= n - 1) continue;
-        var b = new THREE.Mesh(new THREE.BoxGeometry(wW * 0.58, 0.016, wL * 0.62), blackMat);
-        b.position.set(-totalW / 2 + wW * (idx + 1), 0.008, -wL * 0.19);
-        g.add(b);
+        var bg = g.createLinearGradient(0, 44, 0, 212);
+        bg.addColorStop(0, '#04050A');
+        bg.addColorStop(1, '#20242F');
+        g.fillStyle = bg;
+        g.fillRect((idx + 1) * w - w * 0.29, 44, w * 0.58, 168);
       }
     }
-    return g;
+
+    // the shadow the fallboard throws over the back of the keys
+    var sh = g.createLinearGradient(0, 44, 0, 118);
+    sh.addColorStop(0, 'rgba(0,0,0,0.78)');
+    sh.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = sh; g.fillRect(0, 44, 1024, 74);
+
+    var t = new THREE.CanvasTexture(c);
+    t.minFilter = THREE.LinearFilter;
+    return t;
   }
 
   function roundRect(g, x, y, w, h, r) {
@@ -318,45 +360,292 @@ function bootPracticeSpace() {
     g.strokeStyle = 'rgba(201,145,63,0.55)'; g.lineWidth = 3;
     roundRect(g, 5, 5, 246, 118, 24); g.stroke();
     g.fillStyle = '#EFE9DF';
-    g.font = '600 42px system-ui, sans-serif';
+    g.font = '600 40px system-ui, sans-serif';
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(text, 128, 66);
     return new THREE.CanvasTexture(c);
   }
 
+  // ---------- the two rigs ----------
+
+  function buildMusicRig() {
+    var r = rigs.music;
+    r.group = new THREE.Group();
+    // upper band of the camera frame, roughly what is straight ahead of the phone
+    var geo = remapUV(new THREE.PlaneGeometry(1, 0.56), 0.04, 0.46, 0.96, 1.0);
+    r.win = new THREE.Mesh(geo, windowMaterial());
+    r.group.add(r.win);
+    r.group.visible = false;
+    scene.add(r.group);
+
+    r.grab = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 0.56),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    r.grab.userData.rig = 'music';
+    r.grab.userData.action = 'grab';
+    scene.add(r.grab);
+  }
+
+  function buildPianoRig() {
+    var r = rigs.piano;
+    var g = new THREE.Group();
+    // polished ebony is nearly black but it is never flat black; the highlight is
+    // the whole reason it reads as a solid object and not a hole in the panorama
+    var ebony = new THREE.MeshStandardMaterial({ color: 0x0D0C0B, roughness: 0.22, metalness: 0.10 });
+    var ebonyMatte = new THREE.MeshStandardMaterial({ color: 0x0A0908, roughness: 0.62, metalness: 0.04 });
+    var brass = new THREE.MeshStandardMaterial({ color: 0x5A4420, roughness: 0.68, metalness: 0.45 });
+    var felt = new THREE.MeshStandardMaterial({ color: 0x5A1F24, roughness: 0.95 });
+
+    // the window on your real keys: lower band of the same frame, lying flat
+    // where the keybed is, so you look down into it rather than at it
+    var keysGeo = remapUV(new THREE.PlaneGeometry(1.06, 0.30), 0.06, 0.0, 0.94, 0.40);
+    r.win = new THREE.Mesh(keysGeo, windowMaterial());
+    r.win.rotation.x = -Math.PI / 2;
+    r.win.position.y = 0.001;
+    r.win.visible = false;
+    g.add(r.win);
+
+    // same footprint, untouched UVs, showing the drawn keybed until video arrives
+    r.fallback = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.06, 0.30),
+      new THREE.MeshBasicMaterial({ map: keybedTexture() })
+    );
+    r.fallback.rotation.x = -Math.PI / 2;
+    g.add(r.fallback);
+
+    // key slip along the front edge, the bit nearest your stomach. matte, because
+    // a polished upward face this close to the eye blows out into a headlamp
+    var slip = new THREE.Mesh(new THREE.BoxGeometry(1.20, 0.030, 0.055), ebonyMatte);
+    slip.position.set(0, 0.008, 0.178);
+    g.add(slip);
+
+    // a thin edge on the slip, so the near lip of the piano has a line
+    var edge = new THREE.Mesh(new THREE.BoxGeometry(1.20, 0.004, 0.008), brass);
+    edge.position.set(0, 0.024, 0.205);
+    g.add(edge);
+
+    // cheek blocks either side of the keys
+    [-1, 1].forEach(function (s) {
+      var cheek = new THREE.Mesh(new THREE.BoxGeometry(0.070, 0.072, 0.360), ebony);
+      cheek.position.set(s * 0.565, 0.030, 0.005);
+      g.add(cheek);
+    });
+
+    // fallboard tipped back off the keys, then the music desk above it
+    var fall = new THREE.Mesh(new THREE.BoxGeometry(1.20, 0.185, 0.026), ebony);
+    fall.position.set(0, 0.082, -0.172);
+    fall.rotation.x = -0.22;
+    g.add(fall);
+
+    var lip = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.022, 0.032), ebony);
+    lip.position.set(0, 0.112, -0.228);
+    g.add(lip);
+
+    var desk = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.300, 0.018), ebonyMatte);
+    desk.position.set(0, 0.248, -0.270);
+    desk.rotation.x = -0.30;
+    g.add(desk);
+
+    // the rim running away from you, with the strip of felt you catch under the lid
+    var rim = new THREE.Mesh(new THREE.BoxGeometry(1.34, 0.090, 1.05), ebony);
+    rim.position.set(0, 0.150, -0.860);
+    g.add(rim);
+
+    var strip = new THREE.Mesh(new THREE.BoxGeometry(1.16, 0.006, 0.160), felt);
+    strip.position.set(0, 0.198, -0.402);
+    g.add(strip);
+
+    g.visible = false;
+    r.group = g;
+    scene.add(g);
+
+    r.grab = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.06, 0.30),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    r.grab.rotation.x = -Math.PI / 2;
+    r.grab.userData.rig = 'piano';
+    r.grab.userData.action = 'grab';
+    scene.add(r.grab);
+  }
+
+  // when the camera arrives after the rigs are already built, hand it to both windows
+  function attachVideo() {
+    ['music', 'piano'].forEach(function (k) {
+      var w = rigs[k].win;
+      if (!w) return;
+      w.material.map = videoTex;
+      w.material.color.setHex(0xffffff);
+      w.material.needsUpdate = true;
+      w.visible = true;
+      if (rigs[k].fallback) rigs[k].fallback.visible = false;
+    });
+  }
+
+  // ---------- placement ----------
+
+  function head() { return new THREE.Vector3(0, EYE, 0); }
+
+  function placeMusic() {
+    var r = rigs.music;
+    var d = new THREE.Vector3(
+      Math.cos(r.elev) * Math.sin(r.azim),
+      Math.sin(r.elev),
+      -Math.cos(r.elev) * Math.cos(r.azim)
+    );
+    var h = head();
+    var p = h.clone().addScaledVector(d, r.dist);
+    r.group.position.copy(p);
+    r.group.scale.set(r.width, r.width, 1);
+    r.group.lookAt(h);
+    r.grab.position.copy(p);
+    r.grab.scale.set(r.width, r.width, 1);
+    r.grab.lookAt(h);
+    r.anchor = p;
+  }
+
+  function placePiano() {
+    var r = rigs.piano;
+    var p = new THREE.Vector3(
+      Math.sin(r.yaw) * r.dist,
+      EYE - r.drop,
+      -Math.cos(r.yaw) * r.dist
+    );
+    r.group.position.copy(p);
+    r.group.rotation.y = r.yaw;
+    r.group.scale.setScalar(r.width);
+    r.grab.position.copy(p);
+    r.grab.position.y += 0.01;
+    r.grab.rotation.set(-Math.PI / 2, 0, 0);
+    r.grab.rotation.z = -r.yaw;
+    r.grab.scale.set(r.width, r.width, 1);
+    // buttons take their aim from just above the fallboard, not from the keys
+    r.anchor = p.clone();
+    r.anchor.y += 0.30 * r.width;
+    r.anchor.z -= 0.16 * r.width * Math.cos(r.yaw);
+    r.anchor.x += 0.16 * r.width * Math.sin(r.yaw);
+  }
+
+  function placeAll() {
+    placeMusic();
+    placePiano();
+    layoutToolbar();
+    refreshPickables();
+  }
+
+  function refreshPickables() {
+    pickables = [];
+    for (var i = 0; i < toolbar.length; i++) if (toolbar[i].visible) pickables.push(toolbar[i]);
+    ['music', 'piano'].forEach(function (k) {
+      var r = rigs[k];
+      r.grab.visible = r.on && !r.locked;
+      if (r.on && !r.locked) pickables.push(r.grab);
+    });
+  }
+
+  // ---------- toolbar ----------
+
+  var TOOL_DEFS = [
+    { action: 'nearer',  label: 'nearer',  repeat: true },
+    { action: 'farther', label: 'farther', repeat: true },
+    { action: 'lower',   label: 'lower',   repeat: true },
+    { action: 'higher',  label: 'higher',  repeat: true },
+    { action: 'smaller', label: 'smaller', repeat: true },
+    { action: 'bigger',  label: 'bigger',  repeat: true },
+    { action: 'lock',    label: 'lock',    repeat: false },
+    { action: 'quieter', label: 'quieter', repeat: true },
+    { action: 'louder',  label: 'louder',  repeat: true }
+  ];
+  var toolByAction = {};
+
   function buildToolbar() {
-    var defs = [
-      { action: 'nearer',  label: 'nearer',  repeat: true },
-      { action: 'farther', label: 'farther', repeat: true },
-      { action: 'smaller', label: 'smaller', repeat: true },
-      { action: 'bigger',  label: 'bigger',  repeat: true },
-      { action: 'lock',    label: 'lock',    repeat: false }
-    ];
     lockTex = labelTexture('lock');
     unlockTex = labelTexture('unlock');
-    for (var i = 0; i < defs.length; i++) {
-      var tex = defs[i].action === 'lock' ? lockTex : labelTexture(defs[i].label);
+    TOOL_DEFS.forEach(function (def) {
+      var tex = def.action === 'lock' ? lockTex : labelTexture(def.label);
       var m = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.2, 0.1),
+        new THREE.PlaneGeometry(0.13, 0.065),
         new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthTest: false })
       );
       m.renderOrder = 10;
-      m.userData.action = defs[i].action;
-      m.userData.repeat = defs[i].repeat;
-      m.userData.slot = i - (defs.length - 1) / 2;
+      m.userData.action = def.action;
+      m.userData.repeat = def.repeat;
       m.visible = false;
       scene.add(m);
       toolbar.push(m);
-      if (defs[i].action === 'lock') lockBtn = m;
-    }
+      toolByAction[def.action] = m;
+    });
 
     hintPlate = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.44, 0.11),
+      new THREE.PlaneGeometry(0.30, 0.075),
       new THREE.MeshBasicMaterial({ map: labelTexture('hold still to place'), transparent: true, depthTest: false })
     );
     hintPlate.renderOrder = 12;
     hintPlate.visible = false;
     scene.add(hintPlate);
+  }
+
+  // buttons always sit the same reach from your eyes, whatever the rig is doing.
+  // hanging them off the rig itself made them balloon when the piano came close.
+  var TOOL_REACH = 0.80, ROW_STEP = 0.135, FIRST_ROW = 0.20, COL_STEP = 0.155;
+
+  function aimAt(obj, yawA, pitchA, radius) {
+    var h = head();
+    obj.position.set(
+      h.x + radius * Math.cos(pitchA) * Math.sin(yawA),
+      h.y + radius * Math.sin(pitchA),
+      h.z - radius * Math.cos(pitchA) * Math.cos(yawA)
+    );
+    obj.lookAt(h);
+  }
+
+  function rigAim(r) {
+    var d = r.anchor.clone().sub(head());
+    var len = d.length() || 1;
+    return {
+      yaw: Math.atan2(d.x, -d.z),
+      pitch: Math.asin(THREE.MathUtils.clamp(d.y / len, -1, 1))
+    };
+  }
+
+  // rows of at most four, under whichever rig you last touched
+  function layoutToolbar() {
+    var inSpace = (mode === 'stereo' || mode === 'xr');
+    for (var i = 0; i < toolbar.length; i++) toolbar[i].visible = false;
+    if (!inSpace) return;
+
+    var r = rigs[active];
+    if (!r || !r.on) {
+      var other = active === 'piano' ? 'music' : 'piano';
+      if (rigs[other].on) { active = other; r = rigs[other]; } else { return; }
+    }
+
+    var names = r.tools.slice();
+    if (audio.on) names = names.concat(['quieter', 'louder']);
+
+    var rows = [];
+    for (var n = 0; n < names.length;) {
+      var take = Math.min(4, names.length - n);
+      rows.push(names.slice(n, n + take));
+      n += take;
+    }
+
+    var aim = rigAim(r);
+    for (var row = 0; row < rows.length; row++) {
+      var rowPitch = aim.pitch - FIRST_ROW - row * ROW_STEP;
+      for (var c = 0; c < rows[row].length; c++) {
+        var m = toolByAction[rows[row][c]];
+        if (!m) continue;
+        m.visible = true;
+        aimAt(m, aim.yaw, rowPitch, TOOL_REACH);
+        m.translateX((c - (rows[row].length - 1) / 2) * COL_STEP);
+        if (m.userData.action === 'lock') {
+          m.material.map = r.locked ? unlockTex : lockTex;
+          m.material.needsUpdate = true;
+        }
+      }
+    }
   }
 
   function buildReticle() {
@@ -378,58 +667,7 @@ function bootPracticeSpace() {
     camera.add(reticle);
   }
 
-  function place() {
-    var d = new THREE.Vector3(
-      Math.cos(elev) * Math.sin(azim),
-      Math.sin(elev),
-      -Math.cos(elev) * Math.cos(azim)
-    );
-    var head = new THREE.Vector3(0, EYE, 0);
-    var p = head.clone().addScaledVector(d, dist);
-
-    grabPlate.position.copy(p);
-    grabPlate.scale.set(width, width, 1);
-    grabPlate.lookAt(head);
-
-    if (camMesh) {
-      camMesh.position.copy(p);
-      camMesh.scale.set(width, width * 0.56, 1);
-      camMesh.lookAt(head);
-    }
-
-    keysGroup.position.copy(p);
-    keysGroup.scale.setScalar(width / 1.3);
-
-    var below = width * 0.56 / 2 + 0.1;
-    for (var i = 0; i < toolbar.length; i++) {
-      var t = toolbar[i];
-      t.position.copy(p);
-      t.position.y -= below;
-      t.lookAt(head);
-      t.translateX(t.userData.slot * 0.23);
-    }
-
-    if (hintPlate) {
-      hintPlate.position.copy(p);
-      hintPlate.position.y += width * 0.56 / 2 + 0.11;
-      hintPlate.lookAt(head);
-    }
-
-    pickables = locked ? toolbar.slice() : toolbar.concat([grabPlate]);
-  }
-
-  function syncSliders() {
-    elevEl.value = String(Math.round(THREE.MathUtils.radToDeg(elev)));
-    distEl.value = dist.toFixed(2);
-    widthEl.value = width.toFixed(2);
-  }
-
-  function readSliders() {
-    elev = THREE.MathUtils.degToRad(parseFloat(elevEl.value));
-    dist = parseFloat(distEl.value);
-    width = parseFloat(widthEl.value);
-    place();
-  }
+  // ---------- panorama ----------
 
   function loadSky(id) {
     var img = document.getElementById(id);
@@ -451,8 +689,9 @@ function bootPracticeSpace() {
   }
 
   function startPassthrough() {
+    if (videoTex) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      errEl.textContent = 'This page cannot open the camera here. The physical cutout still works.';
+      errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
       return;
     }
     navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
@@ -462,36 +701,160 @@ function bootPracticeSpace() {
         videoEl.muted = true;
         videoEl.srcObject = stream;
         videoEl.play();
-        var tex = new THREE.VideoTexture(videoEl);
-        tex.minFilter = THREE.LinearFilter;
-        camMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: tex }));
-        scene.add(camMesh);
-        place();
+        videoTex = new THREE.VideoTexture(videoEl);
+        videoTex.minFilter = THREE.LinearFilter;
+        attachVideo();
       })
       .catch(function () {
-        errEl.textContent = 'Camera access was refused, so the software cutout is off. The physical cutout still works.';
+        errEl.textContent = 'Camera access was refused. The keys window stays dark; the physical cutout still works.';
       });
   }
 
-  function toneOn() {
+  // ---------- room tone ----------
+
+  var audio = { ctx: null, master: null, verb: null, nodes: [], level: 0.5, on: false, timer: null };
+
+  // a hall is noise plus a tail plus something happening occasionally. the tail is
+  // what the old version was missing, and it is why that one read as a hiss.
+  function impulseResponse(ctx, seconds, decay) {
+    var len = Math.floor(ctx.sampleRate * seconds);
+    var buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    var early = [0.011, 0.019, 0.029, 0.043, 0.058, 0.074, 0.091];
+    for (var c = 0; c < 2; c++) {
+      var d = buf.getChannelData(c);
+      for (var i = 0; i < len; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+      }
+      for (var e = 0; e < early.length; e++) {
+        var s = Math.floor(early[e] * ctx.sampleRate * (c ? 1.06 : 1));
+        if (s < len) d[s] += (e % 2 ? -0.55 : 0.55) / (e * 0.6 + 1);
+      }
+    }
+    return buf;
+  }
+
+  function noiseBuffer(ctx, seconds) {
+    var len = Math.floor(ctx.sampleRate * seconds);
+    var buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (var c = 0; c < 2; c++) {
+      var d = buf.getChannelData(c), last = 0;
+      for (var i = 0; i < len; i++) {
+        var w = Math.random() * 2 - 1;
+        last = (last + 0.018 * w) / 1.018;
+        d[i] = last * 3.4;
+      }
+    }
+    return buf;
+  }
+
+  function audioOn() {
+    if (audio.on) return;
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
-    var ctx = new AC();
-    var len = ctx.sampleRate * 3;
-    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    var d = buf.getChannelData(0), last = 0;
-    for (var i = 0; i < len; i++) {
-      var white = Math.random() * 2 - 1;
-      last = (last + 0.02 * white) / 1.02;
-      d[i] = last * 3.2;
-    }
-    var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
-    var g = ctx.createGain(); g.gain.value = 0.16;
-    src.connect(lp); lp.connect(g); g.connect(ctx.destination);
-    src.start();
-    toneNode = src;
+    if (!audio.ctx) audio.ctx = new AC();
+    var ctx = audio.ctx;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    var master = ctx.createGain();
+    master.gain.value = 0;
+    master.connect(ctx.destination);
+
+    var verb = ctx.createConvolver();
+    verb.buffer = impulseResponse(ctx, 2.9, 2.4);
+    var wet = ctx.createGain();
+    wet.gain.value = 0.85;
+    verb.connect(wet);
+    wet.connect(master);
+
+    var bed = ctx.createBufferSource();
+    bed.buffer = noiseBuffer(ctx, 8);
+    bed.loop = true;
+    var hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 45;
+    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 760; lp.Q.value = 0.4;
+    var breath = ctx.createGain(); breath.gain.value = 0.8;
+
+    // a very slow swell, so the bed drifts instead of sitting perfectly still
+    var lfo = ctx.createOscillator(); lfo.frequency.value = 0.045;
+    var lfoAmt = ctx.createGain(); lfoAmt.gain.value = 0.16;
+    lfo.connect(lfoAmt); lfoAmt.connect(breath.gain);
+
+    bed.connect(hp); hp.connect(lp); lp.connect(breath);
+    breath.connect(master);
+    breath.connect(verb);
+    bed.start(); lfo.start();
+
+    audio.master = master;
+    audio.verb = verb;
+    audio.nodes = [bed, lfo];
+    audio.on = true;
+    setLevel(audio.level);
+    scheduleStir();
+    layoutToolbar();
   }
+
+  // a seat creaking, a shoe on the boards, a cough three rows back.
+  // always through the reverb, never dry, or it sounds like it is in your head.
+  function stir() {
+    var ctx = audio.ctx;
+    if (!ctx || !audio.on || !audio.verb) return;
+    var dur = 0.09 + Math.random() * 0.45;
+    var b = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+    var d = b.getChannelData(0);
+    for (var i = 0; i < d.length; i++) {
+      var t = i / d.length;
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2) * Math.min(1, t * 45);
+    }
+    var s = ctx.createBufferSource(); s.buffer = b;
+    var f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 240 + Math.random() * 900;
+    f.Q.value = 0.9;
+    var g = ctx.createGain();
+    g.gain.value = 0.05 + Math.random() * 0.10;
+    s.connect(f); f.connect(g);
+    if (ctx.createStereoPanner) {
+      var pan = ctx.createStereoPanner();
+      pan.pan.value = Math.random() * 2 - 1;
+      g.connect(pan); pan.connect(audio.verb);
+    } else {
+      g.connect(audio.verb);
+    }
+    s.start();
+  }
+
+  function scheduleStir() {
+    clearTimeout(audio.timer);
+    audio.timer = setTimeout(function () { stir(); scheduleStir(); }, 4000 + Math.random() * 15000);
+  }
+
+  function setLevel(v) {
+    audio.level = Math.max(0, Math.min(1, v));
+    volEl.value = audio.level.toFixed(2);
+    if (!audio.master || !audio.ctx) return;
+    var g = audio.master.gain;
+    var t = audio.ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setTargetAtTime(audio.level * 0.55, t, 0.25);
+  }
+
+  function audioOff() {
+    if (!audio.on) return;
+    clearTimeout(audio.timer);
+    var t = audio.ctx.currentTime;
+    audio.master.gain.cancelScheduledValues(t);
+    audio.master.gain.setTargetAtTime(0, t, 0.2);
+    var nodes = audio.nodes;
+    setTimeout(function () {
+      nodes.forEach(function (n) { try { n.stop(); } catch (e) {} });
+    }, 700);
+    audio.nodes = [];
+    audio.master = null;
+    audio.verb = null;
+    audio.on = false;
+    layoutToolbar();
+  }
+
+  // ---------- head tracking ----------
 
   function enableOrientation() {
     return new Promise(function (resolve) {
@@ -537,6 +900,8 @@ function bootPracticeSpace() {
     return camera;
   }
 
+  // ---------- gaze ----------
+
   // rebuilding ring geometry every frame churns memory on a phone,
   // so only redraw when the arc actually moves a visible amount
   var lastArc = -1;
@@ -557,8 +922,11 @@ function bootPracticeSpace() {
   function updateGaze(dt) {
     var inSpace = (mode === 'stereo' || mode === 'xr');
     reticle.visible = inSpace;
-    for (var i = 0; i < toolbar.length; i++) toolbar[i].visible = inSpace;
-    if (!inSpace) { gazeHit = null; return; }
+    if (!inSpace) {
+      for (var i = 0; i < toolbar.length; i++) toolbar[i].visible = false;
+      gazeHit = null;
+      return;
+    }
 
     var vc = viewCamera();
     vc.updateMatrixWorld();
@@ -566,10 +934,23 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (moving) {
-      azim = Math.atan2(vDir.x, -vDir.z);
-      elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
-      place();
+    if (movingRig) {
+      var r = rigs[movingRig];
+      if (r.kind === 'plate') {
+        r.azim = Math.atan2(vDir.x, -vDir.z);
+        r.elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
+      } else {
+        // the piano stays flat and square to you; your gaze sets how far out
+        // and how far down it sits, and which way it is turned
+        var reach = 0.85;
+        var pitchA = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
+        r.yaw = Math.atan2(vDir.x, -vDir.z);
+        r.drop = Math.max(0.10, Math.min(1.10, -Math.sin(pitchA) * reach));
+        r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
+      }
+      placeAll();
+      var aim = rigAim(r);
+      aimAt(hintPlate, aim.yaw, aim.pitch + 0.20, TOOL_REACH);
       hintPlate.visible = true;
 
       // holding your head still is how you put it down when there is no button
@@ -593,55 +974,80 @@ function bootPracticeSpace() {
     gazeHeld += dt;
 
     if (obj.userData.repeat) {
-      if (gazeHeld > REPEAT_DELAY) { doAction(obj.userData.action, dt); setReticle(1, 0xC9913F); }
+      if (gazeHeld > REPEAT_DELAY) { doAction(obj.userData.action, dt, obj); setReticle(1, 0xC9913F); }
       else setReticle(gazeHeld / REPEAT_DELAY, 0xC9913F);
     } else if (gazeHeld > DWELL) {
-      doAction(obj.userData.action, dt);
+      doAction(obj.userData.action, dt, obj);
       gazeHeld = -99;
     } else {
       setReticle(Math.max(0, gazeHeld) / DWELL, 0xC9913F);
     }
   }
 
-  function grab() {
-    moving = true;
+  function grab(which) {
+    active = which;
+    movingRig = which;
     steady = 0;
     lastDir.set(0, 0, 0);
+    layoutToolbar();
+    refreshPickables();
   }
 
   function drop() {
-    moving = false;
+    var was = movingRig;
+    movingRig = null;
     steady = 0;
     hintPlate.visible = false;
-    syncSliders();
+    placeAll();
     // do not let the same stare immediately pick it back up
-    gazeHit = grabPlate;
-    gazeHeld = -99;
+    if (was) { gazeHit = rigs[was].grab; gazeHeld = -99; }
   }
 
-  function setLocked(v) {
-    locked = v;
-    lockBtn.material.map = locked ? unlockTex : lockTex;
-    lockBtn.material.needsUpdate = true;
-    if (locked && moving) drop();
-    place();
-  }
-
-  function doAction(action, dt) {
+  function doAction(action, dt, obj) {
     var step = dt || 0.016;
-    if (action === 'nearer')  { dist  = Math.max(0.35, dist - step * 0.55); place(); syncSliders(); }
-    if (action === 'farther') { dist  = Math.min(1.80, dist + step * 0.55); place(); syncSliders(); }
-    if (action === 'smaller') { width = Math.max(0.40, width - step * 0.8); place(); syncSliders(); }
-    if (action === 'bigger')  { width = Math.min(2.40, width + step * 0.8); place(); syncSliders(); }
-    if (action === 'grab')    { if (moving) drop(); else grab(); }
-    if (action === 'lock')     { setLocked(!locked); }
+
+    if (action === 'grab') {
+      var which = obj && obj.userData.rig;
+      if (!which) return;
+      if (movingRig === which) drop(); else grab(which);
+      return;
+    }
+
+    if (action === 'quieter') { setLevel(audio.level - step * 0.55); return; }
+    if (action === 'louder')  { setLevel(audio.level + step * 0.55); return; }
+
+    var r = rigs[active];
+    if (!r) return;
+
+    if (action === 'lock') {
+      r.locked = !r.locked;
+      if (r.locked && movingRig === active) drop();
+      placeAll();
+      return;
+    }
+
+    if (action === 'smaller') r.width = Math.max(0.40, r.width - step * 0.8);
+    if (action === 'bigger')  r.width = Math.min(2.40, r.width + step * 0.8);
+
+    if (r.kind === 'plate') {
+      if (action === 'nearer')  r.dist = Math.max(0.35, r.dist - step * 0.55);
+      if (action === 'farther') r.dist = Math.min(1.80, r.dist + step * 0.55);
+    } else {
+      if (action === 'nearer')  r.dist = Math.max(0.20, r.dist - step * 0.45);
+      if (action === 'farther') r.dist = Math.min(1.20, r.dist + step * 0.45);
+      if (action === 'lower')   r.drop = Math.min(1.10, r.drop + step * 0.45);
+      if (action === 'higher')  r.drop = Math.max(0.10, r.drop - step * 0.45);
+    }
+    placeAll();
   }
 
   function onTrigger() {
     if (mode === 'flat') return;
-    if (moving) { drop(); return; }
-    if (gazeHit) { doAction(gazeHit.userData.action, 0.08); gazeHeld = 0; }
+    if (movingRig) { drop(); return; }
+    if (gazeHit) { doAction(gazeHit.userData.action, 0.08, gazeHit); gazeHeld = 0; }
   }
+
+  // ---------- render ----------
 
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
@@ -710,17 +1116,27 @@ function bootPracticeSpace() {
   }
 
   function applyOptions() {
-    floorDisc.visible = document.getElementById('optFloor').checked;
-    keysGroup.visible = document.getElementById('optKeys').checked;
-    if (document.getElementById('optCam').checked && !camMesh) startPassthrough();
-    if (camMesh) camMesh.visible = document.getElementById('optCam').checked;
-    if (document.getElementById('optTone').checked && !toneNode) toneOn();
-    readSliders();
+    rigs.music.on = document.getElementById('optCam').checked;
+    rigs.piano.on = document.getElementById('optPiano').checked;
+    rigs.music.group.visible = rigs.music.on;
+    rigs.piano.group.visible = rigs.piano.on;
+
+    // one camera serves both windows, so ask for it if either one is up
+    if (rigs.music.on || rigs.piano.on) startPassthrough();
+
+    if (rigs.piano.on) active = 'piano';
+    else if (rigs.music.on) active = 'music';
+
+    if (document.getElementById('optTone').checked) audioOn(); else audioOff();
+    setLevel(parseFloat(volEl.value));
+    placeAll();
   }
 
   function showChrome(on) {
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
+    layoutToolbar();
+    refreshPickables();
   }
 
   function enterVR() {
@@ -729,7 +1145,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; moving = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -755,22 +1171,21 @@ function bootPracticeSpace() {
   loadSky(document.getElementById('env').value);
 
   document.getElementById('env').addEventListener('change', function (e) { loadSky(e.target.value); });
-  [elevEl, distEl, widthEl].forEach(function (el) { el.addEventListener('input', readSliders); });
-  ['optCam', 'optKeys', 'optFloor'].forEach(function (id) {
+  ['optCam', 'optPiano', 'optTone'].forEach(function (id) {
     document.getElementById(id).addEventListener('change', applyOptions);
   });
+  volEl.addEventListener('input', function () { setLevel(parseFloat(volEl.value)); });
 
   var note = document.getElementById('modeNote');
   function useStereo() {
-    note.innerHTML = '<b>No WebXR in this browser</b>, which is normal on Safari. Enter uses a split-screen ' +
+    note.innerHTML = '<b>No WebXR here</b>, which is normal on Safari. Enter uses a split-screen ' +
       'stereo fallback driven by the gyroscope. Hold the phone in landscape.';
     document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
   }
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
       if (ok) {
-        note.innerHTML = '<b>WebXR is available here.</b> Enter goes to proper stereo VR. ' +
-          'Then drop the phone in the viewer.';
+        note.innerHTML = '<b>WebXR is available here.</b> Enter goes to proper stereo VR.';
         document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
       } else { useStereo(); }
     }).catch(useStereo);
@@ -780,7 +1195,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; moving = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = function () {
