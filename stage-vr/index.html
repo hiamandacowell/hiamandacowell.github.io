@@ -710,9 +710,19 @@ function bootPracticeSpace() {
 
   // ---------- panorama ----------
 
+  // Which column of each panorama should sit dead ahead, as a fraction across
+  // the image. An unrotated inverted sphere puts u = 0.75 in front of you, and
+  // on the stage capture that is the house-left wall, so you started off looking
+  // at the side of the proscenium with the audience over your shoulder. The
+  // house runs from about 0.325 to 0.735 with its centre near 0.54, so 0.43
+  // faces you between house right and house centre.
+  var ENV_FORWARD = { 'img-stage': 0.43, 'img-green': 0.75 };
+
   function loadSky(id) {
     var img = document.getElementById(id);
     if (!img) { errEl.textContent = 'That panorama is missing.'; return; }
+    var fwd = ENV_FORWARD.hasOwnProperty(id) ? ENV_FORWARD[id] : 0.75;
+    sky.rotation.y = 2 * Math.PI * (fwd + 0.25);
     function apply() {
       var t = new THREE.Texture(img);
       t.minFilter = THREE.LinearFilter;
