@@ -222,15 +222,21 @@ function bootPracticeSpace() {
   // two independent windows on the real room, both fed by the one rear camera.
   // the music window hangs in front of your face; the piano lies flat where the
   // real keybed is, so its body can be built around it in the right orientation.
+  // Both rigs start a little to the left of where you are facing, so the default
+  // view is you angled out towards the house rather than square to your own
+  // keys, which is how you actually sit at the instrument on a stage. One number
+  // moves the piano and the music window together; they belong to each other.
+  var RIG_YAW = THREE.MathUtils.degToRad(-10);
+
   var rigs = {
     music: {
       kind: 'plate', on: false,
-      azim: 0, elev: THREE.MathUtils.degToRad(-14), dist: 1.05, width: 1.05,
+      azim: RIG_YAW, elev: THREE.MathUtils.degToRad(-14), dist: 1.05, width: 1.05,
       group: null
     },
     piano: {
       kind: 'deck', on: false,
-      yaw: 0, drop: 0.46, dist: 0.44, width: 1.0,
+      yaw: RIG_YAW, drop: 0.46, dist: 0.44, width: 1.0,
       group: null
     }
   };
@@ -577,13 +583,16 @@ function bootPracticeSpace() {
 
   // ---------- menu ----------
 
-  // one small tab parked off to the left, well away from the keys and from
-  // anything you would look at on purpose. it is the only thing gaze can hit.
+  // One small tab parked off to the left, well away from the keys and from
+  // anything you would look at on purpose. It is the only thing gaze can hit.
+  // The music window, nudged left with the piano, now reaches to about 35
+  // degrees on that side and its list would have hung over the corner of it,
+  // so the tab sits at 48 and the whole menu clears the window.
   var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
   var menu = {
     open: false, page: 'root', idle: 0,
-    yaw: THREE.MathUtils.degToRad(-34),
-    pitch: THREE.MathUtils.degToRad(-8),
+    yaw: THREE.MathUtils.degToRad(-48),
+    pitch: THREE.MathUtils.degToRad(-2),
     tab: null, slots: []
   };
   var texCache = {};
