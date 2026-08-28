@@ -262,6 +262,10 @@ function bootPracticeSpace() {
   var SWING_SMOOTH = 0.12;   // seconds of smoothing on the speed estimate
   var STEADY_DECAY = 2;      // a wobble costs progress at this rate, never all of it
   var MIN_MOVE = 0.6;        // seconds before a placement can complete at all
+  // width units per second while you hold a gaze on smaller or bigger. the whole
+  // range is 0.4 to 2.4, so this crosses it in eight seconds; at 0.8 it crossed
+  // in under three and you could not stop where you meant to.
+  var SIZE_RATE = 0.25;
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
@@ -575,7 +579,12 @@ function bootPracticeSpace() {
       -Math.cos(r.yaw) * r.dist
     );
     r.group.position.copy(p);
-    r.group.rotation.y = r.yaw;
+    // Turn the piano to keep the keys towards you wherever you drag it, so it
+    // swings around you rather than spinning on the spot. The group's local +Z
+    // is the player's side, and the way back to your head from a point at
+    // azimuth yaw is (-sin yaw, cos yaw), which Ry reaches at -yaw. Using +yaw
+    // turned it away at twice the drag angle instead.
+    r.group.rotation.y = -r.yaw;
     r.group.scale.setScalar(r.width);
   }
 
@@ -1118,8 +1127,8 @@ function bootPracticeSpace() {
     var r = rigs[which];
 
     if (id === 'move') { menu.open = false; grab(which); return; }
-    if (id === 'smaller') r.width = Math.max(0.40, r.width - step * 0.8);
-    if (id === 'bigger')  r.width = Math.min(2.40, r.width + step * 0.8);
+    if (id === 'smaller') r.width = Math.max(0.40, r.width - step * SIZE_RATE);
+    if (id === 'bigger')  r.width = Math.min(2.40, r.width + step * SIZE_RATE);
     placeAll();
   }
 
