@@ -162,11 +162,14 @@
 
   <details>
     <summary>Changing things once you are inside</summary>
-    <p>Everything lives behind one small <b>menu</b> tab floating <b>above your head</b>. Look up at it
-       for a moment to open it, or <b>press the viewer button</b> if yours has one. Overhead is the one
-       direction you never look while playing, so nothing you do at the instrument can open it by
-       accident, and nothing else in the scene answers to your gaze at all. Once it opens, the choices
-       drop down into easy view. The menu folds itself away if you stop using it.</p>
+    <p>Everything lives behind one <b>menu</b> tab floating <b>above you</b>, a brass tag you find by
+       tilting your head up. Up is the one direction you never look while playing, so nothing you do at
+       the instrument can open it by accident, and nothing else in the scene answers to your gaze at
+       all. The first time you go in, a note sits at eye level pointing up at it; once you have opened
+       the menu that note never comes back. Open it by looking at the tag for a moment, or by
+       <b>pressing the viewer button</b>. It folds itself away if you stop using it.</p>
+    <p>The choices appear <b>off to your right</b>, around eye level, rather than up where the tag is,
+       so nothing you actually pick is an awkward reach.</p>
     <p>Inside: <b>piano</b>, <b>windows</b> and <b>recenter</b>, never more than five rows on screen.
        Pick <b>move it</b> to pick something up; it then follows your head, so look where you want it and
        <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to drop it at
@@ -215,7 +218,9 @@ function bootPracticeSpace() {
   var errEl = document.getElementById('err');
 
   var renderer, scene, camera, sky, skyTex, videoEl, videoTex;
-  var reticle, reticleRing, hintPlate = null;
+  var reticle, reticleRing, hintPlate = null, menuTip = null;
+  // the pointer to the tab retires for good once you have opened the menu once
+  var menuFound = false;
   var pickables = [];
   var mode = 'flat';
   var orient = null;
@@ -442,15 +447,16 @@ function bootPracticeSpace() {
     g.closePath();
   }
 
-  function labelTexture(text) {
+  function labelTexture(text, accent) {
     var c = document.createElement('canvas');
     c.width = 256; c.height = 128;
     var g = c.getContext('2d');
-    g.fillStyle = 'rgba(14,13,12,0.82)';
+    g.fillStyle = accent ? 'rgba(201,145,63,0.94)' : 'rgba(14,13,12,0.82)';
     roundRect(g, 5, 5, 246, 118, 24); g.fill();
-    g.strokeStyle = 'rgba(201,145,63,0.55)'; g.lineWidth = 3;
+    g.strokeStyle = accent ? 'rgba(255,232,196,0.9)' : 'rgba(201,145,63,0.55)';
+    g.lineWidth = accent ? 5 : 3;
     roundRect(g, 5, 5, 246, 118, 24); g.stroke();
-    g.fillStyle = '#EFE9DF';
+    g.fillStyle = accent ? '#1A1206' : '#EFE9DF';
     // shrink to fit rather than run off the plate: "hold still to place" and
     // "music window" are both wider than the label at the nominal size
     var size = 40;
@@ -666,15 +672,16 @@ function bootPracticeSpace() {
   var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
   var menu = {
     open: false, page: 'root', idle: 0,
-    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(46),
-    listYaw: 0, listTop: THREE.MathUtils.degToRad(30),
+    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(32),
+    listYaw: THREE.MathUtils.degToRad(34), listTop: THREE.MathUtils.degToRad(12),
     tab: null, slots: []
   };
   var texCache = {};
 
-  function cachedLabel(text) {
-    if (!texCache[text]) texCache[text] = labelTexture(text);
-    return texCache[text];
+  function cachedLabel(text, accent) {
+    var k = (accent ? 'a:' : 'p:') + text;
+    if (!texCache[k]) texCache[k] = labelTexture(text, accent);
+    return texCache[k];
   }
 
   function plate(w, h, tex) {
@@ -697,7 +704,7 @@ function bootPracticeSpace() {
   }
 
   function buildMenu() {
-    menu.tab = plate(0.115, 0.058, cachedLabel('menu'));
+    menu.tab = plate(0.17, 0.085, cachedLabel('menu', true));
     menu.tab.userData.id = 'open';
     menu.tab.visible = false;
     scene.add(menu.tab);
@@ -713,6 +720,12 @@ function bootPracticeSpace() {
     hintPlate.renderOrder = 12;
     hintPlate.visible = false;
     scene.add(hintPlate);
+
+    // nothing about a tab overhead announces itself, so say so once
+    menuTip = plate(0.40, 0.10, cachedLabel('look up for the menu'));
+    menuTip.renderOrder = 11;
+    menuTip.visible = false;
+    scene.add(menuTip);
   }
 
   function setHint(text) {
@@ -787,6 +800,7 @@ function bootPracticeSpace() {
   function layoutMenu() {
     var inSpace = (mode === 'stereo' || mode === 'xr');
     menu.tab.visible = false;
+    menuTip.visible = false;
     for (var i = 0; i < menu.slots.length; i++) menu.slots[i].visible = false;
 
     if (!inSpace || movingRig || recentering) { refreshPickables(); return; }
@@ -794,6 +808,10 @@ function bootPracticeSpace() {
     if (!menu.open) {
       menu.tab.visible = true;
       aimAt(menu.tab, menu.tabYaw, menu.tabPitch, MENU_REACH);
+      if (!menuFound) {
+        menuTip.visible = true;
+        aimAt(menuTip, menu.tabYaw, THREE.MathUtils.degToRad(13), MENU_REACH);
+      }
       refreshPickables();
       return;
     }
@@ -897,6 +915,7 @@ function bootPracticeSpace() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: document.getElementById('env').value,
+        menuFound: !!menuFound,
         panelsOn: !!document.getElementById('optCam').checked,
         panels: panels.map(function (q) {
           return { azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h, round: !!q.round };
@@ -934,6 +953,7 @@ function bootPracticeSpace() {
     if (s.env === 'img-stage' || s.env === 'img-green') {
       document.getElementById('env').value = s.env;
     }
+    menuFound = !!s.menuFound;
     document.getElementById('optCam').checked = !!s.panelsOn;
     panelsOn = !!s.panelsOn;
     if (Object.prototype.toString.call(s.panels) === '[object Array]') {
@@ -1187,7 +1207,7 @@ function bootPracticeSpace() {
     var step = dt || 0.016;
     if (!id) return;
 
-    if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); return; }
+    if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
     if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
@@ -1237,7 +1257,7 @@ function bootPracticeSpace() {
     if (recentering) { finishRecenter(); return; }
     if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
     // button pressed while looking at nothing opens the menu at its parked spot
-    if (!menu.open) { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); }
+    if (!menu.open) { menu.open = true; menu.page = 'root'; menu.idle = 0; menuFound = true; layoutMenu(); }
   }
 
   // ---------- render ----------
