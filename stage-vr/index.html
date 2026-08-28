@@ -131,8 +131,9 @@
     <legend>Windows on the real room</legend>
 
     <label class="row"><input type="checkbox" id="optCam">
-      <span>Music window
-        <small>A window on the real room at eye level, for glancing at your score.</small>
+      <span>Music windows
+        <small>Windows on the real room at eye level, for glancing at your score. Add up to
+        three from inside, each its own size and shape.</small>
       </span></label>
 
     <label class="row"><input type="checkbox" id="optPiano">
@@ -143,8 +144,8 @@
     <details>
       <summary>How the windows work</summary>
       <p>Each window is a hole showing what the rear camera can actually see behind it, worked out from
-         where you put the window and where your head is pointed. Both share the one camera, so they show
-         different parts of the room, not the same picture twice.</p>
+         where you put the window and where your head is pointed. They all share the one camera, so they
+         show different parts of the room, not the same picture several times over.</p>
       <p><b>Where the camera cannot reach, the window is black.</b> A phone lens sees about 65 degrees
          across, so the keys window is usually dark while you are looking out at the house, and fills in
          as you tilt your head down towards it. That is the lens telling the truth, not a fault.</p>
@@ -161,16 +162,19 @@
 
   <details>
     <summary>Changing things once you are inside</summary>
-    <p>Everything lives behind one small <b>menu</b> tab parked off to your left. Look at it for a moment
-       to open it, or <b>press the viewer button</b> if yours has one. Nothing else answers to your gaze,
-       so you can watch your own hands through the piano window for as long as you like and nothing
-       will move. The menu folds itself away if you stop using it.</p>
-    <p>Inside: <b>piano</b>, <b>music window</b> and <b>recenter</b>, never more than four choices on
-       screen. Pick <b>move it</b> to pick a window up; it then follows your head, so look where you
-       want it and <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to
-       drop it at once. Holding still means not turning your head, not being a statue: a wobble costs
-       you a moment, it does not start you over. Once placed, it stays put in the room while you look
-       around.</p>
+    <p>Everything lives behind one small <b>menu</b> tab floating <b>above your head</b>. Look up at it
+       for a moment to open it, or <b>press the viewer button</b> if yours has one. Overhead is the one
+       direction you never look while playing, so nothing you do at the instrument can open it by
+       accident, and nothing else in the scene answers to your gaze at all. Once it opens, the choices
+       drop down into easy view. The menu folds itself away if you stop using it.</p>
+    <p>Inside: <b>piano</b>, <b>windows</b> and <b>recenter</b>, never more than five rows on screen.
+       Pick <b>move it</b> to pick something up; it then follows your head, so look where you want it and
+       <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to drop it at
+       once. Holding still means not turning your head, not being a statue: a wobble costs you a moment,
+       it does not start you over. Once placed, it stays put in the room while you look around.</p>
+    <p>Under <b>windows</b> you can <b>add</b> up to three, and each one has its own <b>size</b>, with
+       wider, narrower, taller and shorter as separate controls rather than one scale, so you can make a
+       square, a letterbox or a tall page. <b>Shape</b> switches that window between square and round.</p>
     <p><b>Recenter</b> is in there because the buttons on this page are out of reach once the phone is
        shut in the viewer, and the heading drifts over a long session. It waits rather than firing at
        once, since you are looking off at the menu when you pick it: look where you want front to be,
@@ -228,19 +232,19 @@ function bootPracticeSpace() {
   // moves the piano and the music window together; they belong to each other.
   var RIG_YAW = THREE.MathUtils.degToRad(-10);
 
-  var rigs = {
-    music: {
-      kind: 'plate', on: false,
-      azim: RIG_YAW, elev: THREE.MathUtils.degToRad(-14), dist: 1.05, width: 1.05,
-      group: null
-    },
-    piano: {
-      kind: 'deck', on: false,
-      yaw: RIG_YAW, drop: 0.46, dist: 0.44, width: 1.0,
-      group: null
-    }
+  var piano = {
+    kind: 'deck', on: false,
+    yaw: RIG_YAW, drop: 0.46, dist: 0.44, width: 1.0,
+    group: null, win: null, fallback: null
   };
-  var active = 'piano';
+
+  // Music windows are a list rather than one fixed panel. Width and height move
+  // independently, which covers square, letterbox and portrait without needing
+  // preset shapes; round is the one shape that is not just an aspect ratio, so
+  // it is a toggle. Three is a cap: past that the menu stops being a menu.
+  var PANEL_MAX = 3;
+  var panels = [];
+  var panelsOn = false;
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, recentering = false, lastT = 0;
@@ -301,7 +305,6 @@ function bootPracticeSpace() {
     sheen.position.set(0.4, 3.0, -2.0);
     scene.add(sheen);
 
-    buildMusicRig();
     buildPianoRig();
     buildMenu();
     buildReticle();
@@ -463,17 +466,57 @@ function bootPracticeSpace() {
 
   // ---------- the two rigs ----------
 
-  function buildMusicRig() {
-    var r = rigs.music;
-    r.group = new THREE.Group();
-    r.win = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.56), windowMaterial());
-    r.group.add(r.win);
-    r.group.visible = false;
-    scene.add(r.group);
+  // a unit plane or a unit disc, scaled per panel, so one geometry swap is the
+  // whole of the shape toggle. the projective shader ignores uvs, so neither
+  // needs its own texture coordinates.
+  function panelGeometry(round) {
+    return round ? new THREE.CircleGeometry(0.5, 48) : new THREE.PlaneGeometry(1, 1);
+  }
+
+  function makePanel(init) {
+    var p = {
+      kind: 'panel',
+      azim: RIG_YAW, elev: THREE.MathUtils.degToRad(-14), dist: 1.05,
+      w: 1.05, h: 0.59, round: false,
+      group: null, win: null
+    };
+    if (init) {
+      for (var k in init) if (Object.prototype.hasOwnProperty.call(p, k)) p[k] = init[k];
+    }
+    p.group = new THREE.Group();
+    p.win = new THREE.Mesh(panelGeometry(p.round), windowMaterial());
+    p.group.add(p.win);
+    p.group.visible = panelsOn;
+    scene.add(p.group);
+    return p;
+  }
+
+  function setPanelShape(p, round) {
+    p.round = !!round;
+    p.win.geometry.dispose();
+    p.win.geometry = panelGeometry(p.round);
+  }
+
+  function removePanel(i) {
+    var p = panels[i];
+    if (!p) return;
+    scene.remove(p.group);
+    p.win.geometry.dispose();
+    panels.splice(i, 1);
+    if (movingRig === p) { movingRig = null; hintPlate.visible = false; }
+  }
+
+  // a new window lands beside the ones already out rather than on top of them
+  function addPanel() {
+    if (panels.length >= PANEL_MAX) return null;
+    var p = makePanel({ azim: RIG_YAW + THREE.MathUtils.degToRad(30 * panels.length) });
+    panels.push(p);
+    placeAll();
+    return p;
   }
 
   function buildPianoRig() {
-    var r = rigs.piano;
+    var r = piano;
     var g = new THREE.Group();
     // polished ebony is nearly black but it is never flat black; the highlight is
     // the whole reason it reads as a solid object and not a hole in the panorama
@@ -549,32 +592,29 @@ function bootPracticeSpace() {
   function attachVideo() {
     winMat.uniforms.uVideo.value = videoTex;
     winMat.uniforms.uHasVideo.value = 1;
-    ['music', 'piano'].forEach(function (k) {
-      if (rigs[k].win) rigs[k].win.visible = true;
-      if (rigs[k].fallback) rigs[k].fallback.visible = false;
-    });
+    if (piano.win) piano.win.visible = true;
+    if (piano.fallback) piano.fallback.visible = false;
+    for (var i = 0; i < panels.length; i++) panels[i].win.visible = true;
   }
 
   // ---------- placement ----------
 
   function head() { return new THREE.Vector3(0, EYE, 0); }
 
-  function placeMusic() {
-    var r = rigs.music;
+  function placePanel(r) {
     var d = new THREE.Vector3(
       Math.cos(r.elev) * Math.sin(r.azim),
       Math.sin(r.elev),
       -Math.cos(r.elev) * Math.cos(r.azim)
     );
     var h = head();
-    var p = h.clone().addScaledVector(d, r.dist);
-    r.group.position.copy(p);
-    r.group.scale.set(r.width, r.width, 1);
+    r.group.position.copy(h.clone().addScaledVector(d, r.dist));
+    r.group.scale.set(r.w, r.h, 1);
     r.group.lookAt(h);
   }
 
   function placePiano() {
-    var r = rigs.piano;
+    var r = piano;
     var p = new THREE.Vector3(
       Math.sin(r.yaw) * r.dist,
       EYE - r.drop,
@@ -591,8 +631,15 @@ function bootPracticeSpace() {
   }
 
   function placeAll() {
-    placeMusic();
     placePiano();
+    for (var i = 0; i < panels.length; i++) {
+      panels[i].group.visible = panelsOn;
+      placePanel(panels[i]);
+    }
+  }
+
+  function placeRig(r) {
+    if (r.kind === 'deck') placePiano(); else placePanel(r);
   }
 
   function refreshPickables() {
@@ -610,11 +657,17 @@ function bootPracticeSpace() {
   // The music window, nudged left with the piano, now reaches to about 35
   // degrees on that side and its list would have hung over the corner of it,
   // so the tab sits at 48 and the whole menu clears the window.
+  // The tab is deliberately awkward and the list deliberately is not. Overhead
+  // is the one direction a player never looks: the keys are down, the score is
+  // ahead, the house is level. So nothing you do at the instrument can stray
+  // onto it. Once open the list drops into easy view just above the horizon,
+  // clear of the music windows below, and clear of the tab so the stare that
+  // opened the menu is not already sitting on the first choice.
   var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
   var menu = {
     open: false, page: 'root', idle: 0,
-    yaw: THREE.MathUtils.degToRad(-48),
-    pitch: THREE.MathUtils.degToRad(-2),
+    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(46),
+    listYaw: 0, listTop: THREE.MathUtils.degToRad(30),
     tab: null, slots: []
   };
   var texCache = {};
@@ -649,7 +702,7 @@ function bootPracticeSpace() {
     menu.tab.visible = false;
     scene.add(menu.tab);
 
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 5; i++) {
       var s = plate(0.175, 0.088, null);
       s.visible = false;
       scene.add(s);
@@ -668,21 +721,62 @@ function bootPracticeSpace() {
   }
 
   // never more than four things on screen at once
-  function menuItems() {
-    if ((menu.page === 'piano' && !rigs.piano.on) ||
-        (menu.page === 'music' && !rigs.music.on)) menu.page = 'root';
+  // pages are strings; the ones about a particular window carry its index
+  function pageParts() {
+    var m = /^(panel|size):(\d+)$/.exec(menu.page);
+    return m ? { kind: m[1], i: parseInt(m[2], 10) } : null;
+  }
 
-    if (menu.page === 'piano' || menu.page === 'music') {
+  function menuItems() {
+    var pp = pageParts();
+    if (pp && !panels[pp.i]) { menu.page = 'windows'; pp = null; }
+    if (menu.page === 'piano' && !piano.on) menu.page = 'root';
+    if (menu.page === 'windows' && !panelsOn) menu.page = 'root';
+
+    if (menu.page === 'piano') {
       return [
-        { id: 'move', label: 'move it' },
+        { id: 'move:piano', label: 'move it' },
         { id: 'smaller', label: 'smaller', repeat: true },
         { id: 'bigger', label: 'bigger', repeat: true },
         { id: 'page:root', label: 'back' }
       ];
     }
+
+    if (menu.page === 'windows') {
+      var out = [];
+      for (var i = 0; i < panels.length; i++) {
+        out.push({ id: 'page:panel:' + i, label: 'window ' + (i + 1) });
+      }
+      // the add entry drops away at the cap, which is what keeps this page
+      // inside four rows however many windows you have out
+      if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', label: 'add a window' });
+      out.push({ id: 'page:root', label: 'back' });
+      return out;
+    }
+
+    if (pp && pp.kind === 'panel') {
+      return [
+        { id: 'move:' + pp.i, label: 'move it' },
+        { id: 'page:size:' + pp.i, label: 'size' },
+        { id: 'shape:' + pp.i, label: panels[pp.i].round ? 'make it square' : 'make it round' },
+        { id: 'remove:' + pp.i, label: 'remove it' },
+        { id: 'page:windows', label: 'back' }
+      ];
+    }
+
+    if (pp && pp.kind === 'size') {
+      return [
+        { id: 'wider:' + pp.i,    label: 'wider',    repeat: true },
+        { id: 'narrower:' + pp.i, label: 'narrower', repeat: true },
+        { id: 'taller:' + pp.i,   label: 'taller',   repeat: true },
+        { id: 'shorter:' + pp.i,  label: 'shorter',  repeat: true },
+        { id: 'page:panel:' + pp.i, label: 'back' }
+      ];
+    }
+
     var items = [];
-    if (rigs.piano.on) items.push({ id: 'page:piano', label: 'piano' });
-    if (rigs.music.on) items.push({ id: 'page:music', label: 'music window' });
+    if (piano.on) items.push({ id: 'page:piano', label: 'piano' });
+    if (panelsOn) items.push({ id: 'page:windows', label: 'windows' });
     // the Recenter button on the page is unreachable with the phone shut in a
     // viewer, and the heading drifts, so it has to live in here as well
     items.push({ id: 'recenter', label: 'recenter' });
@@ -699,7 +793,7 @@ function bootPracticeSpace() {
 
     if (!menu.open) {
       menu.tab.visible = true;
-      aimAt(menu.tab, menu.yaw, menu.pitch, MENU_REACH);
+      aimAt(menu.tab, menu.tabYaw, menu.tabPitch, MENU_REACH);
       refreshPickables();
       return;
     }
@@ -712,9 +806,9 @@ function bootPracticeSpace() {
       s.userData.repeat = !!items[j].repeat;
       s.material.map = cachedLabel(items[j].label);
       s.material.needsUpdate = true;
-      // the list unfurls below the tab, never on top of it, so the stare that
-      // opened the menu is left sitting on nothing and picks nothing
-      aimAt(s, menu.yaw, menu.pitch - (j + 1) * MENU_STEP, MENU_REACH);
+      // the list sits well below the tab, never on top of it, so the stare that
+      // opened the menu is left looking at nothing and picks nothing
+      aimAt(s, menu.listYaw, menu.listTop - j * MENU_STEP, MENU_REACH);
     }
     refreshPickables();
   }
@@ -803,15 +897,14 @@ function bootPracticeSpace() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: document.getElementById('env').value,
-        music: {
-          on: !!document.getElementById('optCam').checked,
-          azim: rigs.music.azim, elev: rigs.music.elev,
-          dist: rigs.music.dist, width: rigs.music.width
-        },
+        panelsOn: !!document.getElementById('optCam').checked,
+        panels: panels.map(function (q) {
+          return { azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h, round: !!q.round };
+        }),
         piano: {
           on: !!document.getElementById('optPiano').checked,
-          yaw: rigs.piano.yaw, drop: rigs.piano.drop,
-          dist: rigs.piano.dist, width: rigs.piano.width
+          yaw: piano.yaw, drop: piano.drop,
+          dist: piano.dist, width: piano.width
         }
       }));
     } catch (e) { /* private window, blocked storage, quota: not worth a fuss */ }
@@ -841,16 +934,24 @@ function bootPracticeSpace() {
     if (s.env === 'img-stage' || s.env === 'img-green') {
       document.getElementById('env').value = s.env;
     }
-    if (s.music && typeof s.music === 'object') {
-      var m = rigs.music;
-      m.azim  = num(s.music.azim,  m.azim,  -Math.PI, Math.PI);
-      m.elev  = num(s.music.elev,  m.elev,  -1.5, 1.5);
-      m.dist  = num(s.music.dist,  m.dist,  0.35, 1.80);
-      m.width = num(s.music.width, m.width, 0.40, 2.40);
-      document.getElementById('optCam').checked = !!s.music.on;
+    document.getElementById('optCam').checked = !!s.panelsOn;
+    panelsOn = !!s.panelsOn;
+    if (Object.prototype.toString.call(s.panels) === '[object Array]') {
+      for (var i = 0; i < s.panels.length && panels.length < PANEL_MAX; i++) {
+        var q = s.panels[i];
+        if (!q || typeof q !== 'object') continue;
+        panels.push(makePanel({
+          azim:  num(q.azim,  RIG_YAW, -Math.PI, Math.PI),
+          elev:  num(q.elev,  THREE.MathUtils.degToRad(-14), -1.5, 1.5),
+          dist:  num(q.dist,  1.05, 0.35, 1.80),
+          w:     num(q.w,     1.05, 0.25, 2.40),
+          h:     num(q.h,     0.59, 0.25, 2.40),
+          round: !!q.round
+        }));
+      }
     }
     if (s.piano && typeof s.piano === 'object') {
-      var p = rigs.piano;
+      var p = piano;
       p.yaw   = num(s.piano.yaw,   p.yaw,   -Math.PI, Math.PI);
       p.drop  = num(s.piano.drop,  p.drop,  0.10, 1.10);
       p.dist  = num(s.piano.dist,  p.dist,  0.20, 1.20);
@@ -1013,8 +1114,8 @@ function bootPracticeSpace() {
   }
 
   function updateMovingRig(vDir) {
-    var r = rigs[movingRig];
-    if (r.kind === 'plate') {
+    var r = movingRig;
+    if (r.kind === 'panel') {
       r.azim = Math.atan2(vDir.x, -vDir.z);
       r.elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
     } else {
@@ -1026,7 +1127,7 @@ function bootPracticeSpace() {
       r.drop = Math.max(0.10, Math.min(1.10, -Math.sin(pitchA) * reach));
       r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
     }
-    placeAll();
+    placeRig(r);
   }
 
   function armHold() {
@@ -1037,9 +1138,9 @@ function bootPracticeSpace() {
     armDir.set(0, 0, 0);
   }
 
-  function grab(which) {
-    active = which;
-    movingRig = which;
+  function grab(r) {
+    if (!r) return;
+    movingRig = r;
     setHint('hold still to place');
     armHold();
     layoutMenu();
@@ -1091,14 +1192,41 @@ function bootPracticeSpace() {
     if (id === 'recenter') { startRecenter(); return; }
     if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
 
+    if (id === 'addpanel') {
+      var added = addPanel();
+      if (added) { menu.page = 'panel:' + (panels.length - 1); scheduleSave(); }
+      layoutMenu();
+      return;
+    }
 
-    var which = (menu.page === 'piano' || menu.page === 'music') ? menu.page : null;
-    if (!which) return;
-    var r = rigs[which];
+    if (id === 'smaller') { piano.width = Math.max(0.40, piano.width - step * SIZE_RATE); placeAll(); scheduleSave(); return; }
+    if (id === 'bigger')  { piano.width = Math.min(2.40, piano.width + step * SIZE_RATE); placeAll(); scheduleSave(); return; }
 
-    if (id === 'move') { menu.open = false; grab(which); return; }
-    if (id === 'smaller') r.width = Math.max(0.40, r.width - step * SIZE_RATE);
-    if (id === 'bigger')  r.width = Math.min(2.40, r.width + step * SIZE_RATE);
+    var colon = id.indexOf(':');
+    if (colon < 0) return;
+    var verb = id.slice(0, colon), arg = id.slice(colon + 1);
+
+    if (verb === 'move') {
+      menu.open = false;
+      grab(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
+      return;
+    }
+
+    var p = panels[parseInt(arg, 10)];
+    if (!p) { menu.page = 'windows'; layoutMenu(); return; }
+
+    if (verb === 'shape')  { setPanelShape(p, !p.round); scheduleSave(); layoutMenu(); return; }
+    if (verb === 'remove') {
+      removePanel(parseInt(arg, 10));
+      menu.page = 'windows';
+      placeAll(); scheduleSave(); layoutMenu();
+      return;
+    }
+
+    if (verb === 'wider')    p.w = Math.min(2.40, p.w + step * SIZE_RATE);
+    if (verb === 'narrower') p.w = Math.max(0.25, p.w - step * SIZE_RATE);
+    if (verb === 'taller')   p.h = Math.min(2.40, p.h + step * SIZE_RATE);
+    if (verb === 'shorter')  p.h = Math.max(0.25, p.h - step * SIZE_RATE);
     placeAll();
     scheduleSave();
   }
@@ -1182,16 +1310,16 @@ function bootPracticeSpace() {
   }
 
   function applyOptions() {
-    rigs.music.on = document.getElementById('optCam').checked;
-    rigs.piano.on = document.getElementById('optPiano').checked;
-    rigs.music.group.visible = rigs.music.on;
-    rigs.piano.group.visible = rigs.piano.on;
+    panelsOn = document.getElementById('optCam').checked;
+    piano.on = document.getElementById('optPiano').checked;
+    piano.group.visible = piano.on;
 
-    // one camera serves both windows, so ask for it if either one is up
-    if (rigs.music.on || rigs.piano.on) startPassthrough();
+    // turning the windows on for the first time hands you one to place
+    if (panelsOn && panels.length === 0) addPanel();
 
-    if (rigs.piano.on) active = 'piano';
-    else if (rigs.music.on) active = 'music';
+    // one camera serves every window, so ask for it if anything is up
+    if (panelsOn || piano.on) startPassthrough();
+
 
     placeAll();
     layoutMenu();
