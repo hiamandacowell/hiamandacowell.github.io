@@ -155,17 +155,9 @@
     </details>
   </fieldset>
 
-  <fieldset>
-    <legend>Sound</legend>
-    <label class="row"><input type="checkbox" id="optTone">
-      <span>Room tone
-        <small>A hall that breathes, with the odd shuffle out in the seats. Adjustable from inside.</small>
-      </span></label>
-    <div class="slider">Level<input type="range" id="vol" min="0" max="1" step="0.02" value="0.5"></div>
-  </fieldset>
-
   <button class="go" id="enter">Enter</button>
   <button class="ghost" id="peek">Look around on this screen first</button>
+  <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <details>
     <summary>Changing things once you are inside</summary>
@@ -173,12 +165,19 @@
        to open it, or <b>press the viewer button</b> if yours has one. Nothing else answers to your gaze,
        so you can watch your own hands through the piano window for as long as you like and nothing
        will move. The menu folds itself away if you stop using it.</p>
-    <p>Inside: <b>piano</b>, <b>music window</b> and <b>sound</b>, never more than four choices on
+    <p>Inside: <b>piano</b>, <b>music window</b> and <b>recenter</b>, never more than four choices on
        screen. Pick <b>move it</b> to pick a window up; it then follows your head, so look where you
        want it and <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to
        drop it at once. Holding still means not turning your head, not being a statue: a wobble costs
        you a moment, it does not start you over. Once placed, it stays put in the room while you look
        around.</p>
+    <p><b>Recenter</b> is in there because the buttons on this page are out of reach once the phone is
+       shut in the viewer, and the heading drifts over a long session. It waits rather than firing at
+       once, since you are looking off at the menu when you pick it: look where you want front to be,
+       then hold still.</p>
+    <p>Where you put things is <b>remembered on this phone</b>, so the next time you open the page your
+       piano is where you left it. Nothing leaves the device, and there is a button below to forget it
+       all and start fresh.</p>
     <p><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari, turn on Motion
        &amp; Orientation Access, then reload.</p>
   </details>
@@ -210,7 +209,6 @@ function bootPracticeSpace() {
   var ui = document.getElementById('ui');
   var hud = document.getElementById('hud');
   var errEl = document.getElementById('err');
-  var volEl = document.getElementById('vol');
 
   var renderer, scene, camera, sky, skyTex, videoEl, videoTex;
   var reticle, reticleRing, hintPlate = null;
@@ -245,8 +243,12 @@ function bootPracticeSpace() {
   var active = 'piano';
 
   var raycaster = new THREE.Raycaster();
-  var gazeHit = null, gazeHeld = 0, movingRig = null, lastT = 0;
+  var gazeHit = null, gazeHeld = 0, movingRig = null, recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
+  // where you were looking when a hold was armed, and how far off that you must
+  // get before a recenter will commit. without it, picking recenter and then
+  // simply not moving would set front to the menu you were staring at.
+  var armDir = new THREE.Vector3(), MIN_TURN = 15;
   // seconds of gaze to ignore after something fires. without it the stare that
   // chose a menu item carries straight on into whatever replaces it.
   var cooldown = 0, COOLDOWN = 0.7, mustLeave = null;
@@ -654,17 +656,21 @@ function bootPracticeSpace() {
       menu.slots.push(s);
     }
 
-    hintPlate = plate(0.30, 0.075, cachedLabel('hold still to place'));
+    hintPlate = plate(0.34, 0.085, cachedLabel('hold still to place'));
     hintPlate.renderOrder = 12;
     hintPlate.visible = false;
     scene.add(hintPlate);
   }
 
+  function setHint(text) {
+    hintPlate.material.map = cachedLabel(text);
+    hintPlate.material.needsUpdate = true;
+  }
+
   // never more than four things on screen at once
   function menuItems() {
     if ((menu.page === 'piano' && !rigs.piano.on) ||
-        (menu.page === 'music' && !rigs.music.on) ||
-        (menu.page === 'sound' && !audio.on)) menu.page = 'root';
+        (menu.page === 'music' && !rigs.music.on)) menu.page = 'root';
 
     if (menu.page === 'piano' || menu.page === 'music') {
       return [
@@ -674,17 +680,12 @@ function bootPracticeSpace() {
         { id: 'page:root', label: 'back' }
       ];
     }
-    if (menu.page === 'sound') {
-      return [
-        { id: 'quieter', label: 'quieter', repeat: true },
-        { id: 'louder', label: 'louder', repeat: true },
-        { id: 'page:root', label: 'back' }
-      ];
-    }
     var items = [];
     if (rigs.piano.on) items.push({ id: 'page:piano', label: 'piano' });
     if (rigs.music.on) items.push({ id: 'page:music', label: 'music window' });
-    if (audio.on) items.push({ id: 'page:sound', label: 'sound' });
+    // the Recenter button on the page is unreachable with the phone shut in a
+    // viewer, and the heading drifts, so it has to live in here as well
+    items.push({ id: 'recenter', label: 'recenter' });
     items.push({ id: 'close', label: 'close' });
     return items;
   }
@@ -694,7 +695,7 @@ function bootPracticeSpace() {
     menu.tab.visible = false;
     for (var i = 0; i < menu.slots.length; i++) menu.slots[i].visible = false;
 
-    if (!inSpace || movingRig) { refreshPickables(); return; }
+    if (!inSpace || movingRig || recentering) { refreshPickables(); return; }
 
     if (!menu.open) {
       menu.tab.visible = true;
@@ -790,148 +791,73 @@ function bootPracticeSpace() {
       });
   }
 
-  // ---------- room tone ----------
+  // ---------- remembering your setup ----------
 
-  var audio = { ctx: null, master: null, verb: null, nodes: [], level: 0.5, on: false, timer: null };
+  // Placing a window from inside a viewer is fiddly enough that doing it again
+  // every session is the worst of the friction. Everything below survives a
+  // reload; nothing here leaves the phone.
+  var STORE_KEY = 'hill-practice-space-v1';
+  var saveTimer = null;
 
-  // a hall is noise plus a tail plus something happening occasionally. the tail is
-  // what the old version was missing, and it is why that one read as a hiss.
-  function impulseResponse(ctx, seconds, decay) {
-    var len = Math.floor(ctx.sampleRate * seconds);
-    var buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    var early = [0.011, 0.019, 0.029, 0.043, 0.058, 0.074, 0.091];
-    for (var c = 0; c < 2; c++) {
-      var d = buf.getChannelData(c);
-      for (var i = 0; i < len; i++) {
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-      }
-      for (var e = 0; e < early.length; e++) {
-        var s = Math.floor(early[e] * ctx.sampleRate * (c ? 1.06 : 1));
-        if (s < len) d[s] += (e % 2 ? -0.55 : 0.55) / (e * 0.6 + 1);
-      }
+  function saveState() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        env: document.getElementById('env').value,
+        music: {
+          on: !!document.getElementById('optCam').checked,
+          azim: rigs.music.azim, elev: rigs.music.elev,
+          dist: rigs.music.dist, width: rigs.music.width
+        },
+        piano: {
+          on: !!document.getElementById('optPiano').checked,
+          yaw: rigs.piano.yaw, drop: rigs.piano.drop,
+          dist: rigs.piano.dist, width: rigs.piano.width
+        }
+      }));
+    } catch (e) { /* private window, blocked storage, quota: not worth a fuss */ }
+  }
+
+  // smaller and bigger fire every frame while you hold a gaze on them,
+  // so coalesce the writes rather than hammering storage sixty times a second
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, 400);
+  }
+
+  // stored numbers are only trusted inside the range the control itself allows,
+  // so a corrupt or hand-edited entry cannot strand a window somewhere unusable
+  function num(v, fallback, lo, hi) {
+    return (typeof v === 'number' && isFinite(v) && v >= lo && v <= hi) ? v : fallback;
+  }
+
+  function loadState() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var s = null;
+    try { s = JSON.parse(raw); } catch (e) { return; }
+    if (!s || typeof s !== 'object') return;
+
+    if (s.env === 'img-stage' || s.env === 'img-green') {
+      document.getElementById('env').value = s.env;
     }
-    return buf;
-  }
-
-  function noiseBuffer(ctx, seconds) {
-    var len = Math.floor(ctx.sampleRate * seconds);
-    var buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (var c = 0; c < 2; c++) {
-      var d = buf.getChannelData(c), last = 0;
-      for (var i = 0; i < len; i++) {
-        var w = Math.random() * 2 - 1;
-        last = (last + 0.018 * w) / 1.018;
-        d[i] = last * 3.4;
-      }
+    if (s.music && typeof s.music === 'object') {
+      var m = rigs.music;
+      m.azim  = num(s.music.azim,  m.azim,  -Math.PI, Math.PI);
+      m.elev  = num(s.music.elev,  m.elev,  -1.5, 1.5);
+      m.dist  = num(s.music.dist,  m.dist,  0.35, 1.80);
+      m.width = num(s.music.width, m.width, 0.40, 2.40);
+      document.getElementById('optCam').checked = !!s.music.on;
     }
-    return buf;
-  }
-
-  function audioOn() {
-    if (audio.on) return;
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    if (!audio.ctx) audio.ctx = new AC();
-    var ctx = audio.ctx;
-    if (ctx.state === 'suspended') ctx.resume();
-
-    var master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
-
-    var verb = ctx.createConvolver();
-    verb.buffer = impulseResponse(ctx, 2.9, 2.4);
-    var wet = ctx.createGain();
-    wet.gain.value = 0.85;
-    verb.connect(wet);
-    wet.connect(master);
-
-    var bed = ctx.createBufferSource();
-    bed.buffer = noiseBuffer(ctx, 8);
-    bed.loop = true;
-    var hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 45;
-    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 760; lp.Q.value = 0.4;
-    var breath = ctx.createGain(); breath.gain.value = 0.8;
-
-    // a very slow swell, so the bed drifts instead of sitting perfectly still
-    var lfo = ctx.createOscillator(); lfo.frequency.value = 0.045;
-    var lfoAmt = ctx.createGain(); lfoAmt.gain.value = 0.16;
-    lfo.connect(lfoAmt); lfoAmt.connect(breath.gain);
-
-    bed.connect(hp); hp.connect(lp); lp.connect(breath);
-    breath.connect(master);
-    breath.connect(verb);
-    bed.start(); lfo.start();
-
-    audio.master = master;
-    audio.verb = verb;
-    audio.nodes = [bed, lfo];
-    audio.on = true;
-    setLevel(audio.level);
-    scheduleStir();
-    layoutMenu();
-  }
-
-  // a seat creaking, a shoe on the boards, a cough three rows back.
-  // always through the reverb, never dry, or it sounds like it is in your head.
-  function stir() {
-    var ctx = audio.ctx;
-    if (!ctx || !audio.on || !audio.verb) return;
-    var dur = 0.09 + Math.random() * 0.45;
-    var b = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
-    var d = b.getChannelData(0);
-    for (var i = 0; i < d.length; i++) {
-      var t = i / d.length;
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2) * Math.min(1, t * 45);
+    if (s.piano && typeof s.piano === 'object') {
+      var p = rigs.piano;
+      p.yaw   = num(s.piano.yaw,   p.yaw,   -Math.PI, Math.PI);
+      p.drop  = num(s.piano.drop,  p.drop,  0.10, 1.10);
+      p.dist  = num(s.piano.dist,  p.dist,  0.20, 1.20);
+      p.width = num(s.piano.width, p.width, 0.40, 2.40);
+      document.getElementById('optPiano').checked = !!s.piano.on;
     }
-    var s = ctx.createBufferSource(); s.buffer = b;
-    var f = ctx.createBiquadFilter();
-    f.type = 'bandpass';
-    f.frequency.value = 240 + Math.random() * 900;
-    f.Q.value = 0.9;
-    var g = ctx.createGain();
-    g.gain.value = 0.05 + Math.random() * 0.10;
-    s.connect(f); f.connect(g);
-    if (ctx.createStereoPanner) {
-      var pan = ctx.createStereoPanner();
-      pan.pan.value = Math.random() * 2 - 1;
-      g.connect(pan); pan.connect(audio.verb);
-    } else {
-      g.connect(audio.verb);
-    }
-    s.start();
-  }
-
-  function scheduleStir() {
-    clearTimeout(audio.timer);
-    audio.timer = setTimeout(function () { stir(); scheduleStir(); }, 4000 + Math.random() * 15000);
-  }
-
-  function setLevel(v) {
-    audio.level = Math.max(0, Math.min(1, v));
-    volEl.value = audio.level.toFixed(2);
-    if (!audio.master || !audio.ctx) return;
-    var g = audio.master.gain;
-    var t = audio.ctx.currentTime;
-    g.cancelScheduledValues(t);
-    g.setTargetAtTime(audio.level * 0.55, t, 0.25);
-  }
-
-  function audioOff() {
-    if (!audio.on) return;
-    clearTimeout(audio.timer);
-    var t = audio.ctx.currentTime;
-    audio.master.gain.cancelScheduledValues(t);
-    audio.master.gain.setTargetAtTime(0, t, 0.2);
-    var nodes = audio.nodes;
-    setTimeout(function () {
-      nodes.forEach(function (n) { try { n.stop(); } catch (e) {} });
-    }, 700);
-    audio.nodes = [];
-    audio.master = null;
-    audio.verb = null;
-    audio.on = false;
-    layoutMenu();
+    placeAll();
   }
 
   // ---------- head tracking ----------
@@ -1010,27 +936,19 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig) {
-      var r = rigs[movingRig];
-      if (r.kind === 'plate') {
-        r.azim = Math.atan2(vDir.x, -vDir.z);
-        r.elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
-      } else {
-        // the piano stays flat and square to you; your gaze sets how far out
-        // and how far down it sits, and which way it is turned
-        var reach = 0.85;
-        var pitchA = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
-        r.yaw = Math.atan2(vDir.x, -vDir.z);
-        r.drop = Math.max(0.10, Math.min(1.10, -Math.sin(pitchA) * reach));
-        r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
-      }
-      placeAll();
+    if (movingRig || recentering) {
+      if (movingRig) updateMovingRig(vDir);
+      if (armDir.lengthSq() === 0) armDir.copy(vDir);
+      // net angle from where the hold was armed, not distance travelled, so
+      // jitter cannot quietly add up to it
+      var turned = THREE.MathUtils.radToDeg(armDir.angleTo(vDir));
+
       var gYaw = Math.atan2(vDir.x, -vDir.z);
       var gPitch = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
       aimAt(hintPlate, gYaw, gPitch + 0.19, MENU_REACH);
       hintPlate.visible = true;
 
-      // holding your head still is how you put it down when there is no button
+      // holding your head still is how you commit when there is no button
       moveAge += dt;
       var raw = lastDir.lengthSq()
         ? THREE.MathUtils.radToDeg(lastDir.angleTo(vDir)) / Math.max(dt, 1e-4)
@@ -1044,7 +962,10 @@ function bootPracticeSpace() {
       else steady += dt;
 
       setReticle(steady / PLACE_DWELL, 0xC9913F);
-      if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) drop();
+      if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) {
+        if (movingRig) drop();
+        else if (turned > MIN_TURN) finishRecenter();
+      }
       return;
     }
     hintPlate.visible = false;
@@ -1061,7 +982,7 @@ function bootPracticeSpace() {
     var obj = hits.length ? hits[0].object : null;
 
     // a slot you just used will not fire again until your gaze has left it.
-    // menu pages reuse the same four meshes, so without this the stare that
+    // menu pages reuse the same meshes, so without this the stare that
     // opened a page runs straight on into the item that lands in its place.
     if (obj !== mustLeave) mustLeave = null;
     else if (obj) { gazeHit = obj; gazeHeld = 0; setReticle(0, 0xEFE9DF); return; }
@@ -1091,14 +1012,63 @@ function bootPracticeSpace() {
     }
   }
 
-  function grab(which) {
-    active = which;
-    movingRig = which;
+  function updateMovingRig(vDir) {
+    var r = rigs[movingRig];
+    if (r.kind === 'plate') {
+      r.azim = Math.atan2(vDir.x, -vDir.z);
+      r.elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
+    } else {
+      // the piano stays flat and square to you; your gaze sets how far out
+      // and how far down it sits, and which way it is turned
+      var reach = 0.85;
+      var pitchA = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
+      r.yaw = Math.atan2(vDir.x, -vDir.z);
+      r.drop = Math.max(0.10, Math.min(1.10, -Math.sin(pitchA) * reach));
+      r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
+    }
+    placeAll();
+  }
+
+  function armHold() {
     steady = 0;
     moveAge = 0;
     swingAvg = 0;
     lastDir.set(0, 0, 0);
+    armDir.set(0, 0, 0);
+  }
+
+  function grab(which) {
+    active = which;
+    movingRig = which;
+    setHint('hold still to place');
+    armHold();
     layoutMenu();
+  }
+
+  // Recenter cannot fire the instant you pick it, because to pick it you are
+  // looking 48 degrees off to the left at the menu, and front would end up
+  // there. So it arms, you look where you want front to be, and holding still
+  // commits it, the same gesture as putting a window down.
+  function startRecenter() {
+    menu.open = false;
+    recentering = true;
+    setHint('look ahead, hold still');
+    armHold();
+    layoutMenu();
+  }
+
+  function finishRecenter() {
+    recentering = false;
+    steady = 0;
+    hintPlate.visible = false;
+    doRecenter();
+    layoutMenu();
+    cooldown = COOLDOWN;
+  }
+
+  function doRecenter() {
+    if (mode === 'stereo' && orient) yawOffset = -THREE.MathUtils.degToRad(orient.alpha);
+    yaw = 0; pitch = 0;
   }
 
   function drop() {
@@ -1107,6 +1077,7 @@ function bootPracticeSpace() {
     hintPlate.visible = false;
     placeAll();
     layoutMenu();
+    scheduleSave();
     // do not let the stare that placed it fall straight onto the menu
     cooldown = COOLDOWN;
   }
@@ -1117,10 +1088,9 @@ function bootPracticeSpace() {
 
     if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
+    if (id === 'recenter') { startRecenter(); return; }
     if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
 
-    if (id === 'quieter') { setLevel(audio.level - step * 0.55); return; }
-    if (id === 'louder')  { setLevel(audio.level + step * 0.55); return; }
 
     var which = (menu.page === 'piano' || menu.page === 'music') ? menu.page : null;
     if (!which) return;
@@ -1130,11 +1100,13 @@ function bootPracticeSpace() {
     if (id === 'smaller') r.width = Math.max(0.40, r.width - step * SIZE_RATE);
     if (id === 'bigger')  r.width = Math.min(2.40, r.width + step * SIZE_RATE);
     placeAll();
+    scheduleSave();
   }
 
   function onTrigger() {
     if (mode === 'flat') return;
     if (movingRig) { drop(); return; }
+    if (recentering) { finishRecenter(); return; }
     if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
     // button pressed while looking at nothing opens the menu at its parked spot
     if (!menu.open) { menu.open = true; menu.page = 'root'; menu.idle = 0; layoutMenu(); }
@@ -1221,10 +1193,9 @@ function bootPracticeSpace() {
     if (rigs.piano.on) active = 'piano';
     else if (rigs.music.on) active = 'music';
 
-    if (document.getElementById('optTone').checked) audioOn(); else audioOff();
-    setLevel(parseFloat(volEl.value));
     placeAll();
     layoutMenu();
+    scheduleSave();
   }
 
   function showChrome(on) {
@@ -1239,7 +1210,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; recentering = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -1262,13 +1233,13 @@ function bootPracticeSpace() {
 
   init();
   bindInput();
+  loadState();
   loadSky(document.getElementById('env').value);
 
-  document.getElementById('env').addEventListener('change', function (e) { loadSky(e.target.value); });
-  ['optCam', 'optPiano', 'optTone'].forEach(function (id) {
+  document.getElementById('env').addEventListener('change', function (e) { loadSky(e.target.value); scheduleSave(); });
+  ['optCam', 'optPiano'].forEach(function (id) {
     document.getElementById(id).addEventListener('change', applyOptions);
   });
-  volEl.addEventListener('input', function () { setLevel(parseFloat(volEl.value)); });
 
   var note = document.getElementById('modeNote');
   function useStereo() {
@@ -1285,17 +1256,18 @@ function bootPracticeSpace() {
     }).catch(useStereo);
   } else { useStereo(); }
 
+  document.getElementById('forget').onclick = function () {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    location.reload();
+  };
   document.getElementById('peek').onclick = function () { applyOptions(); mode = 'flat'; showChrome(true); };
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; recentering = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
-  document.getElementById('recenter').onclick = function () {
-    if (mode === 'stereo' && orient) yawOffset = -THREE.MathUtils.degToRad(orient.alpha);
-    yaw = 0; pitch = 0;
-  };
+  document.getElementById('recenter').onclick = doRecenter;
 }
 
 function startPracticeSpace() {
