@@ -237,7 +237,8 @@ function bootPracticeSpace() {
   var panels = [];
 
   var raycaster = new THREE.Raycaster();
-  var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, recentering = false, lastT = 0;
+  var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, grabbedEdge = null,
+      recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
@@ -492,7 +493,7 @@ function bootPracticeSpace() {
     p.win.geometry.dispose();
     panels.splice(i, 1);
     if (movingRig === p) { movingRig = null; hintPlate.visible = false; }
-    if (sizingRig === p) { sizingRig = null; hintPlate.visible = false; }
+    if (sizingRig === p) { sizingRig = null; grabbedEdge = null; hintPlate.visible = false; }
   }
 
   // a new window lands beside the ones already out rather than on top of them
@@ -641,10 +642,18 @@ function bootPracticeSpace() {
     for (var j = 0; j < menu.bloom.length; j++) {
       if (menu.bloom[j].visible) pickables.push(menu.bloom[j]);
     }
+    for (var q = 0; q < menu.handles.length; q++) {
+      if (menu.handles[q].visible) pickables.push(menu.handles[q]);
+    }
   }
 
   // ---------- menu ----------
 
+  // The tag sits at 25 degrees, which is the lighting booth on the stage
+  // capture: above the top balcony, below the dome. It was at 38, and when the
+  // heading moved to house centre that put it in the middle of the skylight.
+  // Landing it on something the room actually has gives it somewhere to be.
+  //
   // Icons rather than words, laid out as two rows: what there is on top, and
   // what you can do to the thing you picked underneath. Position is what you
   // remember rather than the reading, so nothing moves and nothing is ever
@@ -655,19 +664,20 @@ function bootPracticeSpace() {
   // for the ring went with it. A row scans.
   var MENU_REACH = 0.85, MENU_IDLE = 8;
   var TILE = 0.105;
-  var ROW_PITCH = THREE.MathUtils.degToRad(20);
+  var HANDLE = 0.058;
+  var ROW_PITCH = THREE.MathUtils.degToRad(14);
   var ROW_STEP = THREE.MathUtils.degToRad(9);
   var GROUP_GAP = THREE.MathUtils.degToRad(5.5);
-  var BLOOM_PITCH = THREE.MathUtils.degToRad(8);
+  var BLOOM_PITCH = THREE.MathUtils.degToRad(5);
   var BLOOM_STEP = THREE.MathUtils.degToRad(8.2);
   var BLOOM_SHIFT = THREE.MathUtils.degToRad(6);
   var BLOOM_REACH = THREE.MathUtils.degToRad(26);   // furthest a row may sit off centre
 
   var menu = {
     open: false, sel: -1, idle: 0,
-    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(38),
+    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(25),
     ringYaw: 0,
-    tab: null, ring: [], bloom: []
+    tab: null, ring: [], bloom: [], handles: []
   };
   var texCache = {};
   var allTiles = [];
@@ -731,6 +741,17 @@ function bootPracticeSpace() {
       g.moveTo(-30, -30); g.lineTo(30, 30);
       g.moveTo(30, -30); g.lineTo(-30, 30);
       g.stroke();
+      return;
+    }
+    if (name === 'gripH' || name === 'gripV') {
+      g.lineWidth = 9;
+      if (name === 'gripH') {
+        g.beginPath(); g.moveTo(0, -30); g.lineTo(0, 30); g.stroke();
+        arrow(14, 0, 42, 0); arrow(-14, 0, -42, 0);
+      } else {
+        g.beginPath(); g.moveTo(-30, 0); g.lineTo(30, 0); g.stroke();
+        arrow(0, 14, 0, 42); arrow(0, -14, 0, -42);
+      }
       return;
     }
     if (name === 'size') {
@@ -872,7 +893,14 @@ function bootPracticeSpace() {
     var i;
     for (i = 0; i < 6; i++) menu.ring.push(makeTile());
     for (i = 0; i < 4; i++) menu.bloom.push(makeTile());
-    allTiles = menu.ring.concat(menu.bloom);
+    for (i = 0; i < 4; i++) {
+      var hnd = plate(HANDLE, HANDLE, null);
+      hnd.renderOrder = 13;
+      hnd.visible = false;
+      scene.add(hnd);
+      menu.handles.push(hnd);
+    }
+    allTiles = menu.ring.concat(menu.bloom).concat(menu.handles);
 
     hintPlate = plate(0.34, 0.085, cachedLabel('hold still to place'));
     hintPlate.renderOrder = 13;
@@ -922,7 +950,6 @@ function bootPracticeSpace() {
     if (ringId === 'sel:piano') {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
-        { id: 'size:piano', icon: 'size', label: 'size' },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
@@ -958,7 +985,27 @@ function bootPracticeSpace() {
     for (i = 0; i < menu.ring.length; i++) menu.ring[i].visible = false;
     for (i = 0; i < menu.bloom.length; i++) menu.bloom[i].visible = false;
 
-    if (!inScene || movingRig || sizingRig || recentering) { refreshPickables(); return; }
+    for (i = 0; i < menu.handles.length; i++) menu.handles[i].visible = false;
+
+    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
+
+    // size mode: the edges of the thing, and the tag overhead to be done
+    if (sizingRig) {
+      if (!grabbedEdge) {
+        layoutHandles();
+        menu.tab.visible = true;
+        menu.tab.userData.id = 'endsize';
+        menu.tab.material.map = cachedLabel('done', true);
+        menu.tab.material.needsUpdate = true;
+        aimAt(menu.tab, menu.tabYaw, menu.tabPitch, MENU_REACH);
+      }
+      refreshPickables();
+      return;
+    }
+
+    menu.tab.userData.id = 'open';
+    menu.tab.material.map = cachedLabel('menu', true);
+    menu.tab.material.needsUpdate = true;
 
     if (!menu.open) {
       menu.tab.visible = true;
@@ -1037,9 +1084,11 @@ function bootPracticeSpace() {
   // the image. An unrotated inverted sphere puts u = 0.75 in front of you, and
   // on the stage capture that is the house-left wall, so you started off looking
   // at the side of the proscenium with the audience over your shoulder. The
-  // house runs from about 0.325 to 0.735 across the image, so 0.54 is its centre
-  // and that is what you face when you arrive and whenever you recenter.
-  var ENV_FORWARD = { 'img-stage': 0.54, 'img-green': 0.75 };
+  // The house runs from about 0.325 to 0.735 across the image. Its centre is
+  // 0.556, not the 0.54 that reading the strip by eye suggested: the skylight's
+  // centre of brightness lands there, which is 5.7 degrees further round. That
+  // is what you face on arrival and after every recenter.
+  var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.75 };
 
   function loadSky(id) {
     var img = document.getElementById(id);
@@ -1314,9 +1363,9 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || sizingRig || recentering) {
+    if (movingRig || grabbedEdge || recentering) {
       if (movingRig) updateMovingRig(vDir);
-      if (sizingRig) updateSizing(vPos, vDir);
+      if (grabbedEdge) { dragEdge(vPos, vDir); layoutHandles(); }
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
       // net angle from where the hold was armed, not distance travelled, so
       // jitter cannot quietly add up to it
@@ -1343,7 +1392,7 @@ function bootPracticeSpace() {
       setReticle(steady / PLACE_DWELL, 0xC9913F);
       if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) {
         if (movingRig) drop();
-        else if (sizingRig) endSizing();
+        else if (grabbedEdge) releaseEdge();
         else if (turned > MIN_TURN) finishRecenter();
       }
       return;
@@ -1430,14 +1479,27 @@ function bootPracticeSpace() {
   function startSizing(r) {
     if (!r) return;
     sizingRig = r;
+    grabbedEdge = null;
     menu.open = false;
-    setHint('look at a corner, hold still');
+    setHint('take an edge, hold still to let go');
     armHold();
     layoutMenu();
   }
 
+  // let go of the edge but stay in size mode, so the next one is one look away
+  function releaseEdge() {
+    grabbedEdge = null;
+    steady = 0;
+    setHint('take an edge, hold still to let go');
+    hintPlate.visible = false;
+    scheduleSave();
+    layoutMenu();
+    cooldown = COOLDOWN;
+  }
+
   function endSizing() {
     sizingRig = null;
+    grabbedEdge = null;
     steady = 0;
     hintPlate.visible = false;
     placeAll();
@@ -1447,13 +1509,14 @@ function bootPracticeSpace() {
   }
 
   var _n = new THREE.Vector3(), _hit = new THREE.Vector3(), _d = new THREE.Vector3();
+  var _c = new THREE.Vector3();
 
-  function updateSizing(vPos, vDir) {
-    var r = sizingRig, h = head();
+  // the plane the thing lives in, and the two directions across it
+  function rigFrame(r) {
     r.group.updateMatrixWorld(true);
-
+    _c.copy(r.group.position);
     if (r.kind === 'panel') {
-      _n.subVectors(h, r.group.position).normalize();
+      _n.subVectors(head(), _c).normalize();
       _r.set(1, 0, 0).applyQuaternion(r.group.quaternion);
       _u.set(0, 1, 0).applyQuaternion(r.group.quaternion);
     } else {
@@ -1461,24 +1524,102 @@ function bootPracticeSpace() {
       _r.set(1, 0, 0).applyQuaternion(r.group.quaternion);
       _u.set(0, 0, -1).applyQuaternion(r.group.quaternion);
     }
+  }
+
+  function halfOf(r, axis) {
+    if (r.kind !== 'panel') return 0.67 * r.width;
+    return axis === 'x' ? r.w / 2 : r.h / 2;
+  }
+
+  // put the centre back where azim/elev/dist or yaw/drop/dist can express it,
+  // because moving one edge moves the middle as well as the size
+  function recentreRig(r, c) {
+    if (r.kind === 'panel') {
+      var d = _d.subVectors(c, head());
+      r.dist = Math.max(0.35, Math.min(1.80, d.length()));
+      r.elev = Math.asin(THREE.MathUtils.clamp(d.y / (d.length() || 1), -1, 1));
+      r.azim = Math.atan2(d.x, -d.z);
+    } else {
+      r.dist = Math.max(0.20, Math.min(1.20, Math.sqrt(c.x * c.x + c.z * c.z)));
+      r.yaw = Math.atan2(c.x, -c.z);
+      r.drop = Math.max(0.10, Math.min(1.10, EYE - c.y));
+    }
+  }
+
+  // Drag one edge and the opposite one stays put, which is what an edge handle
+  // is for. Scaling about the middle is what the old size gesture did, and it
+  // meant you could never pin one side and pull the other.
+  function dragEdge(vPos, vDir) {
+    var r = sizingRig, side = grabbedEdge;
+    if (!r || !side) return;
+    rigFrame(r);
 
     var denom = _n.dot(vDir);
     if (Math.abs(denom) < 1e-4) return;
-    var t = _n.dot(_d.subVectors(r.group.position, vPos)) / denom;
+    var t = _n.dot(_d.subVectors(_c, vPos)) / denom;
     if (t <= 0.05) return;
-
     _hit.copy(vPos).addScaledVector(vDir, t);
-    _d.subVectors(_hit, r.group.position);
-    var dx = Math.abs(_d.dot(_r)), dy = Math.abs(_d.dot(_u));
+    _d.subVectors(_hit, _c);
+
+    var horiz = (side === 'left' || side === 'right');
+    var axis = horiz ? _r : _u;
+    var half = halfOf(r, horiz ? 'x' : 'y');
+    var reach = _d.dot(axis);
+
+    var MIN = (r.kind === 'panel') ? 0.25 : 0.40 * 1.34;
+    var MAX = (r.kind === 'panel') ? 2.40 : 2.40 * 1.34;
+
+    var fixed, moved;
+    if (side === 'right' || side === 'up') {
+      fixed = -half;
+      moved = Math.max(fixed + MIN, Math.min(fixed + MAX, reach));
+    } else {
+      fixed = half;
+      moved = Math.min(fixed - MIN, Math.max(fixed - MAX, reach));
+    }
+
+    var newHalf = Math.abs(moved - fixed) / 2;
+    _c.addScaledVector(axis, (moved + fixed) / 2);
 
     if (r.kind === 'panel') {
-      r.w = Math.max(0.25, Math.min(2.40, dx * 2));
-      r.h = Math.max(0.25, Math.min(2.40, dy * 2));
+      if (horiz) r.w = newHalf * 2; else r.h = newHalf * 2;
     } else {
-      // the piano keeps its proportions; only how far across it reaches matters
-      r.width = Math.max(0.40, Math.min(2.40, dx / 0.67));
+      r.width = Math.max(0.40, Math.min(2.40, newHalf / 0.67));
     }
+    recentreRig(r, _c);
     placeRig(r);
+  }
+
+  var EDGES = [
+    { side: 'right', icon: 'gripH' },
+    { side: 'left',  icon: 'gripH' },
+    { side: 'up',    icon: 'gripV' },
+    { side: 'down',  icon: 'gripV' }
+  ];
+
+  function layoutHandles() {
+    var r = sizingRig, i;
+    for (i = 0; i < menu.handles.length; i++) menu.handles[i].visible = false;
+    if (!r) return;
+    rigFrame(r);
+    var h = head();
+    // a piano keeps its proportions, so only its sides are worth a handle
+    var n = (r.kind === 'panel') ? 4 : 2;
+    for (i = 0; i < n; i++) {
+      var e = EDGES[i], t = menu.handles[i];
+      var horiz = (e.side === 'left' || e.side === 'right');
+      var axis = horiz ? _r : _u;
+      var half = halfOf(r, horiz ? 'x' : 'y');
+      var sign = (e.side === 'right' || e.side === 'up') ? 1 : -1;
+      t.visible = true;
+      t.userData.id = 'edge:' + e.side;
+      t.userData.repeat = false;
+      t.material.map = cachedIcon(e.icon, '');
+      t.material.needsUpdate = true;
+      t.scale.setScalar(grabbedEdge === e.side ? 1.25 : 1);
+      t.position.copy(_c).addScaledVector(axis, sign * half);
+      t.lookAt(h);
+    }
   }
 
   function grab(r) {
@@ -1530,6 +1671,14 @@ function bootPracticeSpace() {
     var step = dt || 0.016;
     if (!id) return;
 
+    if (id === 'endsize') { endSizing(); return; }
+    if (id.indexOf('edge:') === 0) {
+      grabbedEdge = id.slice(5);
+      setHint('hold still to let go');
+      armHold();
+      layoutMenu();
+      return;
+    }
     if (id === 'open')  { menu.open = true; menu.sel = -1; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
@@ -1615,6 +1764,7 @@ function bootPracticeSpace() {
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
+    if (grabbedEdge) { releaseEdge(); return; }
     if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
     if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
@@ -1693,9 +1843,9 @@ function bootPracticeSpace() {
         ((px - r.left) / r.width) * 2 - 1,
         -((py - r.top) / r.height) * 2 + 1
       );
-      if (movingRig || sizingRig || recentering) {
+      if (movingRig || grabbedEdge || recentering) {
         if (movingRig) drop();
-        else if (sizingRig) endSizing();
+        else if (grabbedEdge) releaseEdge();
         else finishRecenter();
         return;
       }
@@ -1732,7 +1882,7 @@ function bootPracticeSpace() {
     inScene = !!on;
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
-    if (!on) { movingRig = null; sizingRig = null; recentering = false; hintPlate.visible = false; }
+    if (!on) { movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; hintPlate.visible = false; }
     layoutMenu();
   }
 
@@ -1742,7 +1892,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; recentering = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -1812,7 +1962,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; sizingRig = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
