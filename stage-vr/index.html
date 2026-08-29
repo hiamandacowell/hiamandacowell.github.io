@@ -238,7 +238,7 @@ function bootPracticeSpace() {
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, grabbedEdge = null,
-      recentering = false, lastT = 0;
+      recentering = false, fitting = null, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
@@ -662,7 +662,12 @@ function bootPracticeSpace() {
   // This was a ring first. Five small tiles on a circle do not read as a circle,
   // they read as scattered, so there was no shape to learn and the whole reason
   // for the ring went with it. A row scans.
-  var MENU_REACH = 0.85, MENU_IDLE = 8;
+  var MENU_REACH = 0.85, MENU_IDLE = 14;
+  // How far your gaze has to stray before the menu counts as unused. It used to
+  // count any moment you were not looking straight at a row, so eight seconds of
+  // deciding, or a glance down at the very thing you were about to change, shut
+  // it in your face. Looking near it is still using it.
+  var MENU_NEAR = THREE.MathUtils.degToRad(45);
   var TILE = 0.105;
   var HANDLE = 0.058;
   var ROW_PITCH = THREE.MathUtils.degToRad(14);
@@ -740,6 +745,18 @@ function bootPracticeSpace() {
       g.beginPath();
       g.moveTo(-30, -30); g.lineTo(30, 30);
       g.moveTo(30, -30); g.lineTo(-30, 30);
+      g.stroke();
+      return;
+    }
+    if (name === 'fit') {
+      g.strokeRect(-30, -18, 60, 36);
+      for (var k = -1; k <= 1; k++) {
+        g.beginPath(); g.moveTo(k * 15, -18); g.lineTo(k * 15, 18); g.stroke();
+      }
+      g.lineWidth = 8;
+      g.beginPath();
+      g.moveTo(-42, -30); g.lineTo(-42, 30);
+      g.moveTo(42, -30); g.lineTo(42, 30);
       g.stroke();
       return;
     }
@@ -950,6 +967,7 @@ function bootPracticeSpace() {
     if (ringId === 'sel:piano') {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
+        { id: 'fit:piano', icon: 'fit', label: 'fit' },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
@@ -987,7 +1005,7 @@ function bootPracticeSpace() {
 
     for (i = 0; i < menu.handles.length; i++) menu.handles[i].visible = false;
 
-    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
+    if (!inScene || movingRig || recentering || fitting) { refreshPickables(); return; }
 
     // size mode: the edges of the thing, and the tag overhead to be done
     if (sizingRig) {
@@ -1363,7 +1381,7 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || grabbedEdge || recentering) {
+    if (movingRig || grabbedEdge || recentering || fitting) {
       if (movingRig) updateMovingRig(vDir);
       if (grabbedEdge) { dragEdge(vPos, vDir); layoutHandles(); }
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
@@ -1393,6 +1411,7 @@ function bootPracticeSpace() {
       if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
+        else if (fitting) captureFitPoint(vPos, vDir);
         else if (turned > MIN_TURN) finishRecenter();
       }
       return;
@@ -1423,7 +1442,9 @@ function bootPracticeSpace() {
       paintSlots(null, 0);
       // a menu you have stopped using folds itself back down to the tab
       if (menu.open) {
-        menu.idle += dt;
+        var mYaw = menu.ringYaw, mPitch = ROW_PITCH;
+        _n.set(Math.cos(mPitch) * Math.sin(mYaw), Math.sin(mPitch), -Math.cos(mPitch) * Math.cos(mYaw));
+        if (_n.angleTo(vDir) < MENU_NEAR) menu.idle = 0; else menu.idle += dt;
         if (menu.idle > MENU_IDLE) { menu.open = false; menu.idle = 0; layoutMenu(); }
       }
       return;
@@ -1476,6 +1497,58 @@ function bootPracticeSpace() {
   // Pick size and the corner of the thing follows your eyes. Where your gaze
   // meets its plane is where the corner goes, so you look at the size you want
   // and hold still, the same ending as putting something down.
+  // Fitting the piano to the real one. A gaze gives a direction and not a
+  // distance, so the two ends are read off the horizontal plane the keybed
+  // already sits on: get the height about right with move first, then this puts
+  // the width and the position where your actual keys are. Looking down is what
+  // makes it work, and looking down is what you do at a keyboard.
+  function startFitting() {
+    fitting = { stage: 0, a: null };
+    menu.open = false;
+    setHint('look at the left end of your keys, hold still');
+    armHold();
+    layoutMenu();
+  }
+
+  function endFitting() {
+    fitting = null;
+    steady = 0;
+    hintPlate.visible = false;
+    placeAll();
+    layoutMenu();
+    scheduleSave();
+    cooldown = COOLDOWN;
+  }
+
+  function captureFitPoint(vPos, vDir) {
+    var planeY = EYE - piano.drop;
+    if (vDir.y > -0.05) { setHint('look down at your keys'); armHold(); return; }
+    var t = (planeY - vPos.y) / vDir.y;
+    if (t <= 0.05 || t > 4) { armHold(); return; }
+    _hit.copy(vPos).addScaledVector(vDir, t);
+
+    if (fitting.stage === 0) {
+      fitting.a = _hit.clone();
+      fitting.stage = 1;
+      setHint('now the right end, hold still');
+      armHold();
+      return;
+    }
+
+    var a = fitting.a, b = _hit;
+    var span = Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.z - a.z) * (b.z - a.z));
+    if (span < 0.25) { setHint('further apart than that, hold still'); armHold(); return; }
+
+    // the drawn keys span 1.06 across at scale one, so the span sets the scale
+    piano.width = Math.max(0.40, Math.min(2.40, span / 1.06));
+    var cx = (a.x + b.x) / 2, cz = (a.z + b.z) / 2;
+    piano.dist = Math.max(0.20, Math.min(1.20, Math.sqrt(cx * cx + cz * cz)));
+    piano.yaw = Math.atan2(cx, -cz);
+    piano.on = true;
+    piano.group.visible = true;
+    endFitting();
+  }
+
   function startSizing(r) {
     if (!r) return;
     sizingRig = r;
@@ -1737,6 +1810,8 @@ function bootPracticeSpace() {
       return;
     }
 
+    if (verb === 'fit') { startFitting(); return; }
+
     if (verb === 'size') {
       startSizing(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
       return;
@@ -1764,6 +1839,7 @@ function bootPracticeSpace() {
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
+    if (fitting) { endFitting(); return; }
     if (grabbedEdge) { releaseEdge(); return; }
     if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
@@ -1882,7 +1958,10 @@ function bootPracticeSpace() {
     inScene = !!on;
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
-    if (!on) { movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; hintPlate.visible = false; }
+    if (!on) {
+      movingRig = null; sizingRig = null; grabbedEdge = null;
+      recentering = false; fitting = null; hintPlate.visible = false;
+    }
     layoutMenu();
   }
 
@@ -1892,7 +1971,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; fitting = null; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -1962,7 +2041,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; fitting = null; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
