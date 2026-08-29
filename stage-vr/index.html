@@ -264,6 +264,11 @@ function bootPracticeSpace() {
   // range is 0.4 to 2.4, so this crosses it in eight seconds; at 0.8 it crossed
   // in under three and you could not stop where you meant to.
   var SIZE_RATE = 0.25;
+  // metres per second of height while you hold a gaze on lower or higher. A
+  // gaze is a direction and carries no distance, so how far below your eyes the
+  // keys sit is the one thing looking at them cannot say: it needs its own
+  // control, and two buttons are honestly the right tool for it.
+  var DROP_RATE = 0.22;
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
@@ -662,12 +667,10 @@ function bootPracticeSpace() {
   // This was a ring first. Five small tiles on a circle do not read as a circle,
   // they read as scattered, so there was no shape to learn and the whole reason
   // for the ring went with it. A row scans.
-  var MENU_REACH = 0.85, MENU_IDLE = 14;
-  // How far your gaze has to stray before the menu counts as unused. It used to
-  // count any moment you were not looking straight at a row, so eight seconds of
-  // deciding, or a glance down at the very thing you were about to change, shut
-  // it in your face. Looking near it is still using it.
-  var MENU_NEAR = THREE.MathUtils.degToRad(45);
+  // The menu has no timer at all. It closed itself on a countdown once, which
+  // is a thing that can only ever happen at the wrong moment: it goes when you
+  // say it goes.
+  var MENU_REACH = 0.85;
   var TILE = 0.105;
   var HANDLE = 0.058;
   var ROW_PITCH = THREE.MathUtils.degToRad(14);
@@ -746,6 +749,11 @@ function bootPracticeSpace() {
       g.moveTo(-30, -30); g.lineTo(30, 30);
       g.moveTo(30, -30); g.lineTo(-30, 30);
       g.stroke();
+      return;
+    }
+    if (name === 'lower' || name === 'higher') {
+      g.beginPath(); g.moveTo(-44, 0); g.lineTo(44, 0); g.stroke();
+      if (name === 'lower') arrow(0, 10, 0, 44); else arrow(0, -10, 0, -44);
       return;
     }
     if (name === 'fit') {
@@ -909,7 +917,7 @@ function bootPracticeSpace() {
 
     var i;
     for (i = 0; i < 6; i++) menu.ring.push(makeTile());
-    for (i = 0; i < 4; i++) menu.bloom.push(makeTile());
+    for (i = 0; i < 5; i++) menu.bloom.push(makeTile());
     for (i = 0; i < 4; i++) {
       var hnd = plate(HANDLE, HANDLE, null);
       hnd.renderOrder = 13;
@@ -968,6 +976,8 @@ function bootPracticeSpace() {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
         { id: 'fit:piano', icon: 'fit', label: 'fit' },
+        { id: 'lower', icon: 'lower', label: 'lower', repeat: true },
+        { id: 'higher', icon: 'higher', label: 'higher', repeat: true },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
@@ -1441,12 +1451,6 @@ function bootPracticeSpace() {
       setReticle(0, 0xEFE9DF);
       paintSlots(null, 0);
       // a menu you have stopped using folds itself back down to the tab
-      if (menu.open) {
-        var mYaw = menu.ringYaw, mPitch = ROW_PITCH;
-        _n.set(Math.cos(mPitch) * Math.sin(mYaw), Math.sin(mPitch), -Math.cos(mPitch) * Math.cos(mYaw));
-        if (_n.angleTo(vDir) < MENU_NEAR) menu.idle = 0; else menu.idle += dt;
-        if (menu.idle > MENU_IDLE) { menu.open = false; menu.idle = 0; layoutMenu(); }
-      }
       return;
     }
     menu.idle = 0;
@@ -1475,13 +1479,16 @@ function bootPracticeSpace() {
       r.azim = Math.atan2(vDir.x, -vDir.z);
       r.elev = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
     } else {
-      // the piano stays flat and square to you; your gaze sets how far out
-      // and how far down it sits, and which way it is turned
-      var reach = 0.85;
-      var pitchA = Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1));
-      r.yaw = Math.atan2(vDir.x, -vDir.z);
-      r.drop = Math.max(0.10, Math.min(1.10, -Math.sin(pitchA) * reach));
-      r.dist = Math.max(0.22, Math.min(1.20, Math.abs(Math.cos(pitchA)) * reach));
+      // It used to ride a sphere an arm's length from your head, so lowering it
+      // dragged it towards you and there was no way to have it low and still out
+      // in front. It slides about on the plane it already sits at instead, and
+      // how high that plane is has its own control.
+      if (vDir.y > -0.05) return;
+      var t = -r.drop / vDir.y;
+      if (t <= 0.05 || t > 4) return;
+      var px = vDir.x * t, pz = vDir.z * t;
+      r.dist = Math.max(0.20, Math.min(1.20, Math.sqrt(px * px + pz * pz)));
+      r.yaw = Math.atan2(px, -pz);
     }
     placeRig(r);
   }
@@ -1794,6 +1801,17 @@ function bootPracticeSpace() {
     }
 
 
+    // these carry no argument, so they have to be read before the guard below
+    // that drops anything without one
+    if (id === 'lower' || id === 'higher') {
+      piano.drop = (id === 'lower')
+        ? Math.min(1.10, piano.drop + step * DROP_RATE)
+        : Math.max(0.10, piano.drop - step * DROP_RATE);
+      placeAll();
+      scheduleSave();
+      return;
+    }
+
     var colon = id.indexOf(':');
     if (colon < 0) return;
     var verb = id.slice(0, colon), arg = id.slice(colon + 1);
@@ -1811,6 +1829,7 @@ function bootPracticeSpace() {
     }
 
     if (verb === 'fit') { startFitting(); return; }
+
 
     if (verb === 'size') {
       startSizing(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
