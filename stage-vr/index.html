@@ -667,12 +667,16 @@ function bootPracticeSpace() {
   // the corridor, and the marker sits in the opening itself against the brick
   // across the hall, not on the leaf, because the leaf is standing open.
   //
-  // Neither can be reached without deliberately turning: 122 degrees is behind
-  // you and 89 is square to your side. That is what makes it safe to leave a
-  // live button hanging in the room with nothing guarding it.
+  // The stage one cannot be reached without deliberately turning, which is what
+  // makes it safe to leave a live button hanging in a room with nothing
+  // guarding it. The green room's is now straight in front of you instead, so
+  // it earns its safety the other way: 12 degrees down, with the menu tag 25
+  // up, and the reticle arriving on the brick in the gap between them. The
+  // opening runs from 23 above to 28 below, so both are inside the doorway and
+  // neither is anywhere your eyes rest.
   var DOORS = {
     'img-stage': { azim: 122, elev: -3, label: 'green room' },
-    'img-green': { azim: -89, elev: -2, label: 'stage' }
+    'img-green': { azim: 0, elev: -12, label: 'stage' }
   };
   // far enough out to read as hung on the wall rather than held in front of
   // your face, and sized from that to cross the same 7 degrees as a menu tile
@@ -1180,7 +1184,15 @@ function bootPracticeSpace() {
   // 0.556, not the 0.54 that reading the strip by eye suggested: the skylight's
   // centre of brightness lands there, which is 5.7 degrees further round. That
   // is what you face on arrival and after every recenter.
-  var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.75 };
+  //
+  // The green room had never been aimed at all: 0.75 is only where an unrotated
+  // sphere happens to land, and it put a blank block wall in front of you with
+  // the way out 89 degrees off your shoulder, so you arrived able to see the
+  // menu and nothing else. 0.506 is the middle of the open doorway. Everything
+  // you can do in that room now reads in one glance: the way out in the opening,
+  // and the menu tag on the head of the frame above it, because the frame head
+  // sits at 23 degrees and the tag was already at 25.
+  var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.506 };
 
   function loadSky(id) {
     var img = document.getElementById(id);
