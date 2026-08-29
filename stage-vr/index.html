@@ -616,36 +616,173 @@ function bootPracticeSpace() {
   function refreshPickables() {
     pickables = [];
     if (menu.tab.visible) pickables.push(menu.tab);
-    for (var i = 0; i < menu.slots.length; i++) {
-      if (menu.slots[i].visible) pickables.push(menu.slots[i]);
+    for (var i = 0; i < menu.ring.length; i++) {
+      if (menu.ring[i].visible) pickables.push(menu.ring[i]);
+    }
+    for (var j = 0; j < menu.bloom.length; j++) {
+      if (menu.bloom[j].visible) pickables.push(menu.bloom[j]);
     }
   }
 
   // ---------- menu ----------
 
-  // One small tab parked off to the left, well away from the keys and from
-  // anything you would look at on purpose. It is the only thing gaze can hit.
-  // The music window, nudged left with the piano, now reaches to about 35
-  // degrees on that side and its list would have hung over the corner of it,
-  // so the tab sits at 48 and the whole menu clears the window.
-  // The tab is deliberately awkward and the list deliberately is not. Overhead
-  // is the one direction a player never looks: the keys are down, the score is
-  // ahead, the house is level. So nothing you do at the instrument can stray
-  // onto it. Once open the list drops into easy view just above the horizon,
-  // clear of the music windows below, and clear of the tab so the stare that
-  // opened the menu is not already sitting on the first choice.
-  var MENU_REACH = 0.85, MENU_STEP = 0.125, MENU_IDLE = 8;
-  var SLOT_W = 0.20, SLOT_H = 0.075;
+  // A ring of icons rather than a list of words. Position is what you remember,
+  // not the reading, so nothing moves and nothing is ever replaced: picking an
+  // item blooms its options outward beside it while the ring stays where it
+  // was. That also means there is no "back" anywhere in here.
+  var MENU_REACH = 0.85, MENU_IDLE = 8;
+  var TILE = 0.105;
+  var RING_R = THREE.MathUtils.degToRad(12);
+  var BLOOM_PITCH = THREE.MathUtils.degToRad(4);
+  var BLOOM_STEP = THREE.MathUtils.degToRad(8.2);
+  var BLOOM_SHIFT = THREE.MathUtils.degToRad(6);
+  var BLOOM_REACH = THREE.MathUtils.degToRad(26);   // furthest a row may sit off centre
+
   var menu = {
-    open: false, page: 'root', idle: 0,
+    open: false, sel: -1, idle: 0,
     tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(38),
-    listYaw: 0, listTop: THREE.MathUtils.degToRad(29),
-    tab: null, slots: []
+    ringYaw: 0, ringPitch: THREE.MathUtils.degToRad(26),
+    tab: null, ring: [], bloom: []
   };
   var texCache = {};
+  var allTiles = [];
+
+  // The coordinate space is minus fifty to fifty about the centre, so every
+  // glyph is drawn at one scale whatever size the tile ends up.
+  function drawGlyph(g, name) {
+    g.strokeStyle = '#F1F3F5';
+    g.fillStyle = '#F1F3F5';
+    g.lineWidth = 7;
+    g.lineCap = 'round';
+    g.lineJoin = 'round';
+
+    function arrow(x1, y1, x2, y2) {
+      g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+      var a = Math.atan2(y2 - y1, x2 - x1), h = 13;
+      g.beginPath();
+      g.moveTo(x2, y2);
+      g.lineTo(x2 - h * Math.cos(a - 0.5), y2 - h * Math.sin(a - 0.5));
+      g.lineTo(x2 - h * Math.cos(a + 0.5), y2 - h * Math.sin(a + 0.5));
+      g.closePath(); g.fill();
+    }
+
+    if (name === 'piano') {
+      g.strokeRect(-46, -26, 92, 52);
+      for (var i = -1; i <= 1; i++) {
+        g.beginPath(); g.moveTo(i * 23, -26); g.lineTo(i * 23, 26); g.stroke();
+      }
+      [-34, -11, 12, 35].forEach(function (x) { g.fillRect(x - 6, -26, 12, 30); });
+      return;
+    }
+    if (name === 'window') {
+      g.strokeRect(-40, -34, 80, 68);
+      g.lineWidth = 5;
+      g.beginPath();
+      g.moveTo(0, -34); g.lineTo(0, 34);
+      g.moveTo(-40, 0); g.lineTo(40, 0);
+      g.stroke();
+      return;
+    }
+    if (name === 'room') {
+      g.strokeRect(-46, -30, 52, 60);
+      g.strokeRect(-6, -12, 52, 42);
+      return;
+    }
+    if (name === 'recenter') {
+      g.beginPath(); g.arc(0, 0, 26, 0, 6.284); g.stroke();
+      [[0, -46, 0, -32], [0, 46, 0, 32], [-46, 0, -32, 0], [46, 0, 32, 0]].forEach(function (l) {
+        g.beginPath(); g.moveTo(l[0], l[1]); g.lineTo(l[2], l[3]); g.stroke();
+      });
+      g.beginPath(); g.arc(0, 0, 6, 0, 6.284); g.fill();
+      return;
+    }
+    if (name === 'close') {
+      g.beginPath();
+      g.moveTo(-30, -30); g.lineTo(30, 30);
+      g.moveTo(30, -30); g.lineTo(-30, 30);
+      g.stroke();
+      return;
+    }
+    if (name === 'move') {
+      arrow(0, 0, 0, -40); arrow(0, 0, 0, 40);
+      arrow(0, 0, -40, 0); arrow(0, 0, 40, 0);
+      return;
+    }
+    if (name === 'bigger')   { g.strokeRect(-14, -14, 28, 28); arrow(-12, 12, -40, 40); arrow(12, -12, 40, -40); return; }
+    if (name === 'smaller')  { g.strokeRect(-14, -14, 28, 28); arrow(-40, 40, -12, 12); arrow(40, -40, 12, -12); return; }
+    if (name === 'wider')    { g.strokeRect(-16, -22, 32, 44); arrow(-22, 0, -46, 0); arrow(22, 0, 46, 0); return; }
+    if (name === 'narrower') { g.strokeRect(-16, -22, 32, 44); arrow(-46, 0, -24, 0); arrow(46, 0, 24, 0); return; }
+    if (name === 'taller')   { g.strokeRect(-22, -16, 44, 32); arrow(0, -22, 0, -46); arrow(0, 22, 0, 46); return; }
+    if (name === 'shorter')  { g.strokeRect(-22, -16, 44, 32); arrow(0, -46, 0, -24); arrow(0, 46, 0, 24); return; }
+    if (name === 'shape') {
+      g.strokeRect(-44, -30, 44, 60);
+      g.beginPath(); g.arc(16, 0, 28, 0, 6.284); g.stroke();
+      return;
+    }
+    if (name === 'hide' || name === 'show') {
+      g.beginPath();
+      g.moveTo(-44, 0); g.quadraticCurveTo(0, -34, 44, 0);
+      g.quadraticCurveTo(0, 34, -44, 0);
+      g.stroke();
+      g.beginPath(); g.arc(0, 0, 11, 0, 6.284); g.fill();
+      if (name === 'hide') {
+        g.lineWidth = 8;
+        g.beginPath(); g.moveTo(-38, -30); g.lineTo(38, 30); g.stroke();
+      }
+      return;
+    }
+    if (name === 'add') {
+      g.beginPath();
+      g.moveTo(0, -34); g.lineTo(0, 34);
+      g.moveTo(-34, 0); g.lineTo(34, 0);
+      g.stroke();
+      return;
+    }
+  }
+
+  // Icon above, a small word below it. The word stays because an icon on its
+  // own asks you to guess, and guessing is what the old menu got wrong.
+  function iconTexture(icon, label, accent) {
+    var c = document.createElement('canvas');
+    c.width = 160; c.height = 160;
+    var g = c.getContext('2d');
+
+    g.fillStyle = accent ? 'rgba(239,233,223,0.95)' : 'rgba(20,22,25,0.88)';
+    roundRect(g, 4, 4, 152, 152, 26); g.fill();
+    g.strokeStyle = accent ? 'rgba(48,41,37,0.85)' : 'rgba(201,145,63,0.5)';
+    g.lineWidth = accent ? 5 : 3;
+    roundRect(g, 4, 4, 152, 152, 26); g.stroke();
+
+    g.save();
+    g.translate(80, 64);
+    g.scale(0.6, 0.6);
+    if (accent) { g.strokeStyle = '#191614'; g.fillStyle = '#191614'; }
+    drawGlyph(g, icon);
+    g.restore();
+
+    g.fillStyle = accent ? '#191614' : '#D8DCE1';
+    var size = 26;
+    g.font = '500 ' + size + 'px system-ui, sans-serif';
+    while (size > 13 && g.measureText(label).width > 138) {
+      size -= 1;
+      g.font = '500 ' + size + 'px system-ui, sans-serif';
+    }
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(label, 80, 132);
+
+    var t = new THREE.CanvasTexture(c);
+    t.minFilter = THREE.LinearFilter;
+    return t;
+  }
+
+  function cachedIcon(icon, label) {
+    var k = 'i|' + icon + '|' + label;
+    if (!texCache[k]) texCache[k] = iconTexture(icon, label, false);
+    return texCache[k];
+  }
 
   function cachedLabel(text, accent) {
-    var k = (accent ? 'a:' : 'p:') + text;
+    var k = (accent ? 'A:' : 'P:') + text;
     if (!texCache[k]) texCache[k] = labelTexture(text, accent);
     return texCache[k];
   }
@@ -669,40 +806,40 @@ function bootPracticeSpace() {
     obj.lookAt(h);
   }
 
+  function makeTile() {
+    var t = plate(TILE, TILE, null);
+    t.renderOrder = 11;
+    t.visible = false;
+    var fg = new THREE.PlaneGeometry(1, TILE);
+    fg.translate(0.5, 0, 0);
+    var fill = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({
+      color: 0xC9913F, transparent: true, opacity: 0.34, depthTest: false
+    }));
+    fill.renderOrder = 12;
+    fill.position.set(-TILE / 2, 0, 0.001);
+    fill.visible = false;
+    t.add(fill);
+    t.userData.fill = fill;
+    scene.add(t);
+    return t;
+  }
+
   function buildMenu() {
     menu.tab = plate(0.17, 0.085, cachedLabel('menu', true));
     menu.tab.userData.id = 'open';
     menu.tab.visible = false;
     scene.add(menu.tab);
 
-    for (var i = 0; i < 5; i++) {
-      var s = plate(SLOT_W, SLOT_H, null);
-      s.visible = false;
-
-      // the dwell used to show only on the reticle at the centre of your view,
-      // which is not the thing you are choosing. it fills the button instead.
-      var fillGeo = new THREE.PlaneGeometry(1, SLOT_H);
-      fillGeo.translate(0.5, 0, 0);
-      var fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
-        color: 0xC9913F, transparent: true, opacity: 0.34, depthTest: false
-      }));
-      fill.renderOrder = 12;
-      fill.position.x = -SLOT_W / 2;
-      fill.position.z = 0.001;
-      fill.visible = false;
-      s.add(fill);
-      s.userData.fill = fill;
-
-      scene.add(s);
-      menu.slots.push(s);
-    }
+    var i;
+    for (i = 0; i < 6; i++) menu.ring.push(makeTile());
+    for (i = 0; i < 7; i++) menu.bloom.push(makeTile());
+    allTiles = menu.ring.concat(menu.bloom);
 
     hintPlate = plate(0.34, 0.085, cachedLabel('hold still to place'));
-    hintPlate.renderOrder = 12;
+    hintPlate.renderOrder = 13;
     hintPlate.visible = false;
     scene.add(hintPlate);
 
-    // nothing about a tab overhead announces itself, so say so once
     menuTip = plate(0.40, 0.10, cachedLabel('look up for the menu'));
     menuTip.renderOrder = 11;
     menuTip.visible = false;
@@ -714,85 +851,68 @@ function bootPracticeSpace() {
     hintPlate.material.needsUpdate = true;
   }
 
-  // never more than four things on screen at once
-  // pages are strings; the ones about a particular window carry its index
-  function pageParts() {
-    var m = /^(panel|size):(\d+)$/.exec(menu.page);
-    return m ? { kind: m[1], i: parseInt(m[2], 10) } : null;
+  function ringItems() {
+    var out = [{ id: 'sel:piano', icon: 'piano', label: 'piano' }];
+    for (var i = 0; i < panels.length; i++) {
+      out.push({
+        id: 'sel:panel:' + i, icon: 'window',
+        label: panels.length > 1 ? 'window ' + (i + 1) : 'window'
+      });
+    }
+    if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'add', label: 'add' });
+    out.push({
+      id: 'room', icon: 'room',
+      label: document.getElementById('env').value === 'img-stage' ? 'green room' : 'stage'
+    });
+    out.push({ id: 'recenter', icon: 'recenter', label: 'recentre' });
+    out.push({ id: 'close', icon: 'close', label: 'close' });
+    return out.slice(0, menu.ring.length);
   }
 
-  function menuItems() {
-    var pp = pageParts();
-    if (pp && !panels[pp.i]) { menu.page = 'windows'; pp = null; }
-
-
-    if (menu.page === 'piano') {
+  function bloomItems(ringId) {
+    if (ringId === 'sel:piano') {
       return [
-        { id: 'move:piano', label: 'move it' },
-        { id: 'smaller', label: 'smaller', repeat: true },
-        { id: 'bigger', label: 'bigger', repeat: true },
-        { id: 'hide:piano', label: piano.on ? 'hide it' : 'show it' },
-        { id: 'page:root', label: 'back' }
+        { id: 'move:piano', icon: 'move', label: 'move' },
+        { id: 'bigger', icon: 'bigger', label: 'bigger', repeat: true },
+        { id: 'smaller', icon: 'smaller', label: 'smaller', repeat: true },
+        { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
-
-    if (menu.page === 'windows') {
-      var out = [];
-      for (var i = 0; i < panels.length; i++) {
-        out.push({ id: 'page:panel:' + i, label: 'window ' + (i + 1) });
-      }
-      // the add entry drops away at the cap, which is what keeps this page
-      // inside four rows however many windows you have out
-      if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', label: 'add a window' });
-      out.push({ id: 'page:root', label: 'back' });
-      return out;
-    }
-
-    if (pp && pp.kind === 'panel') {
-      var pan = panels[pp.i];
+    var m = /^sel:panel:(\d+)$/.exec(ringId || '');
+    if (m) {
+      var i = m[1], pan = panels[parseInt(i, 10)];
+      if (!pan) return [];
       return [
-        { id: 'move:' + pp.i, label: 'move it' },
-        { id: 'page:size:' + pp.i, label: 'size' },
-        { id: 'shape:' + pp.i, label: pan.round ? 'make it square' : 'make it round' },
-        { id: 'hide:' + pp.i, label: pan.on ? 'hide it' : 'show it' },
-        { id: PANEL_MAX > 1 ? 'page:windows' : 'page:root', label: 'back' }
+        { id: 'move:' + i, icon: 'move', label: 'move' },
+        { id: 'wider:' + i, icon: 'wider', label: 'wider', repeat: true },
+        { id: 'narrower:' + i, icon: 'narrower', label: 'narrower', repeat: true },
+        { id: 'taller:' + i, icon: 'taller', label: 'taller', repeat: true },
+        { id: 'shorter:' + i, icon: 'shorter', label: 'shorter', repeat: true },
+        { id: 'shape:' + i, icon: 'shape', label: pan.round ? 'square' : 'round' },
+        { id: 'hide:' + i, icon: pan.on ? 'hide' : 'show', label: pan.on ? 'hide' : 'show' }
       ];
     }
+    return [];
+  }
 
-    if (pp && pp.kind === 'size') {
-      return [
-        { id: 'wider:' + pp.i,    label: 'wider',    repeat: true },
-        { id: 'narrower:' + pp.i, label: 'narrower', repeat: true },
-        { id: 'taller:' + pp.i,   label: 'taller',   repeat: true },
-        { id: 'shorter:' + pp.i,  label: 'shorter',  repeat: true },
-        { id: 'page:panel:' + pp.i, label: 'back' }
-      ];
-    }
-
-    var items = [{ id: 'page:piano', label: 'piano' }];
-    // with a single window there is no list worth paging through, so go straight in
-    if (PANEL_MAX > 1) items.push({ id: 'page:windows', label: 'windows' });
-    else if (panels.length) items.push({ id: 'page:panel:0', label: 'music window' });
-    // both panoramas are already in the page as img tags, so this is a texture
-    // swap with nothing to fetch: no reason to make you go back out for it
-    items.push({
-      id: 'room',
-      label: document.getElementById('env').value === 'img-stage' ? 'green room' : 'on stage'
-    });
-    // the Recenter button on the page is unreachable with the phone shut in a
-    // viewer, and the heading drifts, so it has to live in here as well
-    items.push({ id: 'recenter', label: 'recenter' });
-    items.push({ id: 'close', label: 'close' });
-    return items;
+  function placeTile(tile, item, yawA, pitchA) {
+    tile.visible = true;
+    tile.userData.id = item.id;
+    tile.userData.repeat = !!item.repeat;
+    tile.material.map = cachedIcon(item.icon, item.label);
+    tile.material.needsUpdate = true;
+    tile.scale.setScalar(1);
+    aimAt(tile, yawA, pitchA, MENU_REACH);
   }
 
   function layoutMenu() {
-    var inSpace = inScene;
+    var i;
     menu.tab.visible = false;
     menuTip.visible = false;
-    for (var i = 0; i < menu.slots.length; i++) menu.slots[i].visible = false;
+    for (i = 0; i < menu.ring.length; i++) menu.ring[i].visible = false;
+    for (i = 0; i < menu.bloom.length; i++) menu.bloom[i].visible = false;
 
-    if (!inSpace || movingRig || recentering) { refreshPickables(); return; }
+    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
 
     if (!menu.open) {
       menu.tab.visible = true;
@@ -805,17 +925,39 @@ function bootPracticeSpace() {
       return;
     }
 
-    var items = menuItems();
-    for (var j = 0; j < items.length && j < menu.slots.length; j++) {
-      var s = menu.slots[j];
-      s.visible = true;
-      s.userData.id = items[j].id;
-      s.userData.repeat = !!items[j].repeat;
-      s.material.map = cachedLabel(items[j].label);
-      s.material.needsUpdate = true;
-      // the list sits well below the tab, never on top of it, so the stare that
-      // opened the menu is left looking at nothing and picks nothing
-      aimAt(s, menu.listYaw, menu.listTop - j * MENU_STEP, MENU_REACH);
+    var items = ringItems();
+    if (menu.sel >= items.length) menu.sel = -1;
+
+    // evenly round the ring from the top, clockwise, so an item keeps its place
+    // between one visit and the next and you can go to it without reading
+    var n = items.length;
+    for (i = 0; i < n; i++) {
+      var t = i * 2 * Math.PI / n;
+      placeTile(menu.ring[i], items[i],
+        menu.ringYaw + RING_R * Math.sin(t),
+        menu.ringPitch + RING_R * Math.cos(t));
+    }
+
+    if (menu.sel >= 0) {
+      var bl = bloomItems(items[menu.sel].id);
+      var st = menu.sel * 2 * Math.PI / n;
+      // The options sit in one row under the ring rather than fanning outward
+      // from the item. Outward from the top of the ring meant looking up past
+      // 45 degrees; this keeps every choice in the same comfortable band. The
+      // row slides towards whichever item you picked, and that item stays
+      // enlarged, so it still reads as having come from there.
+      // a long row is already near the edge of an easy glance, so the further
+      // it reaches the less it is allowed to slide towards its item
+      var half = (bl.length - 1) / 2 * BLOOM_STEP;
+      var room = Math.max(0, BLOOM_REACH - half);
+      var shift = Math.max(-BLOOM_SHIFT, Math.min(BLOOM_SHIFT, RING_R * Math.sin(st)));
+      shift = Math.max(-room, Math.min(room, shift));
+      for (i = 0; i < bl.length && i < menu.bloom.length; i++) {
+        placeTile(menu.bloom[i], bl[i],
+          menu.ringYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
+          BLOOM_PITCH);
+      }
+      menu.ring[menu.sel].scale.setScalar(1.12);
     }
     refreshPickables();
   }
@@ -969,7 +1111,7 @@ function bootPracticeSpace() {
     stowRoom();
     layOutRoom(env);
     loadSky(env);
-    menu.page = 'root';
+    menu.sel = -1;
     layoutMenu();
     scheduleSave();
   }
@@ -1084,14 +1226,16 @@ function bootPracticeSpace() {
   var lastArc = -1;
   // hover and progress live on the row itself; the reticle is only for aiming
   function paintSlots(hit, progress) {
-    for (var i = 0; i < menu.slots.length; i++) {
-      var s = menu.slots[i];
+    // one flat list built once: this runs every frame
+    for (var i = 0; i < allTiles.length; i++) {
+      var s = allTiles[i];
       if (!s.visible) continue;
       var on = (s === hit);
-      s.scale.setScalar(on ? 1.07 : 1);
+      var picked = (menu.sel >= 0 && s === menu.ring[menu.sel]);
+      s.scale.setScalar(on ? 1.14 : (picked ? 1.12 : 1));
       var f = s.userData.fill;
       f.visible = on && progress > 0.01;
-      if (f.visible) f.scale.x = SLOT_W * Math.min(1, progress);
+      if (f.visible) f.scale.x = TILE * Math.min(1, progress);
     }
   }
 
@@ -1167,8 +1311,8 @@ function bootPracticeSpace() {
     var obj = hits.length ? hits[0].object : null;
 
     // a slot you just used will not fire again until your gaze has left it.
-    // menu pages reuse the same meshes, so without this the stare that
-    // opened a page runs straight on into the item that lands in its place.
+    // tiles are reused as the ring changes, so without this the stare that
+    // picked one runs straight on into whatever lands in its place.
     if (obj !== mustLeave) mustLeave = null;
     else if (obj) { gazeHit = obj; gazeHeld = 0; setReticle(0, 0xEFE9DF); paintSlots(obj, 0); return; }
 
@@ -1277,7 +1421,7 @@ function bootPracticeSpace() {
     var step = dt || 0.016;
     if (!id) return;
 
-    if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
+    if (id === 'open')  { menu.open = true; menu.sel = -1; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
 
@@ -1287,11 +1431,20 @@ function bootPracticeSpace() {
       goToRoom(el.value);
       return;
     }
-    if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
+    // picking a ring item does not replace anything: it blooms beside it
+    if (id.indexOf('sel:') === 0) {
+      var ring = ringItems();
+      for (var k = 0; k < ring.length; k++) {
+        if (ring[k].id === id) { menu.sel = (menu.sel === k) ? -1 : k; break; }
+      }
+      menu.idle = 0;
+      layoutMenu();
+      return;
+    }
 
     if (id === 'addpanel') {
       var added = addPanel();
-      if (added) { menu.page = 'panel:' + (panels.length - 1); scheduleSave(); }
+      if (added) { menu.sel = panels.length; scheduleSave(); }
       layoutMenu();
       return;
     }
@@ -1318,12 +1471,12 @@ function bootPracticeSpace() {
     }
 
     var p = panels[parseInt(arg, 10)];
-    if (!p) { menu.page = 'windows'; layoutMenu(); return; }
+    if (!p) { menu.sel = -1; layoutMenu(); return; }
 
     if (verb === 'shape')  { setPanelShape(p, !p.round); scheduleSave(); layoutMenu(); return; }
     if (verb === 'remove') {
       removePanel(parseInt(arg, 10));
-      menu.page = 'windows';
+      menu.sel = -1;
       placeAll(); scheduleSave(); layoutMenu();
       return;
     }
@@ -1342,7 +1495,7 @@ function bootPracticeSpace() {
     if (recentering) { finishRecenter(); return; }
     if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
     // button pressed while looking at nothing opens the menu at its parked spot
-    if (!menu.open) { menu.open = true; menu.page = 'root'; menu.idle = 0; menuFound = true; layoutMenu(); }
+    if (!menu.open) { menu.open = true; menu.sel = -1; menu.idle = 0; menuFound = true; layoutMenu(); }
   }
 
   // ---------- render ----------
