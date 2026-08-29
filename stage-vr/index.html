@@ -1405,9 +1405,24 @@ function bootPracticeSpace() {
     });
   }
 
+  // Which way up the screen is being held. window.orientation is the old name
+  // for this and Chrome has removed it, so on Android it read as undefined,
+  // fell through to 0, and the app believed the phone was upright while it was
+  // held sideways in the viewer: the whole frame turns a quarter for that, and
+  // the tag that should be above you ends up beside you. screen.orientation is
+  // the live one. Keep the old name behind it for iOS Safari, where it is still
+  // what there is. The two agree where both exist, and where they differ it is
+  // -90 against 270, which is the same rotation.
+  function screenAngle() {
+    if (screen.orientation && typeof screen.orientation.angle === 'number') {
+      return screen.orientation.angle;
+    }
+    return window.orientation || 0;
+  }
+
   function onOrient(e) {
     if (e.alpha === null || e.alpha === undefined) return;
-    orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: (window.orientation || 0) };
+    orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: screenAngle() };
     // the first reading after entering is what "straight ahead" means, so the
     // house lands where it was aimed instead of wherever the compass points
     if (pendingRecenter) { pendingRecenter = false; doRecenter(); }
@@ -1987,6 +2002,7 @@ function bootPracticeSpace() {
 
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
+  var _size = new THREE.Vector2();
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -1999,7 +2015,16 @@ function bootPracticeSpace() {
     updateWindowProjection();
 
     if (mode === 'stereo') {
-      var w = renderer.domElement.width, h = renderer.domElement.height;
+      // CSS pixels, not the drawing buffer. setViewport and setScissor multiply
+      // by the pixel ratio themselves, so handing them domElement.width counted
+      // the ratio twice: on a phone at ratio 2 the left eye was drawn across the
+      // whole width and twice the height, anchored at the bottom, so the centre
+      // of the view sat off the top of the screen and everything you could see
+      // was the bottom half of the frame. That is why the menu tag read as way
+      // below where it is. On this desktop the ratio happens to be 1 and the bug
+      // is invisible, which is how it survived.
+      renderer.getSize(_size);
+      var w = _size.x, h = _size.y;
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
         c.fov = 78; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
@@ -2024,6 +2049,10 @@ function bootPracticeSpace() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    // turning the phone to landscape is a resize, and the numbers you want to
+    // read are the landscape ones
+    var n = document.getElementById('modeNote');
+    if (n && n.textContent) n.textContent = deviceLine();
   }
 
   function bindInput() {
@@ -2153,14 +2182,30 @@ function bootPracticeSpace() {
   showEnv(envEl.value);
 
   var note = document.getElementById('modeNote');
+
+  // TEMPORARY. The split screen can only be got wrong on a real device, and
+  // there is no console to read on a phone in a viewer, so put the numbers
+  // where you can read them before you go in. Take this back out once the
+  // stereo geometry has been confirmed right on the phone.
+  function deviceLine() {
+    renderer.getSize(_size);
+    return 'ratio ' + (window.devicePixelRatio || 1) +
+      ' · css ' + Math.round(_size.x) + 'x' + Math.round(_size.y) +
+      ' · buffer ' + renderer.domElement.width + 'x' + renderer.domElement.height +
+      ' · angle ' +
+      ((screen.orientation && typeof screen.orientation.angle === 'number')
+        ? screen.orientation.angle : '-') +
+      '/' + (typeof window.orientation === 'number' ? window.orientation : '-');
+  }
+
   function useStereo() {
-    note.textContent = '';
+    note.textContent = deviceLine();
     document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
   }
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
       if (ok) {
-        note.textContent = '';
+        note.textContent = deviceLine();
         document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
       } else { useStereo(); }
     }).catch(useStereo);
