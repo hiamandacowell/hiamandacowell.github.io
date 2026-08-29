@@ -634,11 +634,12 @@ function bootPracticeSpace() {
   // onto it. Once open the list drops into easy view just above the horizon,
   // clear of the music windows below, and clear of the tab so the stare that
   // opened the menu is not already sitting on the first choice.
-  var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
+  var MENU_REACH = 0.85, MENU_STEP = 0.125, MENU_IDLE = 8;
+  var SLOT_W = 0.20, SLOT_H = 0.075;
   var menu = {
     open: false, page: 'root', idle: 0,
-    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(36),
-    listYaw: 0, listTop: THREE.MathUtils.degToRad(27),
+    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(38),
+    listYaw: 0, listTop: THREE.MathUtils.degToRad(29),
     tab: null, slots: []
   };
   var texCache = {};
@@ -675,8 +676,23 @@ function bootPracticeSpace() {
     scene.add(menu.tab);
 
     for (var i = 0; i < 5; i++) {
-      var s = plate(0.175, 0.088, null);
+      var s = plate(SLOT_W, SLOT_H, null);
       s.visible = false;
+
+      // the dwell used to show only on the reticle at the centre of your view,
+      // which is not the thing you are choosing. it fills the button instead.
+      var fillGeo = new THREE.PlaneGeometry(1, SLOT_H);
+      fillGeo.translate(0.5, 0, 0);
+      var fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
+        color: 0xC9913F, transparent: true, opacity: 0.34, depthTest: false
+      }));
+      fill.renderOrder = 12;
+      fill.position.x = -SLOT_W / 2;
+      fill.position.z = 0.001;
+      fill.visible = false;
+      s.add(fill);
+      s.userData.fill = fill;
+
       scene.add(s);
       menu.slots.push(s);
     }
@@ -1066,6 +1082,19 @@ function bootPracticeSpace() {
   // rebuilding ring geometry every frame churns memory on a phone,
   // so only redraw when the arc actually moves a visible amount
   var lastArc = -1;
+  // hover and progress live on the row itself; the reticle is only for aiming
+  function paintSlots(hit, progress) {
+    for (var i = 0; i < menu.slots.length; i++) {
+      var s = menu.slots[i];
+      if (!s.visible) continue;
+      var on = (s === hit);
+      s.scale.setScalar(on ? 1.07 : 1);
+      var f = s.userData.fill;
+      f.visible = on && progress > 0.01;
+      if (f.visible) f.scale.x = SLOT_W * Math.min(1, progress);
+    }
+  }
+
   function setReticle(progress, color) {
     var p = THREE.MathUtils.clamp(progress, 0, 1);
     var q = Math.round(p * 24) / 24;
@@ -1083,7 +1112,7 @@ function bootPracticeSpace() {
   function updateGaze(dt) {
     var inSpace = inScene;
     reticle.visible = inSpace;
-    if (!inSpace) { gazeHit = null; return; }
+    if (!inSpace) { gazeHit = null; paintSlots(null, 0); return; }
 
     var vc = viewCamera();
     vc.updateMatrixWorld();
@@ -1128,6 +1157,7 @@ function bootPracticeSpace() {
     if (cooldown > 0) {
       cooldown = Math.max(0, cooldown - dt);
       setReticle(0, 0xEFE9DF);
+      paintSlots(null, 0);
       gazeHit = null; gazeHeld = 0;
       return;
     }
@@ -1140,11 +1170,12 @@ function bootPracticeSpace() {
     // menu pages reuse the same meshes, so without this the stare that
     // opened a page runs straight on into the item that lands in its place.
     if (obj !== mustLeave) mustLeave = null;
-    else if (obj) { gazeHit = obj; gazeHeld = 0; setReticle(0, 0xEFE9DF); return; }
+    else if (obj) { gazeHit = obj; gazeHeld = 0; setReticle(0, 0xEFE9DF); paintSlots(obj, 0); return; }
 
     if (obj !== gazeHit) { gazeHit = obj; gazeHeld = 0; }
     if (!obj) {
       setReticle(0, 0xEFE9DF);
+      paintSlots(null, 0);
       // a menu you have stopped using folds itself back down to the tab
       if (menu.open) {
         menu.idle += dt;
@@ -1155,16 +1186,21 @@ function bootPracticeSpace() {
     menu.idle = 0;
     gazeHeld += dt;
 
+    var prog;
     if (obj.userData.repeat) {
-      if (gazeHeld > REPEAT_DELAY) { activate(obj.userData.id, dt); setReticle(1, 0xC9913F); }
-      else setReticle(gazeHeld / REPEAT_DELAY, 0xC9913F);
+      prog = gazeHeld > REPEAT_DELAY ? 1 : gazeHeld / REPEAT_DELAY;
+      if (gazeHeld > REPEAT_DELAY) activate(obj.userData.id, dt);
+      setReticle(prog, 0xC9913F);
     } else if (gazeHeld > DWELL) {
       activate(obj.userData.id, dt);
       mustLeave = obj;
       cooldown = COOLDOWN;
+      prog = 1;
     } else {
-      setReticle(Math.max(0, gazeHeld) / DWELL, 0xC9913F);
+      prog = Math.max(0, gazeHeld) / DWELL;
+      setReticle(prog, 0xC9913F);
     }
+    paintSlots(obj, prog);
   }
 
   function updateMovingRig(vDir) {
