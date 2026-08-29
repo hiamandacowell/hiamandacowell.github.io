@@ -8,15 +8,15 @@
 
 <style>
   :root{
-    --ink:#0E0D0C;
-    --surface:#191614;
-    --surface-2:#211D1A;
-    --line:#302925;
-    --text:#EFE9DF;
-    --muted:#9A9086;
+    --ink:#0B0C0E;
+    --surface:#15171A;
+    --surface-2:#1D2025;
+    --line:#2A2E34;
+    --text:#F1F3F5;
+    --muted:#99A0A9;
     --brass:#C9913F;
     --brass-dim:#8A6329;
-    --velvet:#8E2B33;
+    --velvet:#C4303C;
     --warn:#E0A6A6;
     --display:"Fraunces", Georgia, "Times New Roman", serif;
     --ui:"Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -37,41 +37,47 @@
     position:relative; z-index:2; min-height:100vh; min-height:100dvh;
     padding:34px 20px 56px;
     background:
-      radial-gradient(130% 80% at 50% -10%, rgba(201,145,63,0.10) 0%, rgba(14,13,12,0) 62%),
+      radial-gradient(120% 70% at 50% -8%, rgba(196,48,60,0.10) 0%, rgba(11,12,14,0) 60%),
       var(--ink);
   }
   .wrap{max-width:460px;margin:0 auto;}
 
   .eyebrow{
     font-size:11px; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--brass); margin:0 0 10px;
+    color:var(--velvet); margin:0 0 10px;
   }
   h1{
     font-family:var(--display);
     font-weight:600; font-size:34px; line-height:1.08; letter-spacing:-0.015em;
     margin:0 0 14px; text-wrap:balance;
   }
-  .rule{height:1px;background:linear-gradient(90deg,var(--brass-dim),rgba(201,145,63,0));margin:0 0 16px;}
+  .rule{height:1px;background:linear-gradient(90deg,var(--velvet),rgba(196,48,60,0));margin:0 0 18px;}
   .sub{font-size:14.5px;line-height:1.6;color:var(--muted);margin:0 0 26px;}
   .sub b{color:var(--text);font-weight:500;}
 
-  fieldset{
-    border:1px solid var(--line); border-radius:10px;
-    padding:10px 14px 8px; margin:0 0 14px; background:var(--surface);
-  }
-  legend{
-    font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--muted); padding:0 7px;
-  }
-  label.row{display:flex;gap:11px;padding:9px 2px;font-size:15px;cursor:pointer;align-items:flex-start;}
-  label.row input{width:17px;height:17px;margin-top:2px;accent-color:var(--brass);flex:none;}
-  label.row small{display:block;color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:3px;}
+  /* the select still drives loadSky and what gets saved; the tiles set it */
+  #env{display:none;}
 
-  .slider{padding:6px 2px 10px;font-size:12.5px;color:var(--muted);}
-  .slider input{width:100%;accent-color:var(--brass);margin-top:5px;}
-  select{
-    width:100%;padding:11px 10px;border-radius:7px;background:var(--surface-2);
-    color:var(--text);border:1px solid var(--line);font-family:var(--ui);font-size:14.5px;
+  .pick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 28px;}
+  .tile{
+    position:relative;padding:0;border:1px solid var(--line);border-radius:12px;
+    background:var(--surface);overflow:hidden;cursor:pointer;text-align:left;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tile .shot{
+    display:block;height:104px;background-size:cover;background-position:center;
+    filter:saturate(.85) brightness(.8);
+  }
+  .tile[data-env="img-stage"] .shot{background-image:url(hill-stage.jpg);background-position:48% 58%;}
+  .tile[data-env="img-green"] .shot{background-image:url(hill-greenroom.jpg);background-position:75% 55%;}
+  .tile .cap{
+    display:block;padding:11px 12px 12px;font-size:14.5px;font-weight:500;color:var(--text);
+  }
+  .tile[aria-pressed="true"]{border-color:var(--velvet);}
+  .tile[aria-pressed="true"] .shot{filter:none;}
+  .tile[aria-pressed="true"]::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--velvet);
   }
 
   details{margin:2px 0 6px;}
@@ -86,16 +92,16 @@
 
   button{font-family:var(--ui);}
   button.go{
-    width:100%;padding:15px;font-size:15.5px;font-weight:600;letter-spacing:.01em;
-    border:0;border-radius:9px;background:var(--brass);color:#1A1206;cursor:pointer;margin-top:6px;
+    width:100%;padding:16px;font-size:16px;font-weight:600;letter-spacing:.01em;
+    border:0;border-radius:10px;background:var(--text);color:#0B0C0E;cursor:pointer;
   }
-  button.go:hover{background:#D9A150;}
+  button.go:hover{background:#fff;}
   button.ghost{
     width:100%;padding:11px;font-size:13.5px;border:1px solid var(--line);border-radius:8px;
     background:transparent;color:var(--muted);cursor:pointer;margin-top:9px;
   }
-  button.ghost:hover{color:var(--text);border-color:var(--brass-dim);}
-  :focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+  button.ghost:hover{color:var(--text);border-color:var(--muted);}
+  :focus-visible{outline:2px solid var(--velvet);outline-offset:2px;}
 
   .note{font-size:12.8px;color:var(--muted);line-height:1.6;margin:16px 0 0;}
   .note b{color:var(--text);font-weight:600;}
@@ -116,80 +122,30 @@
   <p class="eyebrow">Piano bench, downstage center</p>
   <h1>Hill Auditorium Practice Space</h1>
   <div class="rule"></div>
-  <p class="sub">The Hill stage in 360, from where you sit to play. Runs in a
-     <b>Google Cardboard viewer with any phone</b>.</p>
+  <p class="sub">The Hill stage in 360, from where you sit to play. For a
+     <b>Google Cardboard viewer and any phone</b>.</p>
 
-  <fieldset>
-    <legend>Where you start</legend>
-    <select id="env" aria-label="Environment">
-      <option value="img-stage">On stage, facing the house</option>
-      <option value="img-green">Green room, waiting to go on</option>
-    </select>
-  </fieldset>
+  <p class="pick">Where do you want to start?</p>
+  <div class="tiles">
+    <button class="tile" type="button" data-env="img-stage" aria-pressed="true">
+      <span class="shot"></span><span class="cap">On stage</span>
+    </button>
+    <button class="tile" type="button" data-env="img-green" aria-pressed="false">
+      <span class="shot"></span><span class="cap">Green room</span>
+    </button>
+  </div>
 
-  <fieldset>
-    <legend>Windows on the real room</legend>
-
-    <label class="row"><input type="checkbox" id="optCam">
-      <span>Music windows
-        <small>Windows on the real room at eye level, for glancing at your score. Add up to
-        three from inside, each its own size and shape.</small>
-      </span></label>
-
-    <label class="row"><input type="checkbox" id="optPiano">
-      <span>Piano
-        <small>A second window, down where your real keys are, framed by a 3D piano body.</small>
-      </span></label>
-
-    <details>
-      <summary>How the windows work</summary>
-      <p>Each window is a hole showing what the rear camera can actually see behind it, worked out from
-         where you put the window and where your head is pointed. They all share the one camera, so they
-         show different parts of the room, not the same picture several times over.</p>
-      <p><b>Where the camera cannot reach, the window is black.</b> A phone lens sees about 65 degrees
-         across, so the keys window is usually dark while you are looking out at the house, and fills in
-         as you tilt your head down towards it. That is the lens telling the truth, not a fault.</p>
-      <p>One camera feeding two eyes reads flat and runs about a tenth of a second behind. Fine for
-         glancing, wrong for reaching. If the camera is unavailable the keys window falls back to a drawn
-         keybed, which is a placeholder and not your keys; trim the bottom edge of the cardboard and look
-         down at your real keyboard through the gap.</p>
-    </details>
-  </fieldset>
+  <select id="env" aria-label="Environment">
+    <option value="img-stage">On stage</option>
+    <option value="img-green">Green room</option>
+  </select>
 
   <button class="go" id="enter">Enter</button>
   <button class="ghost" id="peek">Look around on this screen first</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
-  <details>
-    <summary>Changing things once you are inside</summary>
-    <p>Everything lives behind one <b>menu</b> tab floating <b>above you</b>, a brass tag you find by
-       tilting your head up. Up is the one direction you never look while playing, so nothing you do at
-       the instrument can open it by accident, and nothing else in the scene answers to your gaze at
-       all. The first time you go in, a note sits at eye level pointing up at it; once you have opened
-       the menu that note never comes back. Open it by looking at the tag for a moment, or by
-       <b>pressing the viewer button</b>. It folds itself away if you stop using it.</p>
-    <p>The choices unfurl <b>below the tag but still overhead</b>, so they never hang over the house
-       while you are looking at it, and never sit on top of your windows.</p>
-    <p>Inside: <b>piano</b>, <b>windows</b>, the other <b>room</b>, and <b>recenter</b>, never more than
-       five rows on screen.
-       Pick <b>move it</b> to pick something up; it then follows your head, so look where you want it and
-       <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to drop it at
-       once. Holding still means not turning your head, not being a statue: a wobble costs you a moment,
-       it does not start you over. Once placed, it stays put in the room while you look around.</p>
-    <p>Under <b>windows</b> you can <b>add</b> up to three, and each one has its own <b>size</b>, with
-       wider, narrower, taller and shorter as separate controls rather than one scale, so you can make a
-       square, a letterbox or a tall page. <b>Shape</b> switches that window between square and round.</p>
-    <p><b>Recenter</b> is in there because the buttons on this page are out of reach once the phone is
-       shut in the viewer, and the heading drifts over a long session. It waits rather than firing at
-       once, since you are looking off at the menu when you pick it: look where you want front to be,
-       then hold still.</p>
-    <p>Where you put things is <b>remembered on this phone</b>, so the next time you open the page your
-       piano is where you left it. Nothing leaves the device, and there is a button below to forget it
-       all and start fresh.</p>
-    <p><b>On iPhone</b>, if the view will not follow your head: Settings, Apps, Safari, turn on Motion
-       &amp; Orientation Access, then reload.</p>
-  </details>
-
+  <p class="note">Hold the phone in <b>landscape</b> once you are in. The piano and a window
+     on your real room come with you; move, resize and hide them from the menu above your head.</p>
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
 </div></div>
@@ -239,7 +195,7 @@ function bootPracticeSpace() {
   var RIG_YAW = THREE.MathUtils.degToRad(-10);
 
   var piano = {
-    kind: 'deck', on: false,
+    kind: 'deck', on: true,
     yaw: RIG_YAW, drop: 0.46, dist: 0.44, width: 1.0,
     group: null, win: null, fallback: null
   };
@@ -248,9 +204,10 @@ function bootPracticeSpace() {
   // independently, which covers square, letterbox and portrait without needing
   // preset shapes; round is the one shape that is not just an aspect ratio, so
   // it is a toggle. Three is a cap: past that the menu stops being a menu.
-  var PANEL_MAX = 3;
+  // One window is what ships. The list, the add and remove entries and the menu
+  // paging all still work for more: raise this and they reappear on their own.
+  var PANEL_MAX = 1;
   var panels = [];
-  var panelsOn = false;
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, recentering = false, lastT = 0;
@@ -486,7 +443,7 @@ function bootPracticeSpace() {
 
   function makePanel(init) {
     var p = {
-      kind: 'panel',
+      kind: 'panel', on: true,
       azim: RIG_YAW, elev: THREE.MathUtils.degToRad(-14), dist: 1.05,
       w: 1.05, h: 0.59, round: false,
       group: null, win: null
@@ -497,7 +454,7 @@ function bootPracticeSpace() {
     p.group = new THREE.Group();
     p.win = new THREE.Mesh(panelGeometry(p.round), windowMaterial());
     p.group.add(p.win);
-    p.group.visible = panelsOn;
+    p.group.visible = p.on;
     scene.add(p.group);
     return p;
   }
@@ -644,7 +601,7 @@ function bootPracticeSpace() {
   function placeAll() {
     placePiano();
     for (var i = 0; i < panels.length; i++) {
-      panels[i].group.visible = panelsOn;
+      panels[i].group.visible = panels[i].on;
       placePanel(panels[i]);
     }
   }
@@ -748,14 +705,14 @@ function bootPracticeSpace() {
   function menuItems() {
     var pp = pageParts();
     if (pp && !panels[pp.i]) { menu.page = 'windows'; pp = null; }
-    if (menu.page === 'piano' && !piano.on) menu.page = 'root';
-    if (menu.page === 'windows' && !panelsOn) menu.page = 'root';
+
 
     if (menu.page === 'piano') {
       return [
         { id: 'move:piano', label: 'move it' },
         { id: 'smaller', label: 'smaller', repeat: true },
         { id: 'bigger', label: 'bigger', repeat: true },
+        { id: 'hide:piano', label: piano.on ? 'hide it' : 'show it' },
         { id: 'page:root', label: 'back' }
       ];
     }
@@ -773,12 +730,13 @@ function bootPracticeSpace() {
     }
 
     if (pp && pp.kind === 'panel') {
+      var pan = panels[pp.i];
       return [
         { id: 'move:' + pp.i, label: 'move it' },
         { id: 'page:size:' + pp.i, label: 'size' },
-        { id: 'shape:' + pp.i, label: panels[pp.i].round ? 'make it square' : 'make it round' },
-        { id: 'remove:' + pp.i, label: 'remove it' },
-        { id: 'page:windows', label: 'back' }
+        { id: 'shape:' + pp.i, label: pan.round ? 'make it square' : 'make it round' },
+        { id: 'hide:' + pp.i, label: pan.on ? 'hide it' : 'show it' },
+        { id: PANEL_MAX > 1 ? 'page:windows' : 'page:root', label: 'back' }
       ];
     }
 
@@ -792,9 +750,10 @@ function bootPracticeSpace() {
       ];
     }
 
-    var items = [];
-    if (piano.on) items.push({ id: 'page:piano', label: 'piano' });
-    if (panelsOn) items.push({ id: 'page:windows', label: 'windows' });
+    var items = [{ id: 'page:piano', label: 'piano' }];
+    // with a single window there is no list worth paging through, so go straight in
+    if (PANEL_MAX > 1) items.push({ id: 'page:windows', label: 'windows' });
+    else if (panels.length) items.push({ id: 'page:panel:0', label: 'music window' });
     // both panoramas are already in the page as img tags, so this is a texture
     // swap with nothing to fetch: no reason to make you go back out for it
     items.push({
@@ -927,12 +886,11 @@ function bootPracticeSpace() {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: document.getElementById('env').value,
         menuFound: !!menuFound,
-        panelsOn: !!document.getElementById('optCam').checked,
         panels: panels.map(function (q) {
-          return { azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h, round: !!q.round };
+          return { on: !!q.on, azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h, round: !!q.round };
         }),
         piano: {
-          on: !!document.getElementById('optPiano').checked,
+          on: !!piano.on,
           yaw: piano.yaw, drop: piano.drop,
           dist: piano.dist, width: piano.width
         }
@@ -946,6 +904,17 @@ function bootPracticeSpace() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveState, 400);
   }
+
+  // a coalesced write is a write you can lose by closing the tab inside the
+  // window, so commit any pending one the moment the page goes away
+  function flushSave() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    saveState();
+  }
+  window.addEventListener('pagehide', flushSave);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) flushSave();
+  });
 
   // stored numbers are only trusted inside the range the control itself allows,
   // so a corrupt or hand-edited entry cannot strand a window somewhere unusable
@@ -965,13 +934,12 @@ function bootPracticeSpace() {
       document.getElementById('env').value = s.env;
     }
     menuFound = !!s.menuFound;
-    document.getElementById('optCam').checked = !!s.panelsOn;
-    panelsOn = !!s.panelsOn;
     if (Object.prototype.toString.call(s.panels) === '[object Array]') {
       for (var i = 0; i < s.panels.length && panels.length < PANEL_MAX; i++) {
         var q = s.panels[i];
         if (!q || typeof q !== 'object') continue;
         panels.push(makePanel({
+          on:    q.on !== false,
           azim:  num(q.azim,  RIG_YAW, -Math.PI, Math.PI),
           elev:  num(q.elev,  THREE.MathUtils.degToRad(-14), -1.5, 1.5),
           dist:  num(q.dist,  1.05, 0.35, 1.80),
@@ -987,7 +955,7 @@ function bootPracticeSpace() {
       p.drop  = num(s.piano.drop,  p.drop,  0.10, 1.10);
       p.dist  = num(s.piano.dist,  p.dist,  0.20, 1.20);
       p.width = num(s.piano.width, p.width, 0.40, 2.40);
-      document.getElementById('optPiano').checked = !!s.piano.on;
+      piano.on = s.piano.on !== false;
     }
     placeAll();
   }
@@ -1249,6 +1217,14 @@ function bootPracticeSpace() {
     if (colon < 0) return;
     var verb = id.slice(0, colon), arg = id.slice(colon + 1);
 
+    if (verb === 'hide') {
+      var target = (arg === 'piano') ? piano : panels[parseInt(arg, 10)];
+      if (target) { target.on = !target.on; placeAll(); scheduleSave(); }
+      if (piano.group) piano.group.visible = piano.on;
+      layoutMenu();
+      return;
+    }
+
     if (verb === 'move') {
       menu.open = false;
       grab(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
@@ -1353,16 +1329,13 @@ function bootPracticeSpace() {
   }
 
   function applyOptions() {
-    panelsOn = document.getElementById('optCam').checked;
-    piano.on = document.getElementById('optPiano').checked;
+    // the piano and one window come with you; what you do or do not want is a
+    // decision for once you are inside, not for a form you fill in beforehand
+    if (panels.length === 0) addPanel();
     piano.group.visible = piano.on;
 
-    // turning the windows on for the first time hands you one to place
-    if (panelsOn && panels.length === 0) addPanel();
-
-    // one camera serves every window, so ask for it if anything is up
-    if (panelsOn || piano.on) startPassthrough();
-
+    // one camera serves everything, so ask for it if anything is showing
+    if (piano.on || panels.some(function (q) { return q.on; })) startPassthrough();
 
     placeAll();
     layoutMenu();
@@ -1407,23 +1380,33 @@ function bootPracticeSpace() {
   init();
   bindInput();
   loadState();
-  loadSky(document.getElementById('env').value);
 
-  document.getElementById('env').addEventListener('change', function (e) { loadSky(e.target.value); scheduleSave(); });
-  ['optCam', 'optPiano'].forEach(function (id) {
-    document.getElementById(id).addEventListener('change', applyOptions);
-  });
+  var envEl = document.getElementById('env');
+  var tiles = document.querySelectorAll('.tile');
+
+  function showEnv(value) {
+    envEl.value = value;
+    for (var i = 0; i < tiles.length; i++) {
+      tiles[i].setAttribute('aria-pressed', tiles[i].getAttribute('data-env') === value ? 'true' : 'false');
+    }
+    loadSky(value);
+    scheduleSave();
+  }
+  for (var t = 0; t < tiles.length; t++) {
+    tiles[t].addEventListener('click', function () { showEnv(this.getAttribute('data-env')); });
+  }
+  envEl.addEventListener('change', function (e) { showEnv(e.target.value); });
+  showEnv(envEl.value);
 
   var note = document.getElementById('modeNote');
   function useStereo() {
-    note.innerHTML = '<b>No WebXR here</b>, which is normal on Safari. Enter uses a split-screen ' +
-      'stereo fallback driven by the gyroscope. Hold the phone in landscape.';
+    note.textContent = '';
     document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
   }
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
       if (ok) {
-        note.innerHTML = '<b>WebXR is available here.</b> Enter goes to proper stereo VR.';
+        note.textContent = '';
         document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
       } else { useStereo(); }
     }).catch(useStereo);
