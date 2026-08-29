@@ -208,6 +208,8 @@ function bootPracticeSpace() {
   var menuFound = false;
   var pickables = [];
   var mode = 'flat';
+  // a headset that shows you your own room behind the page
+  var passthrough = false;
   var inScene = false;
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
@@ -283,7 +285,9 @@ function bootPracticeSpace() {
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    // alpha so that a passthrough session has something to show through:
+    // where nothing is drawn, the headset puts your own room there
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
@@ -604,6 +608,42 @@ function bootPracticeSpace() {
   }
 
   // when the camera arrives after the rigs are already built, hand it to both windows
+  // Passthrough turns the windows from pictures into holes.
+  //
+  // The trick is depth and nothing else. The window planes are drawn first and
+  // write only depth, no colour. The panorama is drawn after them and tested
+  // against that depth, so wherever a window is, the panorama is behind it and
+  // simply is not drawn. Nothing is left there at all, and what you see through
+  // the gap is what the headset is compositing behind the page: the room you
+  // are actually sitting in, at full resolution, in real depth, with no lag and
+  // no camera permission. It is what the camera window was always reaching for.
+  //
+  // The piano's drawn body goes too. It is furniture standing exactly where the
+  // real instrument is, and in passthrough the real one is the one you want.
+  function applyPassthrough() {
+    var on = passthrough, i;
+    renderer.setClearAlpha(on ? 0 : 1);
+    sky.renderOrder = on ? -5 : 0;
+    windowMaterial().colorWrite = !on;
+
+    if (piano.win) {
+      piano.win.renderOrder = on ? -10 : 0;
+      if (on) piano.win.visible = true;
+    }
+    if (piano.fallback && on) piano.fallback.visible = false;
+    if (piano.group) {
+      for (i = 0; i < piano.group.children.length; i++) {
+        var ch = piano.group.children[i];
+        if (ch === piano.win || ch === piano.fallback) continue;
+        ch.visible = !on;
+      }
+    }
+    for (i = 0; i < panels.length; i++) {
+      panels[i].win.renderOrder = on ? -10 : 0;
+      if (on) panels[i].win.visible = true;
+    }
+  }
+
   function attachVideo() {
     winMat.uniforms.uVideo.value = videoTex;
     winMat.uniforms.uHasVideo.value = 1;
@@ -1271,6 +1311,11 @@ function bootPracticeSpace() {
   }
 
   function startPassthrough() {
+    // In a headset that shows you the room itself there is nothing to ask a
+    // camera for, and asking is worse than useless: the Quest has no camera to
+    // give a web page, so it offers something that is not one and the window
+    // fills with whatever that is. The window is a hole there, not a picture.
+    if (passthrough) return;
     if (videoTex) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
@@ -2278,17 +2323,28 @@ function bootPracticeSpace() {
     layoutMenu();
   }
 
-  function enterVR() {
-    navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] })
+  function enterXR(kind) {
+    navigator.xr.requestSession(kind, { optionalFeatures: ['local-floor'] })
       .then(function (session) {
         mode = 'xr';
+        passthrough = (kind === 'immersive-ar');
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; parking = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () {
+          passthrough = false;
+          applyPassthrough();
+          mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null;
+          recentering = false; parking = false; steady = 0;
+          showChrome(false);
+        });
+        applyPassthrough();
         showChrome(true);
       })
       .catch(function (e) {
         errEl.textContent = 'VR would not start here (' + e.message + '). Falling back to split screen.';
+        passthrough = false;
+        applyPassthrough();
+        if (piano.on || panels.some(function (q) { return q.on; })) startPassthrough();
         enterStereo();
       });
   }
@@ -2353,12 +2409,36 @@ function bootPracticeSpace() {
     note.textContent = deviceLine();
     document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
   }
+  // Ask for passthrough first. A headset that can show you your own room is a
+  // headset where the windows should be holes rather than a camera picture, and
+  // the ones that can are the ones this is worth doing on. Fall back to a plain
+  // immersive session, then to the split screen a phone gets.
+  function useXR(kind) {
+    note.textContent = deviceLine();
+    document.getElementById('enter').onclick = function () {
+      // set before applyOptions, which would otherwise go and ask for a camera
+      // on the way in to a session that does not need one
+      passthrough = (kind === 'immersive-ar');
+      applyOptions();
+      enterXR(kind);
+    };
+  }
+
   if (navigator.xr && navigator.xr.isSessionSupported) {
-    navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
-      if (ok) {
-        note.textContent = deviceLine();
-        document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
-      } else { useStereo(); }
+    Promise.all([
+      navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
+      navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
+    ]).then(function (r) {
+      var ar = r[0], vr = r[1];
+      // Passthrough only where the headset can also do a plain immersive
+      // session, which is how you tell a headset from a phone. An Android
+      // phone with ARCore says yes to immersive-ar and means something else
+      // entirely by it: a session you hold up and look through at arm's
+      // length. That is not this, and it would take the phone away from the
+      // Cardboard path it actually wants.
+      if (ar && vr) useXR('immersive-ar');
+      else if (vr) useXR('immersive-vr');
+      else useStereo();
     }).catch(useStereo);
   } else { useStereo(); }
 
