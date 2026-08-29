@@ -1307,6 +1307,7 @@ function bootPracticeSpace() {
     scheduleSave();
   }
   var saveTimer = null;
+  var forgetting = false;
 
   function saveState() {
     stowRoom();
@@ -1330,6 +1331,11 @@ function bootPracticeSpace() {
   // window, so commit any pending one the moment the page goes away
   function flushSave() {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    // "start fresh" removes the saved arrangement and reloads, and a reload is
+    // a pagehide, which is exactly where the state gets committed. Without a
+    // way to say we are leaving on purpose, the flush wrote the whole thing
+    // back on the way out and nothing was ever actually forgotten.
+    if (forgetting) return;
     saveState();
   }
   window.addEventListener('pagehide', flushSave);
@@ -1344,6 +1350,12 @@ function bootPracticeSpace() {
   }
 
   function loadState() {
+    // Start from the markup default every time, so what the select holds is
+    // either the default or something this function put there. A reload
+    // restores form control values, and after "start fresh" there is nothing
+    // saved to override them, which would otherwise leave the old room
+    // selected with nothing behind it.
+    document.getElementById('env').value = 'img-stage';
     var raw = null;
     try { raw = localStorage.getItem(STORE_KEY); } catch (e) { return; }
     if (!raw) return;
@@ -2115,6 +2127,8 @@ function bootPracticeSpace() {
   } else { useStereo(); }
 
   document.getElementById('forget').onclick = function () {
+    forgetting = true;
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     // v1 held one global arrangement rather than one per room; clear it too
     try { localStorage.removeItem(STORE_KEY); localStorage.removeItem('hill-practice-space-v1'); } catch (e) {}
     location.reload();
