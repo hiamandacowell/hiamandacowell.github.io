@@ -1829,8 +1829,46 @@ function bootPracticeSpace() {
     cooldown = COOLDOWN;
   }
 
+  // Whether yawOffset yet means anything. Until the first orientation reading
+  // lands there is no relation at all between a world bearing and the real
+  // room, so the first recenter of a session establishes that frame rather than
+  // turning it, and nothing should be taken out of the rigs for it.
+  var framed = false;
+
   function doRecenter() {
-    if (mode === 'stereo' && orient) yawOffset = -THREE.MathUtils.degToRad(orient.alpha);
+    if (mode === 'stereo' && orient) {
+      var next = -THREE.MathUtils.degToRad(orient.alpha);
+      // The panorama, the menu and the doors are meant to swing round and face
+      // you: that is the whole of recentring. The piano and the window are not.
+      // They are aimed at real things that have not moved — your keys, your
+      // stand — but they are held as world bearings, so moving yawOffset slid
+      // them off by exactly the angle you turned through, and a room change
+      // does this now too. Take that angle back out of them and they stay on
+      // the real thing while everything else comes to you.
+      if (framed) {
+        var delta = next - yawOffset;
+        piano.yaw -= delta;
+        for (var i = 0; i < panels.length; i++) panels[i].azim -= delta;
+        // The room you are not in has rigs too, stowed in whatever frame was
+        // current when you left it. Turn those with everything else or they
+        // come back aimed at where your stand used to be. stowRoom overwrites
+        // the room you are in from the live values, so turning that one here
+        // as well costs nothing.
+        for (var k in rooms) {
+          if (!Object.prototype.hasOwnProperty.call(rooms, k)) continue;
+          var r = rooms[k];
+          if (!r) continue;
+          if (r.piano) r.piano.yaw -= delta;
+          if (r.panels) {
+            for (var j = 0; j < r.panels.length; j++) r.panels[j].azim -= delta;
+          }
+        }
+      }
+      yawOffset = next;
+      framed = true;
+      placeAll();
+      scheduleSave();
+    }
     yaw = 0; pitch = 0;
   }
 
@@ -2096,6 +2134,7 @@ function bootPracticeSpace() {
     enableOrientation().then(function (ok) {
       mode = 'stereo';
       yawOffset = 0;
+      framed = false;
       pendingRecenter = true;
       if (orient) doRecenter();
       showChrome(true);
