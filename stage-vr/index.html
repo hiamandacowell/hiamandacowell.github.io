@@ -650,6 +650,60 @@ function bootPracticeSpace() {
     for (var q = 0; q < menu.handles.length; q++) {
       if (menu.handles[q].visible) pickables.push(menu.handles[q]);
     }
+    // last, and further off than any of the menu: where they overlap, the
+    // nearer hit wins and the menu is always the nearer one
+    if (doorMark && doorMark.visible) pickables.push(doorMark);
+  }
+
+  // ---------- the way out ----------
+
+  // You leave a room by its door. Both panoramas have one, so the way between
+  // them is the thing in the room rather than an entry in a list.
+  //
+  // Measured off the same forward as ENV_FORWARD: azim runs round from dead
+  // ahead, positive to your right, elev up from eye level. On the stage that is
+  // the pair of doors in the back wall over your right shoulder, on the join
+  // between the two leaves. In the green room it is the propped-open door to
+  // the corridor, and the marker sits in the opening itself against the brick
+  // across the hall, not on the leaf, because the leaf is standing open.
+  //
+  // Neither can be reached without deliberately turning: 122 degrees is behind
+  // you and 89 is square to your side. That is what makes it safe to leave a
+  // live button hanging in the room with nothing guarding it.
+  var DOORS = {
+    'img-stage': { azim: 122, elev: -3, label: 'green room' },
+    'img-green': { azim: -89, elev: -2, label: 'stage' }
+  };
+  // far enough out to read as hung on the wall rather than held in front of
+  // your face, and sized from that to cross the same 7 degrees as a menu tile
+  var DOOR_REACH = 2.45;
+  var DOOR_TILE = 0.30;
+  // a whole room on the 0.85s that hides a window is something that would
+  // happen to you. This one wants to be meant.
+  var DOOR_DWELL = 1.6;
+  var doorMark = null;
+
+  function layoutDoor() {
+    if (!doorMark) return;
+    var d = DOORS[currentEnv];
+    // while you are placing or sizing something, the room is not the subject
+    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering && !fitting);
+    if (!doorMark.visible) return;
+    doorMark.userData.id = 'door';
+    doorMark.userData.repeat = false;
+    doorMark.material.map = cachedIcon('room', d.label);
+    doorMark.material.needsUpdate = true;
+    doorMark.scale.setScalar(1);
+    aimAt(doorMark,
+      THREE.MathUtils.degToRad(d.azim),
+      THREE.MathUtils.degToRad(d.elev),
+      DOOR_REACH);
+  }
+
+  function switchRoom() {
+    var el = document.getElementById('env');
+    el.value = (el.value === 'img-stage') ? 'img-green' : 'img-stage';
+    goToRoom(el.value);
   }
 
   // ---------- menu ----------
@@ -891,20 +945,22 @@ function bootPracticeSpace() {
     obj.lookAt(h);
   }
 
-  function makeTile() {
-    var t = plate(TILE, TILE, null);
+  function makeTile(size) {
+    var s = size || TILE;
+    var t = plate(s, s, null);
     t.renderOrder = 11;
     t.visible = false;
-    var fg = new THREE.PlaneGeometry(1, TILE);
+    var fg = new THREE.PlaneGeometry(1, s);
     fg.translate(0.5, 0, 0);
     var fill = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({
       color: 0xC9913F, transparent: true, opacity: 0.34, depthTest: false
     }));
     fill.renderOrder = 12;
-    fill.position.set(-TILE / 2, 0, 0.001);
+    fill.position.set(-s / 2, 0, 0.001);
     fill.visible = false;
     t.add(fill);
     t.userData.fill = fill;
+    t.userData.size = s;
     scene.add(t);
     return t;
   }
@@ -925,7 +981,13 @@ function bootPracticeSpace() {
       scene.add(hnd);
       menu.handles.push(hnd);
     }
-    allTiles = menu.ring.concat(menu.bloom).concat(menu.handles);
+    doorMark = makeTile(DOOR_TILE);
+    // beneath the menu row, so a menu opened while you happen to be facing the
+    // way out still reads on top of it rather than fighting it
+    doorMark.renderOrder = 8;
+    doorMark.userData.fill.renderOrder = 9;
+    doorMark.userData.dwell = DOOR_DWELL;
+    allTiles = menu.ring.concat(menu.bloom).concat(menu.handles).concat([doorMark]);
 
     hintPlate = plate(0.34, 0.085, cachedLabel('hold still to place'));
     hintPlate.renderOrder = 13;
@@ -945,8 +1007,12 @@ function bootPracticeSpace() {
 
   // Two groups, and the gap between them is doing real work. Everything in the
   // first is about this room and what is in it. Everything in the second is
-  // about being done with it. Changing room had been sitting in the middle of
-  // the piano and the window, which read as a list of unrelated things.
+  // about being done with it.
+  //
+  // Changing room was here once, first in the middle of the piano and the
+  // window where it read as a list of unrelated things, then over in the second
+  // group. It is gone: you leave a room by its door now, and a menu entry that
+  // does the same thing from anywhere is the weaker of the two ideas.
   function ringItems() {
     var out = [{ id: 'sel:piano', icon: 'piano', label: 'piano', group: 0 }];
     for (var i = 0; i < panels.length; i++) {
@@ -957,10 +1023,6 @@ function bootPracticeSpace() {
     }
     if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'addwindow', label: 'window', group: 0 });
     out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
-    out.push({
-      id: 'room', icon: 'room', group: 1,
-      label: document.getElementById('env').value === 'img-stage' ? 'green room' : 'stage'
-    });
     out.push({ id: 'close', icon: 'close', label: 'close', group: 1 });
     return out.slice(0, menu.ring.length);
   }
@@ -1014,6 +1076,8 @@ function bootPracticeSpace() {
     for (i = 0; i < menu.bloom.length; i++) menu.bloom[i].visible = false;
 
     for (i = 0; i < menu.handles.length; i++) menu.handles[i].visible = false;
+
+    layoutDoor();
 
     if (!inScene || movingRig || recentering || fitting) { refreshPickables(); return; }
 
@@ -1361,8 +1425,10 @@ function bootPracticeSpace() {
       var picked = (menu.sel >= 0 && s === menu.ring[menu.sel]);
       s.scale.setScalar(on ? 1.14 : (picked ? 1.12 : 1));
       var f = s.userData.fill;
+      // the sizing handles are bare plates and have no fill to sweep
+      if (!f) continue;
       f.visible = on && progress > 0.01;
-      if (f.visible) f.scale.x = TILE * Math.min(1, progress);
+      if (f.visible) f.scale.x = (s.userData.size || TILE) * Math.min(1, progress);
     }
   }
 
@@ -1456,18 +1522,20 @@ function bootPracticeSpace() {
     menu.idle = 0;
     gazeHeld += dt;
 
+    // most things take the one dwell; the door out asks for longer
+    var dwell = obj.userData.dwell || DWELL;
     var prog;
     if (obj.userData.repeat) {
       prog = gazeHeld > REPEAT_DELAY ? 1 : gazeHeld / REPEAT_DELAY;
       if (gazeHeld > REPEAT_DELAY) activate(obj.userData.id, dt);
       setReticle(prog, 0xC9913F);
-    } else if (gazeHeld > DWELL) {
+    } else if (gazeHeld > dwell) {
       activate(obj.userData.id, dt);
       mustLeave = obj;
       cooldown = COOLDOWN;
       prog = 1;
     } else {
-      prog = Math.max(0, gazeHeld) / DWELL;
+      prog = Math.max(0, gazeHeld) / dwell;
       setReticle(prog, 0xC9913F);
     }
     paintSlots(obj, prog);
@@ -1763,12 +1831,7 @@ function bootPracticeSpace() {
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
 
-    if (id === 'room') {
-      var el = document.getElementById('env');
-      el.value = (el.value === 'img-stage') ? 'img-green' : 'img-stage';
-      goToRoom(el.value);
-      return;
-    }
+    if (id === 'door') { switchRoom(); return; }
     // picking a ring item does not replace anything: it blooms beside it
     if (id.indexOf('sel:') === 0) {
       var ring = ringItems();
