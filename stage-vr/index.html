@@ -116,7 +116,7 @@
   #gate .wrap{width:100%;}
   #gate input{
     width:100%; padding:15px; margin:0 0 10px; font-family:var(--ui); font-size:18px;
-    letter-spacing:.32em; text-align:center; color:var(--text);
+    letter-spacing:.14em; text-align:center; color:var(--text);
     background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
   }
   #hud{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;display:none;gap:8px;}
@@ -133,9 +133,10 @@
 <div id="gate"><div class="wrap">
   <h1>Stage VR Proof-of-Concept</h1>
   <div class="rule"></div>
-  <p class="sub">Not a public page. Enter the PIN to go in.</p>
+  <p class="sub">Not a public page. Enter the password to go in.</p>
   <form id="gateForm" autocomplete="off">
-    <input id="pin" type="password" inputmode="numeric" placeholder="PIN" aria-label="PIN">
+    <input id="pin" type="password" autocapitalize="none" autocorrect="off" spellcheck="false"
+           placeholder="password" aria-label="Password">
     <button class="go" type="submit">Unlock</button>
   </form>
   <p class="note" id="gateErr" role="status"></p>
@@ -1833,10 +1834,10 @@ function startPracticeSpace() {
 // of the server, and amandacowell.com already goes through Cloudflare, whose
 // Access product does exactly that with no change to this file.
 //
-// To change the PIN, replace the hash below. Any SHA-256 of the new PIN will
-// do, for instance from: echo -n 1913 | sha256sum
+// To change the password, replace the hash below with the SHA-256 of the new
+// one, for instance from: echo -n music | sha256sum
 var GATE_KEY = 'hill-practice-unlocked-v1';
-var PIN_SHA256 = '3b1fba0616142d348bd8a977e3aa3d65dab82a5ac11ed16d4e22ff5460458d4f';
+var PIN_SHA256 = '80f189984e5ca70287d13342f6daa0db45cba3c131c4e46dc81360f3a4c4f690';
 
 function sha256Hex(text) {
   var bytes = new TextEncoder().encode(text);
@@ -1865,7 +1866,7 @@ function setUpGate() {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var tried = input.value.trim();
+    var tried = input.value.trim().toLowerCase();
     if (!tried) return;
     sha256Hex(tried).then(function (h) {
       if (h === PIN_SHA256) {
