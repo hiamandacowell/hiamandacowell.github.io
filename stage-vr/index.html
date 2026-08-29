@@ -2048,6 +2048,10 @@ function bootPracticeSpace() {
   function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    // the ratio is not fixed for the life of a page: turning the phone can
+    // change it, and so can a browser zoom, and setSize only reads whatever it
+    // was last told. Ask again rather than carry a stale one.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     // turning the phone to landscape is a resize, and the numbers you want to
     // read are the landscape ones
