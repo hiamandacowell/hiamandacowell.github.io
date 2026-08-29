@@ -1248,77 +1248,43 @@ function bootPracticeSpace() {
   // Placing a window from inside a viewer is fiddly enough that doing it again
   // every session is the worst of the friction. Everything below survives a
   // reload; nothing here leaves the phone.
-  var STORE_KEY = 'hill-practice-space-v2';
+  var STORE_KEY = 'hill-practice-space-v3';
 
-  // There is no piano in the green room, so the rigs cannot be one global set
-  // that follows you between the two. Each room keeps its own arrangement, and
-  // switching stows the one you are leaving and lays out the one you arrive in.
-  // You arrive to the room and nothing else. The piano and any window are
-  // things you add from the menu when you want them, which also means the
+  // One arrangement, not one per room. The piano and the window are windows on
+  // real things, your keys and your stand, and those do not move when the
+  // picture behind them changes, so an arrangement that follows you between the
+  // rooms is the only one that stays true. It was a set per room once, which
+  // meant crossing a door left your window behind and handed you a fresh one at
+  // the default angle, pointing at nothing.
+  //
+  // What is per room is whether the piano is showing, because there is no piano
+  // in the green room. It goes when you arrive there and comes back on the stage
+  // if it was there when you left. Where it sits is not touched either way:
+  // hiding a thing is not forgetting it, and you fitted it to your real keys
+  // once.
+  //
+  // You still arrive to an empty room the first time. The piano and the window
+  // are things you add from the menu when you want them, which also means the
   // camera is not asked for until something actually needs it.
-  var ROOM_DEFAULTS = {
-    'img-stage': { pianoOn: false },
-    'img-green': { pianoOn: false }
-  };
-  var rooms = {};
+  var stagePianoOn = false;
   var currentEnv = null;
 
-  function stowRoom() {
-    if (!currentEnv) return;
-    rooms[currentEnv] = {
-      piano: {
-        on: !!piano.on, yaw: piano.yaw, drop: piano.drop,
-        dist: piano.dist, width: piano.width
-      },
-      panels: panels.map(function (q) {
-        return { on: !!q.on, azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h };
-      })
-    };
+  // the stage's answer, wherever you happen to be standing when you ask for it
+  function stagePiano() {
+    return (currentEnv === 'img-stage') ? !!piano.on : !!stagePianoOn;
   }
 
-  function layOutRoom(env) {
-    var saved = rooms[env];
-    var defs = ROOM_DEFAULTS[env] || ROOM_DEFAULTS['img-stage'];
-
-    while (panels.length) removePanel(0);
-
-    if (saved && saved.piano) {
-      piano.on    = saved.piano.on !== false;
-      piano.yaw   = num(saved.piano.yaw,   RIG_YAW, -Math.PI, Math.PI);
-      piano.drop  = num(saved.piano.drop,  0.46, 0.10, 1.10);
-      piano.dist  = num(saved.piano.dist,  0.44, 0.20, 1.20);
-      piano.width = num(saved.piano.width, 1.0,  0.40, 2.40);
-    } else {
-      piano.on = !!defs.pianoOn;
-      piano.yaw = RIG_YAW; piano.drop = 0.46; piano.dist = 0.44; piano.width = 1.0;
-    }
-    piano.group.visible = piano.on;
-
-    var list = (saved && Object.prototype.toString.call(saved.panels) === '[object Array]')
-      ? saved.panels : null;
-    if (list) {
-      for (var i = 0; i < list.length && panels.length < PANEL_MAX; i++) {
-        var q = list[i];
-        if (!q || typeof q !== 'object') continue;
-        panels.push(makePanel({
-          on:    q.on !== false,
-          azim:  num(q.azim,  RIG_YAW, -Math.PI, Math.PI),
-          elev:  num(q.elev,  THREE.MathUtils.degToRad(-14), -1.5, 1.5),
-          dist:  num(q.dist,  1.05, 0.35, 1.80),
-          w:     num(q.w,     1.05, 0.25, 2.40),
-          h:     num(q.h,     0.59, 0.25, 2.40)
-        }));
-      }
-    }
-
+  function enterRoom(env) {
+    stagePianoOn = stagePiano();
     currentEnv = env;
+    piano.on = (env === 'img-stage') ? stagePianoOn : false;
+    piano.group.visible = piano.on;
     placeAll();
   }
 
   function goToRoom(env) {
     if (env === currentEnv) return;
-    stowRoom();
-    layOutRoom(env);
+    enterRoom(env);
     loadSky(env);
     menu.sel = -1;
     layoutMenu();
@@ -1328,12 +1294,17 @@ function bootPracticeSpace() {
   var forgetting = false;
 
   function saveState() {
-    stowRoom();
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: currentEnv || document.getElementById('env').value,
         menuFound: !!menuFound,
-        rooms: rooms
+        stagePianoOn: stagePiano(),
+        piano: {
+          yaw: piano.yaw, drop: piano.drop, dist: piano.dist, width: piano.width
+        },
+        panels: panels.map(function (q) {
+          return { on: !!q.on, azim: q.azim, elev: q.elev, dist: q.dist, w: q.w, h: q.h };
+        })
       }));
     } catch (e) { /* private window, blocked storage, quota: not worth a fuss */ }
   }
@@ -1385,9 +1356,29 @@ function bootPracticeSpace() {
       document.getElementById('env').value = s.env;
     }
     menuFound = !!s.menuFound;
-    if (s.rooms && typeof s.rooms === 'object') {
-      if (s.rooms['img-stage']) rooms['img-stage'] = s.rooms['img-stage'];
-      if (s.rooms['img-green']) rooms['img-green'] = s.rooms['img-green'];
+    stagePianoOn = !!s.stagePianoOn;
+
+    if (s.piano && typeof s.piano === 'object') {
+      piano.yaw   = num(s.piano.yaw,   RIG_YAW, -Math.PI, Math.PI);
+      piano.drop  = num(s.piano.drop,  0.46, 0.10, 1.10);
+      piano.dist  = num(s.piano.dist,  0.44, 0.20, 1.20);
+      piano.width = num(s.piano.width, 1.0,  0.40, 2.40);
+    }
+
+    if (Object.prototype.toString.call(s.panels) === '[object Array]') {
+      while (panels.length) removePanel(0);
+      for (var i = 0; i < s.panels.length && panels.length < PANEL_MAX; i++) {
+        var q = s.panels[i];
+        if (!q || typeof q !== 'object') continue;
+        panels.push(makePanel({
+          on:    q.on !== false,
+          azim:  num(q.azim,  RIG_YAW, -Math.PI, Math.PI),
+          elev:  num(q.elev,  THREE.MathUtils.degToRad(-14), -1.5, 1.5),
+          dist:  num(q.dist,  1.05, 0.35, 1.80),
+          w:     num(q.w,     1.05, 0.25, 2.40),
+          h:     num(q.h,     0.59, 0.25, 2.40)
+        }));
+      }
     }
   }
 
@@ -1849,20 +1840,6 @@ function bootPracticeSpace() {
         var delta = next - yawOffset;
         piano.yaw -= delta;
         for (var i = 0; i < panels.length; i++) panels[i].azim -= delta;
-        // The room you are not in has rigs too, stowed in whatever frame was
-        // current when you left it. Turn those with everything else or they
-        // come back aimed at where your stand used to be. stowRoom overwrites
-        // the room you are in from the live values, so turning that one here
-        // as well costs nothing.
-        for (var k in rooms) {
-          if (!Object.prototype.hasOwnProperty.call(rooms, k)) continue;
-          var r = rooms[k];
-          if (!r) continue;
-          if (r.piano) r.piano.yaw -= delta;
-          if (r.panels) {
-            for (var j = 0; j < r.panels.length; j++) r.panels[j].azim -= delta;
-          }
-        }
       }
       yawOffset = next;
       framed = true;
@@ -2091,9 +2068,8 @@ function bootPracticeSpace() {
   }
 
   function applyOptions() {
-    // what you want in a room is a decision for once you are in it, and each
-    // room keeps its own answer
-    if (!currentEnv) layOutRoom(document.getElementById('env').value);
+    // what you want in there with you is a decision for once you are in it
+    if (!currentEnv) enterRoom(document.getElementById('env').value);
     piano.group.visible = piano.on;
 
     // one camera serves everything, and nothing asks for it until something needs it
@@ -2158,8 +2134,7 @@ function bootPracticeSpace() {
       tiles[i].setAttribute('aria-pressed', tiles[i].getAttribute('data-env') === value ? 'true' : 'false');
     }
     if (value === currentEnv) { loadSky(value); return; }
-    stowRoom();
-    layOutRoom(value);
+    enterRoom(value);
     loadSky(value);
     scheduleSave();
   }
@@ -2186,8 +2161,13 @@ function bootPracticeSpace() {
   document.getElementById('forget').onclick = function () {
     forgetting = true;
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-    // v1 held one global arrangement rather than one per room; clear it too
-    try { localStorage.removeItem(STORE_KEY); localStorage.removeItem('hill-practice-space-v1'); } catch (e) {}
+    // v2 held an arrangement per room and v1 one global set placed differently;
+    // neither is read any more, but leaving them behind makes "fresh" a lie
+    try {
+      localStorage.removeItem(STORE_KEY);
+      localStorage.removeItem('hill-practice-space-v2');
+      localStorage.removeItem('hill-practice-space-v1');
+    } catch (e) {}
     location.reload();
   };
   document.getElementById('peek').onclick = function () { applyOptions(); mode = 'flat'; showChrome(true); };
