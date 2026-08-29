@@ -2003,6 +2003,35 @@ function bootPracticeSpace() {
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
   var _size = new THREE.Vector2();
+
+  // A Cardboard gives each eye half the screen, seen through a lens sitting
+  // about this far from it, so the field that eye actually has is set by how
+  // big that half is in millimetres. It was a flat 78 degrees, picked once. On
+  // a screen whose true figure is nearer 90 that renders the world narrower
+  // than it appears, and you turn your head thirty degrees while the room moves
+  // twenty-five: the mismatch is most of what makes cheap VR swim.
+  //
+  // Only the vertical is set here. The horizontal follows from the aspect of
+  // the half-screen, and the pixels are square, so it comes out at the true
+  // physical width on its own.
+  //
+  // Millimetres per CSS pixel is an approximation and cannot be anything else,
+  // because the web has no way to ask how big a screen is. Phones sit between
+  // about 0.155 and 0.166, so 0.16 is never far wrong, and being within a few
+  // percent everywhere beats being exact on one handset.
+  //
+  // SCREEN_TO_LENS is the Cardboard v2 figure; v1 viewers were 42. If a viewer
+  // reads as consistently too wide or too narrow, that is the number to move.
+  // The clamp is only so that an odd screen size cannot produce nonsense.
+  var MM_PER_CSS_PX = 0.16;
+  var SCREEN_TO_LENS = 39.3;
+  var FOV_MIN = 60, FOV_MAX = 110;
+
+  function eyeFov(cssHeight) {
+    var halfMm = (cssHeight * MM_PER_CSS_PX) / 2;
+    var deg = 2 * THREE.MathUtils.radToDeg(Math.atan(halfMm / SCREEN_TO_LENS));
+    return Math.max(FOV_MIN, Math.min(FOV_MAX, deg));
+  }
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -2027,7 +2056,7 @@ function bootPracticeSpace() {
       var w = _size.x, h = _size.y;
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
-        c.fov = 78; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
+        c.fov = eyeFov(h); c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
         c.updateProjectionMatrix();
         c.position.setFromMatrixPosition(camera.matrixWorld);
         c.quaternion.setFromRotationMatrix(camera.matrixWorld);
@@ -2199,7 +2228,8 @@ function bootPracticeSpace() {
       ' · angle ' +
       ((screen.orientation && typeof screen.orientation.angle === 'number')
         ? screen.orientation.angle : '-') +
-      '/' + (typeof window.orientation === 'number' ? window.orientation : '-');
+      '/' + (typeof window.orientation === 'number' ? window.orientation : '-') +
+      ' · fov ' + eyeFov(_size.y).toFixed(1);
   }
 
   function useStereo() {
