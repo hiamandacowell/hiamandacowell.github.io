@@ -241,7 +241,7 @@ function bootPracticeSpace() {
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, grabbedEdge = null,
-      recentering = false, lastT = 0;
+      recentering = false, parking = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
@@ -708,7 +708,7 @@ function bootPracticeSpace() {
     if (!doorMark) return;
     var d = DOORS[currentEnv];
     // while you are placing or sizing something, the room is not the subject
-    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering);
+    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering && !parking);
     if (!doorMark.visible) return;
     doorMark.userData.id = 'door';
     doorMark.userData.repeat = false;
@@ -756,10 +756,14 @@ function bootPracticeSpace() {
   var HANDLE = 0.058;
   // how far above and below the piano its two height buttons sit
   var LIFT_REACH = 0.14;
-  var ROW_PITCH = THREE.MathUtils.degToRad(14);
+  // The two rows hang below the tag rather than sitting at heights of their
+  // own, so that moving the tag moves the whole menu and keeps its shape. These
+  // are the gaps that used to be the difference between 25, 14 and 5.
+  var ROW_DROP = THREE.MathUtils.degToRad(11);
+  var BLOOM_DROP = THREE.MathUtils.degToRad(20);
+  var TIP_DROP = THREE.MathUtils.degToRad(12);
   var ROW_STEP = THREE.MathUtils.degToRad(9);
   var GROUP_GAP = THREE.MathUtils.degToRad(5.5);
-  var BLOOM_PITCH = THREE.MathUtils.degToRad(5);
   var BLOOM_STEP = THREE.MathUtils.degToRad(8.2);
   var BLOOM_SHIFT = THREE.MathUtils.degToRad(6);
   var BLOOM_REACH = THREE.MathUtils.degToRad(26);   // furthest a row may sit off centre
@@ -767,7 +771,6 @@ function bootPracticeSpace() {
   var menu = {
     open: false, sel: -1, idle: 0,
     tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(25),
-    ringYaw: 0,
     tab: null, ring: [], bloom: [], handles: []
   };
   var texCache = {};
@@ -1040,6 +1043,7 @@ function bootPracticeSpace() {
     }
     if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'addwindow', label: 'window', group: 0 });
     out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
+    out.push({ id: 'parkmenu', icon: 'move', label: 'move menu', group: 1 });
     out.push({ id: 'close', icon: 'close', label: 'close', group: 1 });
     return out.slice(0, menu.ring.length);
   }
@@ -1094,7 +1098,7 @@ function bootPracticeSpace() {
 
     layoutDoor();
 
-    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
+    if (!inScene || movingRig || recentering || parking) { refreshPickables(); return; }
 
     // size mode: the edges of the thing, and the tag overhead to be done
     if (sizingRig) {
@@ -1119,7 +1123,7 @@ function bootPracticeSpace() {
       aimAt(menu.tab, menu.tabYaw, menu.tabPitch, MENU_REACH);
       if (!menuFound) {
         menuTip.visible = true;
-        aimAt(menuTip, menu.tabYaw, THREE.MathUtils.degToRad(13), MENU_REACH);
+        aimAt(menuTip, menu.tabYaw, menu.tabPitch - TIP_DROP, MENU_REACH);
       }
       refreshPickables();
       return;
@@ -1139,7 +1143,8 @@ function bootPracticeSpace() {
     }
     var mid = offs[n - 1] / 2;
     for (i = 0; i < n; i++) {
-      placeTile(menu.ring[i], items[i], menu.ringYaw + offs[i] - mid, ROW_PITCH, i === menu.sel);
+      placeTile(menu.ring[i], items[i], menu.tabYaw + offs[i] - mid,
+        menu.tabPitch - ROW_DROP, i === menu.sel);
     }
 
     if (menu.sel >= 0) {
@@ -1158,8 +1163,8 @@ function bootPracticeSpace() {
       shift = Math.max(-room, Math.min(room, shift));
       for (i = 0; i < bl.length && i < menu.bloom.length; i++) {
         placeTile(menu.bloom[i], bl[i],
-          menu.ringYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
-          BLOOM_PITCH);
+          menu.tabYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
+          menu.tabPitch - BLOOM_DROP);
       }
       menu.ring[menu.sel].scale.setScalar(1.12);
     }
@@ -1303,6 +1308,7 @@ function bootPracticeSpace() {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: currentEnv || document.getElementById('env').value,
         menuFound: !!menuFound,
+        menuAt: { yaw: menu.tabYaw, pitch: menu.tabPitch },
         stagePianoOn: stagePiano(),
         piano: {
           yaw: piano.yaw, drop: piano.drop, dist: piano.dist, width: piano.width
@@ -1362,6 +1368,12 @@ function bootPracticeSpace() {
     }
     menuFound = !!s.menuFound;
     stagePianoOn = !!s.stagePianoOn;
+
+    if (s.menuAt && typeof s.menuAt === 'object') {
+      menu.tabYaw = num(s.menuAt.yaw, 0, -Math.PI, Math.PI);
+      menu.tabPitch = num(s.menuAt.pitch, THREE.MathUtils.degToRad(25),
+        PARK_MIN, PARK_MAX);
+    }
 
     if (s.piano && typeof s.piano === 'object') {
       piano.yaw   = num(s.piano.yaw,   RIG_YAW, -Math.PI, Math.PI);
@@ -1498,7 +1510,7 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || grabbedEdge || recentering) {
+    if (movingRig || grabbedEdge || recentering || parking) {
       if (movingRig) updateMovingRig(vDir);
       if (grabbedEdge) { dragEdge(vPos, vDir); layoutHandles(); }
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
@@ -1529,7 +1541,8 @@ function bootPracticeSpace() {
       // because forward would otherwise land on the menu you picked it from.
       // Hold the ring at nothing until that is true, rather than letting it
       // sit full while nothing happens, which reads as a thing that is broken.
-      var needTurn = grabbedEdge ? EDGE_TURN : (recentering ? MIN_TURN : 0);
+      var needTurn = grabbedEdge ? EDGE_TURN
+        : (recentering ? MIN_TURN : (parking ? PARK_TURN : 0));
       if (turned <= needTurn) steady = 0;
 
       var hold = grabbedEdge ? EDGE_DWELL : PLACE_DWELL;
@@ -1537,6 +1550,7 @@ function bootPracticeSpace() {
       if (steady >= hold && moveAge > MIN_MOVE) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
+        else if (parking) finishParking();
         else finishRecenter();
       }
       return;
@@ -1833,6 +1847,42 @@ function bootPracticeSpace() {
     cooldown = COOLDOWN;
   }
 
+  // Where the menu hangs was 25 degrees above you, and 25 was a number picked
+  // on a screen. Through a viewer's lenses it is not the same glance: the
+  // comfortable band is narrower, where it sits depends on the viewer and on
+  // the neck of whoever is wearing it, and no constant is right for all of
+  // them. The same objection as the field of view being a flat 78. So it is
+  // not a constant any more; you put it where you want it and it stays there.
+  //
+  // Only the tag is placed. Both rows hang below it by fixed gaps, so the menu
+  // moves as one piece and keeps the shape you have learned. The yaw is held
+  // against forward rather than the compass, which is what world yaw 0 already
+  // means, so a recenter brings the menu round with everything else.
+  var PARK_TURN = 8;
+  var PARK_MIN = THREE.MathUtils.degToRad(-10);
+  var PARK_MAX = THREE.MathUtils.degToRad(60);
+
+  function startParking() {
+    menu.open = false;
+    parking = true;
+    setHint('look where you want the menu, hold still');
+    armHold();
+    layoutMenu();
+  }
+
+  function finishParking() {
+    parking = false;
+    steady = 0;
+    hintPlate.visible = false;
+    menu.tabYaw = Math.atan2(vDir.x, -vDir.z);
+    menu.tabPitch = Math.max(PARK_MIN, Math.min(PARK_MAX,
+      Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1))));
+    menu.open = true;
+    layoutMenu();
+    scheduleSave();
+    cooldown = COOLDOWN;
+  }
+
   // Whether yawOffset yet means anything. Until the first orientation reading
   // lands there is no relation at all between a world bearing and the real
   // room, so the first recenter of a session establishes that frame rather than
@@ -1896,6 +1946,7 @@ function bootPracticeSpace() {
     if (id === 'open')  { menu.open = true; menu.sel = -1; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
+    if (id === 'parkmenu') { startParking(); return; }
 
     if (id === 'door') { switchRoom(); return; }
     // picking a ring item does not replace anything: it blooms beside it
@@ -1990,6 +2041,7 @@ function bootPracticeSpace() {
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
+    if (parking) { finishParking(); return; }
     if (grabbedEdge) { releaseEdge(); return; }
     if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
@@ -2116,9 +2168,10 @@ function bootPracticeSpace() {
         ((px - r.left) / r.width) * 2 - 1,
         -((py - r.top) / r.height) * 2 + 1
       );
-      if (movingRig || grabbedEdge || recentering) {
+      if (movingRig || grabbedEdge || recentering || parking) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
+        else if (parking) finishParking();
         else finishRecenter();
         return;
       }
@@ -2156,7 +2209,7 @@ function bootPracticeSpace() {
     hud.style.display = on ? 'flex' : 'none';
     if (!on) {
       movingRig = null; sizingRig = null; grabbedEdge = null;
-      recentering = false; hintPlate.visible = false;
+      recentering = false; parking = false; hintPlate.visible = false;
     }
     layoutMenu();
   }
@@ -2167,7 +2220,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; parking = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -2261,7 +2314,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; parking = false; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
