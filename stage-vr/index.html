@@ -822,6 +822,16 @@ function bootPracticeSpace() {
       g.beginPath(); g.arc(18, 6, 5, 0, 6.284); g.fill();
       return;
     }
+    if (name === 'exit') {
+      // a doorway standing open on its far side, and you going out through it.
+      // Deliberately nothing like the close cross: those two are next to each
+      // other and one of them ends the session.
+      g.beginPath();
+      g.moveTo(10, -42); g.lineTo(-34, -42); g.lineTo(-34, 42); g.lineTo(10, 42);
+      g.stroke();
+      arrow(0, 0, 42, 0);
+      return;
+    }
     if (name === 'recenter') {
       g.beginPath(); g.arc(0, 0, 26, 0, 6.284); g.stroke();
       [[0, -46, 0, -32], [0, 46, 0, 32], [-46, 0, -32, 0], [46, 0, 32, 0]].forEach(function (l) {
@@ -992,7 +1002,9 @@ function bootPracticeSpace() {
     scene.add(menu.tab);
 
     var i;
-    for (i = 0; i < 6; i++) menu.ring.push(makeTile());
+    // six items fit the row today; the spare two are so that raising
+    // PANEL_MAX cannot silently push close or the way out off the end
+    for (i = 0; i < 8; i++) menu.ring.push(makeTile());
     for (i = 0; i < 5; i++) menu.bloom.push(makeTile());
     for (i = 0; i < 4; i++) {
       var hnd = plate(HANDLE, HANDLE, null);
@@ -1045,6 +1057,14 @@ function bootPracticeSpace() {
     out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
     out.push({ id: 'parkmenu', icon: 'move', label: 'move menu', group: 1 });
     out.push({ id: 'close', icon: 'close', label: 'close', group: 1 });
+    // In a real headset the page's own Exit button is not on screen at all,
+    // because there is no screen: the only way out was the headset's own
+    // gesture. This is the way out from inside. It sits next to close, which
+    // is the one it can be confused with, so it asks for the same long hold as
+    // a door rather than the ordinary dwell: ending the session by glancing at
+    // the wrong tile is not a thing that should be able to happen.
+    out.push({ id: 'exitvr', icon: 'exit', label: 'exit vr', group: 1,
+      dwell: DOOR_DWELL });
     return out.slice(0, menu.ring.length);
   }
 
@@ -1081,6 +1101,9 @@ function bootPracticeSpace() {
     tile.visible = true;
     tile.userData.id = item.id;
     tile.userData.repeat = !!item.repeat;
+    // tiles are reused as the row changes, so this has to be set every time
+    // rather than only when an item asks for it
+    tile.userData.dwell = item.dwell || 0;
     tile.material.map = cachedIcon(item.icon, item.label, active);
     tile.material.needsUpdate = true;
     tile.scale.setScalar(1);
@@ -1931,9 +1954,24 @@ function bootPracticeSpace() {
     cooldown = COOLDOWN;
   }
 
+  // Leaving, from the HUD button on a screen or from the menu inside a
+  // headset. Ending an XR session also fires its own end handler, which puts
+  // the mode back and shows the chrome; doing both is harmless and doing
+  // neither is not an option, because in stereo there is no session to end.
+  function leaveScene() {
+    var s = renderer.xr.getSession && renderer.xr.getSession();
+    if (mode === 'xr' && s) s.end();
+    mode = 'flat';
+    movingRig = null; sizingRig = null; grabbedEdge = null;
+    recentering = false; parking = false; pendingRecenter = false; steady = 0;
+    showChrome(false);
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  }
+
   function activate(id, dt) {
     var step = dt || 0.016;
     if (!id) return;
+    if (id === 'exitvr') { leaveScene(); return; }
 
     if (id === 'endsize') { endSizing(); return; }
     if (id.indexOf('edge:') === 0) {
@@ -2311,12 +2349,7 @@ function bootPracticeSpace() {
     location.reload();
   };
   document.getElementById('peek').onclick = function () { applyOptions(); mode = 'flat'; showChrome(true); };
-  document.getElementById('exit').onclick = function () {
-    var s = renderer.xr.getSession && renderer.xr.getSession();
-    if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; parking = false; pendingRecenter = false; steady = 0; showChrome(false);
-    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
-  };
+  document.getElementById('exit').onclick = leaveScene;
   document.getElementById('recenter').onclick = doRecenter;
 }
 
