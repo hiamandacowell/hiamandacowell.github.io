@@ -104,6 +104,12 @@
   :focus-visible{outline:2px solid var(--velvet);outline-offset:2px;}
 
   .note{font-size:12.8px;color:var(--muted);line-height:1.6;margin:16px 0 0;}
+  ul.note{margin:20px 0 0;padding:0;list-style:none;}
+  ul.note li{position:relative;padding:0 0 0 16px;margin:0 0 7px;}
+  ul.note li::before{
+    content:"";position:absolute;left:0;top:8px;width:5px;height:5px;
+    border-radius:50%;background:var(--velvet);
+  }
   .note b{color:var(--text);font-weight:600;}
   #err{color:var(--warn);font-size:12.8px;line-height:1.6;margin-top:12px;}
 
@@ -144,8 +150,11 @@
   <button class="ghost" id="peek">Look around on this screen first</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
-  <p class="note">Hold the phone in <b>landscape</b> once you are in. The piano and a window
-     on your real room come with you; move, resize and hide them from the menu above your head.</p>
+  <ul class="note">
+    <li>Hold the phone in <b>landscape</b> once you are in.</li>
+    <li>The piano and a window on your real room come with you.</li>
+    <li>Move, resize or hide them from the <b>menu above your head</b>.</li>
+  </ul>
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
 </div></div>
