@@ -751,6 +751,8 @@ function bootPracticeSpace() {
   var MENU_REACH = 0.85;
   var TILE = 0.105;
   var HANDLE = 0.058;
+  // how far above and below the piano its two height buttons sit
+  var LIFT_REACH = 0.14;
   var ROW_PITCH = THREE.MathUtils.degToRad(14);
   var ROW_STEP = THREE.MathUtils.degToRad(9);
   var GROUP_GAP = THREE.MathUtils.degToRad(5.5);
@@ -1050,8 +1052,6 @@ function bootPracticeSpace() {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
         { id: 'size:piano', icon: 'size', label: 'size' },
-        { id: 'lower', icon: 'lower', label: 'lower', repeat: true },
-        { id: 'higher', icon: 'higher', label: 'higher', repeat: true },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
@@ -1757,6 +1757,32 @@ function bootPracticeSpace() {
       t.scale.setScalar(grabbedEdge === e.side ? 1.25 : 1);
       t.position.copy(_c).addScaledVector(axis, sign * half);
       t.lookAt(h);
+    }
+
+    // How far below your eyes the keys sit is the one thing a gaze cannot say,
+    // because a gaze is a direction and carries no distance, so height stays
+    // two buttons you hold. They were in the menu row, which is parked at its
+    // own heading: move the piano anywhere else and you were holding a gaze on
+    // "lower" with the piano nowhere in sight, changing a height you could not
+    // see. They belong on the piano, above and below it, where looking at one
+    // means looking at the thing it moves. The spare two handles are theirs.
+    if (r.kind !== 'panel') {
+      var lift = [
+        { id: 'higher', icon: 'higher', sign: 1 },
+        { id: 'lower', icon: 'lower', sign: -1 }
+      ];
+      for (i = 0; i < lift.length; i++) {
+        var q = lift[i], t2 = menu.handles[2 + i];
+        t2.visible = true;
+        t2.userData.id = q.id;
+        t2.userData.repeat = true;
+        t2.material.map = cachedIcon(q.icon, '');
+        t2.material.needsUpdate = true;
+        t2.scale.setScalar(1);
+        t2.position.copy(_c);
+        t2.position.y += q.sign * LIFT_REACH;
+        t2.lookAt(h);
+      }
     }
   }
 
