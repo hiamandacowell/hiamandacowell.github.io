@@ -238,13 +238,21 @@ function bootPracticeSpace() {
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, grabbedEdge = null,
-      recentering = false, fitting = null, lastT = 0;
+      recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
   // get before a recenter will commit. without it, picking recenter and then
   // simply not moving would set front to the menu you were staring at.
   var armDir = new THREE.Vector3(), MIN_TURN = 15;
+  // Letting go of an edge is not the same act as putting a whole rig down. You
+  // took the edge in order to move it, so releasing before you have moved it is
+  // never what you meant — and the release could fire on the stillness you were
+  // already in from staring at the handle to take it, which gave you one short
+  // window to move the edge and then let go wherever it had got to. It now
+  // wants you to have moved it at all, and then a longer settle than a drop, so
+  // that stopping to judge the size is not the same as agreeing to it.
+  var EDGE_TURN = 6, EDGE_DWELL = 1.4;
   // seconds of gaze to ignore after something fires. without it the stare that
   // chose a menu item carries straight on into whatever replaces it.
   var cooldown = 0, COOLDOWN = 0.7, mustLeave = null;
@@ -697,7 +705,7 @@ function bootPracticeSpace() {
     if (!doorMark) return;
     var d = DOORS[currentEnv];
     // while you are placing or sizing something, the room is not the subject
-    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering && !fitting);
+    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering);
     if (!doorMark.visible) return;
     doorMark.userData.id = 'door';
     doorMark.userData.repeat = false;
@@ -824,18 +832,6 @@ function bootPracticeSpace() {
     if (name === 'lower' || name === 'higher') {
       g.beginPath(); g.moveTo(-44, 0); g.lineTo(44, 0); g.stroke();
       if (name === 'lower') arrow(0, 10, 0, 44); else arrow(0, -10, 0, -44);
-      return;
-    }
-    if (name === 'fit') {
-      g.strokeRect(-30, -18, 60, 36);
-      for (var k = -1; k <= 1; k++) {
-        g.beginPath(); g.moveTo(k * 15, -18); g.lineTo(k * 15, 18); g.stroke();
-      }
-      g.lineWidth = 8;
-      g.beginPath();
-      g.moveTo(-42, -30); g.lineTo(-42, 30);
-      g.moveTo(42, -30); g.lineTo(42, 30);
-      g.stroke();
       return;
     }
     if (name === 'gripH' || name === 'gripV') {
@@ -1053,7 +1049,7 @@ function bootPracticeSpace() {
     if (ringId === 'sel:piano') {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
-        { id: 'fit:piano', icon: 'fit', label: 'fit' },
+        { id: 'size:piano', icon: 'size', label: 'size' },
         { id: 'lower', icon: 'lower', label: 'lower', repeat: true },
         { id: 'higher', icon: 'higher', label: 'higher', repeat: true },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
@@ -1095,7 +1091,7 @@ function bootPracticeSpace() {
 
     layoutDoor();
 
-    if (!inScene || movingRig || recentering || fitting) { refreshPickables(); return; }
+    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
 
     // size mode: the edges of the thing, and the tag overhead to be done
     if (sizingRig) {
@@ -1484,7 +1480,7 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || grabbedEdge || recentering || fitting) {
+    if (movingRig || grabbedEdge || recentering) {
       if (movingRig) updateMovingRig(vDir);
       if (grabbedEdge) { dragEdge(vPos, vDir); layoutHandles(); }
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
@@ -1510,12 +1506,20 @@ function bootPracticeSpace() {
       if (swingAvg > STEADY_LIMIT) steady = Math.max(0, steady - dt * STEADY_DECAY);
       else steady += dt;
 
-      setReticle(steady / PLACE_DWELL, 0xC9913F);
-      if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) {
+      // Some of these will not commit until you have turned away from where
+      // the hold was armed: an edge because you took it to move it, a recenter
+      // because forward would otherwise land on the menu you picked it from.
+      // Hold the ring at nothing until that is true, rather than letting it
+      // sit full while nothing happens, which reads as a thing that is broken.
+      var needTurn = grabbedEdge ? EDGE_TURN : (recentering ? MIN_TURN : 0);
+      if (turned <= needTurn) steady = 0;
+
+      var hold = grabbedEdge ? EDGE_DWELL : PLACE_DWELL;
+      setReticle(steady / hold, 0xC9913F);
+      if (steady >= hold && moveAge > MIN_MOVE) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
-        else if (fitting) captureFitPoint(vPos, vDir);
-        else if (turned > MIN_TURN) finishRecenter();
+        else finishRecenter();
       }
       return;
     }
@@ -1596,61 +1600,18 @@ function bootPracticeSpace() {
     armDir.set(0, 0, 0);
   }
 
-  // Pick size and the corner of the thing follows your eyes. Where your gaze
-  // meets its plane is where the corner goes, so you look at the size you want
+  // Pick size and the edge of the thing follows your eyes. Where your gaze
+  // meets its plane is where that edge goes, so you look at the size you want
   // and hold still, the same ending as putting something down.
-  // Fitting the piano to the real one. A gaze gives a direction and not a
-  // distance, so the two ends are read off the horizontal plane the keybed
-  // already sits on: get the height about right with move first, then this puts
-  // the width and the position where your actual keys are. Looking down is what
-  // makes it work, and looking down is what you do at a keyboard.
-  function startFitting() {
-    fitting = { stage: 0, a: null };
-    menu.open = false;
-    setHint('look at the left end of your keys, hold still');
-    armHold();
-    layoutMenu();
-  }
-
-  function endFitting() {
-    fitting = null;
-    steady = 0;
-    hintPlate.visible = false;
-    placeAll();
-    layoutMenu();
-    scheduleSave();
-    cooldown = COOLDOWN;
-  }
-
-  function captureFitPoint(vPos, vDir) {
-    var planeY = EYE - piano.drop;
-    if (vDir.y > -0.05) { setHint('look down at your keys'); armHold(); return; }
-    var t = (planeY - vPos.y) / vDir.y;
-    if (t <= 0.05 || t > 4) { armHold(); return; }
-    _hit.copy(vPos).addScaledVector(vDir, t);
-
-    if (fitting.stage === 0) {
-      fitting.a = _hit.clone();
-      fitting.stage = 1;
-      setHint('now the right end, hold still');
-      armHold();
-      return;
-    }
-
-    var a = fitting.a, b = _hit;
-    var span = Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.z - a.z) * (b.z - a.z));
-    if (span < 0.25) { setHint('further apart than that, hold still'); armHold(); return; }
-
-    // the drawn keys span 1.06 across at scale one, so the span sets the scale
-    piano.width = Math.max(0.40, Math.min(2.40, span / 1.06));
-    var cx = (a.x + b.x) / 2, cz = (a.z + b.z) / 2;
-    piano.dist = Math.max(0.20, Math.min(1.20, Math.sqrt(cx * cx + cz * cz)));
-    piano.yaw = Math.atan2(cx, -cz);
-    piano.on = true;
-    piano.group.visible = true;
-    endFitting();
-  }
-
+  //
+  // The piano gets this too, and used to get "fit" instead: look at the left
+  // end of your real keys, then the right, and it took the width and position
+  // from the span between them. It asked you to aim at something you cannot
+  // see. The keys are only visible through the piano window, which is dark
+  // until you are already looking down at them, so there was nothing on screen
+  // to align to and no way to tell whether you had hit the end of the keyboard
+  // or a foot past it. Dragging an edge you can see beats aiming at one you
+  // cannot.
   function startSizing(r) {
     if (!r) return;
     sizingRig = r;
@@ -1942,8 +1903,6 @@ function bootPracticeSpace() {
       return;
     }
 
-    if (verb === 'fit') { startFitting(); return; }
-
 
     if (verb === 'size') {
       startSizing(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
@@ -1972,7 +1931,6 @@ function bootPracticeSpace() {
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
-    if (fitting) { endFitting(); return; }
     if (grabbedEdge) { releaseEdge(); return; }
     if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
@@ -2092,7 +2050,7 @@ function bootPracticeSpace() {
     hud.style.display = on ? 'flex' : 'none';
     if (!on) {
       movingRig = null; sizingRig = null; grabbedEdge = null;
-      recentering = false; fitting = null; hintPlate.visible = false;
+      recentering = false; hintPlate.visible = false;
     }
     layoutMenu();
   }
@@ -2103,7 +2061,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; fitting = null; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -2180,7 +2138,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; fitting = null; pendingRecenter = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
