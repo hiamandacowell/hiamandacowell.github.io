@@ -237,7 +237,7 @@ function bootPracticeSpace() {
   var panels = [];
 
   var raycaster = new THREE.Raycaster();
-  var gazeHit = null, gazeHeld = 0, movingRig = null, recentering = false, lastT = 0;
+  var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
@@ -492,6 +492,7 @@ function bootPracticeSpace() {
     p.win.geometry.dispose();
     panels.splice(i, 1);
     if (movingRig === p) { movingRig = null; hintPlate.visible = false; }
+    if (sizingRig === p) { sizingRig = null; hintPlate.visible = false; }
   }
 
   // a new window lands beside the ones already out rather than on top of them
@@ -640,9 +641,6 @@ function bootPracticeSpace() {
     for (var j = 0; j < menu.bloom.length; j++) {
       if (menu.bloom[j].visible) pickables.push(menu.bloom[j]);
     }
-    for (var k = 0; k < menu.edges.length; k++) {
-      if (menu.edges[k].visible) pickables.push(menu.edges[k]);
-    }
   }
 
   // ---------- menu ----------
@@ -669,7 +667,7 @@ function bootPracticeSpace() {
     open: false, sel: -1, idle: 0,
     tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(38),
     ringYaw: 0,
-    tab: null, ring: [], bloom: [], edges: []
+    tab: null, ring: [], bloom: []
   };
   var texCache = {};
   var allTiles = [];
@@ -735,20 +733,31 @@ function bootPracticeSpace() {
       g.stroke();
       return;
     }
+    if (name === 'size') {
+      g.strokeRect(-40, -30, 80, 60);
+      arrow(-8, -6, -36, -26);
+      arrow(8, 6, 36, 26);
+      return;
+    }
+    if (name === 'addwindow') {
+      g.strokeRect(-46, -38, 68, 62);
+      g.lineWidth = 5;
+      g.beginPath();
+      g.moveTo(-12, -38); g.lineTo(-12, 24);
+      g.moveTo(-46, -7); g.lineTo(22, -7);
+      g.stroke();
+      g.lineWidth = 8;
+      g.beginPath();
+      g.moveTo(34, 18); g.lineTo(34, 48);
+      g.moveTo(19, 33); g.lineTo(49, 33);
+      g.stroke();
+      return;
+    }
     if (name === 'move') {
       arrow(0, 0, 0, -40); arrow(0, 0, 0, 40);
       arrow(0, 0, -40, 0); arrow(0, 0, 40, 0);
       return;
     }
-    // Four boxes of the same size with arrows around them were four identical
-    // icons. The box itself is now the message: a wide box means wider. The
-    // arrows only say which way, and the outline says what you are getting.
-    if (name === 'bigger')   { g.strokeRect(-38, -38, 76, 76); arrow(-8, 8, -30, 30); arrow(8, -8, 30, -30); return; }
-    if (name === 'smaller')  { g.strokeRect(-19, -19, 38, 38); arrow(-42, 42, -24, 24); arrow(42, -42, 24, -24); return; }
-    if (name === 'wider')    { g.strokeRect(-32, -20, 64, 40); arrow(36, 0, 49, 0); arrow(-36, 0, -49, 0); return; }
-    if (name === 'narrower') { g.strokeRect(-14, -20, 28, 40); arrow(-47, 0, -22, 0); arrow(47, 0, 22, 0); return; }
-    if (name === 'taller')   { g.strokeRect(-20, -32, 40, 64); arrow(0, -36, 0, -49); arrow(0, 36, 0, 49); return; }
-    if (name === 'shorter')  { g.strokeRect(-20, -14, 40, 28); arrow(0, -47, 0, -22); arrow(0, 47, 0, 22); return; }
     if (name === 'hide' || name === 'show') {
       g.lineWidth = 6;
       g.beginPath();
@@ -863,8 +872,7 @@ function bootPracticeSpace() {
     var i;
     for (i = 0; i < 6; i++) menu.ring.push(makeTile());
     for (i = 0; i < 4; i++) menu.bloom.push(makeTile());
-    for (i = 0; i < 4; i++) menu.edges.push(makeTile());
-    allTiles = menu.ring.concat(menu.bloom).concat(menu.edges);
+    allTiles = menu.ring.concat(menu.bloom);
 
     hintPlate = plate(0.34, 0.085, cachedLabel('hold still to place'));
     hintPlate.renderOrder = 13;
@@ -894,8 +902,8 @@ function bootPracticeSpace() {
         label: panels.length > 1 ? 'window ' + (i + 1) : 'window'
       });
     }
-    if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'add', label: 'add', group: 0 });
-    out.push({ id: 'recenter', icon: 'recenter', label: 'recentre', group: 0 });
+    if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'addwindow', label: 'window', group: 0 });
+    out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
     out.push({
       id: 'room', icon: 'room', group: 1,
       label: document.getElementById('env').value === 'img-stage' ? 'green room' : 'stage'
@@ -904,17 +912,17 @@ function bootPracticeSpace() {
     return out.slice(0, menu.ring.length);
   }
 
-  // Sizing used to be four tiles in the menu row, which meant holding a gaze on
-  // a button at the bottom of your view while the thing you were resizing was
-  // somewhere else entirely: you could not watch it change while you changed
-  // it. The size controls now sit on the object, one to each side, so the
-  // window is in the middle of them while it grows. Position gives you the axis
-  // and the icon gives you the direction. What is left in the menu row is the
-  // handful of things that are not spatial.
+  // Sizing was four buttons in a row, then four floating around the object, and
+  // neither worked: the first put the control somewhere other than the thing it
+  // changed, the second scattered four tiles into the air with nothing tying
+  // them to anything. It is one gesture now, the sibling of move. Pick size and
+  // the corner of the thing follows your eyes, so you look at where you want the
+  // edge to be and hold still, exactly as you do to put it down.
   function bloomItems(ringId) {
     if (ringId === 'sel:piano') {
       return [
         { id: 'move:piano', icon: 'move', label: 'move' },
+        { id: 'size:piano', icon: 'size', label: 'size' },
         { id: 'hide:piano', icon: piano.on ? 'hide' : 'show', label: piano.on ? 'hide' : 'show' }
       ];
     }
@@ -924,83 +932,14 @@ function bootPracticeSpace() {
       if (!pan) return [];
       return [
         { id: 'move:' + i, icon: 'move', label: 'move' },
+        { id: 'size:' + i, icon: 'size', label: 'size' },
         { id: 'hide:' + i, icon: pan.on ? 'hide' : 'show', label: pan.on ? 'hide' : 'show' }
       ];
     }
     return [];
   }
 
-  // right and left change the width, above and below change the height
-  function edgeItems(ringId) {
-    if (ringId === 'sel:piano') {
-      return [
-        { id: 'bigger', icon: 'bigger', label: 'bigger', repeat: true, side: 'right' },
-        { id: 'smaller', icon: 'smaller', label: 'smaller', repeat: true, side: 'left' }
-      ];
-    }
-    var m = /^sel:panel:(\d+)$/.exec(ringId || '');
-    if (m) {
-      var i = m[1];
-      if (!panels[parseInt(i, 10)]) return [];
-      return [
-        { id: 'wider:' + i, icon: 'wider', label: 'wider', repeat: true, side: 'right' },
-        { id: 'narrower:' + i, icon: 'narrower', label: 'narrower', repeat: true, side: 'left' },
-        { id: 'taller:' + i, icon: 'taller', label: 'taller', repeat: true, side: 'up' },
-        { id: 'shorter:' + i, icon: 'shorter', label: 'shorter', repeat: true, side: 'down' }
-      ];
-    }
-    return [];
-  }
-
   var _r = new THREE.Vector3(), _u = new THREE.Vector3(), _p = new THREE.Vector3();
-
-  function layoutEdges(ringId) {
-    var items = edgeItems(ringId);
-    var rig = null, hw = 0, hh = 0, dist = 1;
-    if (ringId === 'sel:piano') {
-      rig = piano;
-      hw = hh = 0.67 * piano.width;
-      dist = Math.sqrt(piano.dist * piano.dist + piano.drop * piano.drop);
-    } else {
-      var m = /^sel:panel:(\d+)$/.exec(ringId || '');
-      if (m) {
-        rig = panels[parseInt(m[1], 10)];
-        if (rig) { hw = rig.w / 2; hh = rig.h / 2; dist = rig.dist; }
-      }
-    }
-    if (!rig || !rig.group) return;
-
-    rig.group.updateMatrixWorld(true);
-    _r.set(1, 0, 0).applyQuaternion(rig.group.quaternion);
-    _u.set(0, 1, 0).applyQuaternion(rig.group.quaternion);
-
-    // Hung off the true edges, a default window put its two width controls
-    // thirty degrees apart and pushed another into the menu row. They sit in a
-    // tight cluster on the window instead, at a fixed angle from its centre
-    // whatever size it is, so they stay together and stay where you left them.
-    var pad = TILE * 0.62 + 0.05;
-    var lo = 0.13 * dist, hi = 0.235 * dist;
-    var offW = Math.max(lo, Math.min(hi, hw + pad));
-    var offH = Math.max(lo, Math.min(hi, hh + pad));
-    var h = head();
-
-    for (var i = 0; i < items.length && i < menu.edges.length; i++) {
-      var t = menu.edges[i], side = items[i].side;
-      _p.copy(rig.group.position);
-      if (side === 'right') _p.addScaledVector(_r, offW);
-      else if (side === 'left') _p.addScaledVector(_r, -offW);
-      else if (side === 'up') _p.addScaledVector(_u, offH);
-      else _p.addScaledVector(_u, -offH);
-      t.visible = true;
-      t.userData.id = items[i].id;
-      t.userData.repeat = !!items[i].repeat;
-      t.material.map = cachedIcon(items[i].icon, items[i].label);
-      t.material.needsUpdate = true;
-      t.scale.setScalar(1);
-      t.position.copy(_p);
-      t.lookAt(h);
-    }
-  }
 
   function placeTile(tile, item, yawA, pitchA, active) {
     tile.visible = true;
@@ -1018,9 +957,8 @@ function bootPracticeSpace() {
     menuTip.visible = false;
     for (i = 0; i < menu.ring.length; i++) menu.ring[i].visible = false;
     for (i = 0; i < menu.bloom.length; i++) menu.bloom[i].visible = false;
-    for (i = 0; i < menu.edges.length; i++) menu.edges[i].visible = false;
 
-    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
+    if (!inScene || movingRig || sizingRig || recentering) { refreshPickables(); return; }
 
     if (!menu.open) {
       menu.tab.visible = true;
@@ -1069,7 +1007,6 @@ function bootPracticeSpace() {
           menu.ringYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
           BLOOM_PITCH);
       }
-      layoutEdges(items[menu.sel].id);
       menu.ring[menu.sel].scale.setScalar(1.12);
     }
     refreshPickables();
@@ -1100,9 +1037,9 @@ function bootPracticeSpace() {
   // the image. An unrotated inverted sphere puts u = 0.75 in front of you, and
   // on the stage capture that is the house-left wall, so you started off looking
   // at the side of the proscenium with the audience over your shoulder. The
-  // house runs from about 0.325 to 0.735 with its centre near 0.54, so 0.43
-  // faces you between house right and house centre.
-  var ENV_FORWARD = { 'img-stage': 0.43, 'img-green': 0.75 };
+  // house runs from about 0.325 to 0.735 across the image, so 0.54 is its centre
+  // and that is what you face when you arrive and whenever you recenter.
+  var ENV_FORWARD = { 'img-stage': 0.54, 'img-green': 0.75 };
 
   function loadSky(id) {
     var img = document.getElementById(id);
@@ -1377,8 +1314,9 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || recentering) {
+    if (movingRig || sizingRig || recentering) {
       if (movingRig) updateMovingRig(vDir);
+      if (sizingRig) updateSizing(vPos, vDir);
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
       // net angle from where the hold was armed, not distance travelled, so
       // jitter cannot quietly add up to it
@@ -1405,6 +1343,7 @@ function bootPracticeSpace() {
       setReticle(steady / PLACE_DWELL, 0xC9913F);
       if (steady >= PLACE_DWELL && moveAge > MIN_MOVE) {
         if (movingRig) drop();
+        else if (sizingRig) endSizing();
         else if (turned > MIN_TURN) finishRecenter();
       }
       return;
@@ -1485,6 +1424,63 @@ function bootPracticeSpace() {
     armDir.set(0, 0, 0);
   }
 
+  // Pick size and the corner of the thing follows your eyes. Where your gaze
+  // meets its plane is where the corner goes, so you look at the size you want
+  // and hold still, the same ending as putting something down.
+  function startSizing(r) {
+    if (!r) return;
+    sizingRig = r;
+    menu.open = false;
+    setHint('look at a corner, hold still');
+    armHold();
+    layoutMenu();
+  }
+
+  function endSizing() {
+    sizingRig = null;
+    steady = 0;
+    hintPlate.visible = false;
+    placeAll();
+    layoutMenu();
+    scheduleSave();
+    cooldown = COOLDOWN;
+  }
+
+  var _n = new THREE.Vector3(), _hit = new THREE.Vector3(), _d = new THREE.Vector3();
+
+  function updateSizing(vPos, vDir) {
+    var r = sizingRig, h = head();
+    r.group.updateMatrixWorld(true);
+
+    if (r.kind === 'panel') {
+      _n.subVectors(h, r.group.position).normalize();
+      _r.set(1, 0, 0).applyQuaternion(r.group.quaternion);
+      _u.set(0, 1, 0).applyQuaternion(r.group.quaternion);
+    } else {
+      _n.set(0, 1, 0);
+      _r.set(1, 0, 0).applyQuaternion(r.group.quaternion);
+      _u.set(0, 0, -1).applyQuaternion(r.group.quaternion);
+    }
+
+    var denom = _n.dot(vDir);
+    if (Math.abs(denom) < 1e-4) return;
+    var t = _n.dot(_d.subVectors(r.group.position, vPos)) / denom;
+    if (t <= 0.05) return;
+
+    _hit.copy(vPos).addScaledVector(vDir, t);
+    _d.subVectors(_hit, r.group.position);
+    var dx = Math.abs(_d.dot(_r)), dy = Math.abs(_d.dot(_u));
+
+    if (r.kind === 'panel') {
+      r.w = Math.max(0.25, Math.min(2.40, dx * 2));
+      r.h = Math.max(0.25, Math.min(2.40, dy * 2));
+    } else {
+      // the piano keeps its proportions; only how far across it reaches matters
+      r.width = Math.max(0.40, Math.min(2.40, dx / 0.67));
+    }
+    placeRig(r);
+  }
+
   function grab(r) {
     if (!r) return;
     movingRig = r;
@@ -1550,6 +1546,19 @@ function bootPracticeSpace() {
       for (var k = 0; k < ring.length; k++) {
         if (ring[k].id === id) { menu.sel = (menu.sel === k) ? -1 : k; break; }
       }
+      // choosing something is asking to see it: it used to open the options for
+      // a piano that stayed invisible until you also found "show"
+      if (menu.sel >= 0) {
+        var pm = /^sel:panel:(\d+)$/.exec(id);
+        var target = (id === 'sel:piano') ? piano : (pm ? panels[parseInt(pm[1], 10)] : null);
+        if (target && !target.on) {
+          target.on = true;
+          if (target === piano) piano.group.visible = true;
+          startPassthrough();
+          placeAll();
+          scheduleSave();
+        }
+      }
       menu.idle = 0;
       layoutMenu();
       return;
@@ -1562,15 +1571,6 @@ function bootPracticeSpace() {
       return;
     }
 
-    if (id === 'smaller' || id === 'bigger') {
-      piano.width = (id === 'bigger')
-        ? Math.min(2.40, piano.width + step * SIZE_RATE)
-        : Math.max(0.40, piano.width - step * SIZE_RATE);
-      placeAll();
-      if (menu.open && menu.sel >= 0) layoutEdges('sel:piano');
-      scheduleSave();
-      return;
-    }
 
     var colon = id.indexOf(':');
     if (colon < 0) return;
@@ -1585,6 +1585,11 @@ function bootPracticeSpace() {
       }
       if (piano.group) piano.group.visible = piano.on;
       layoutMenu();
+      return;
+    }
+
+    if (verb === 'size') {
+      startSizing(arg === 'piano' ? piano : panels[parseInt(arg, 10)]);
       return;
     }
 
@@ -1604,19 +1609,13 @@ function bootPracticeSpace() {
       return;
     }
 
-    var relayout = true;
-    if (verb === 'wider')    p.w = Math.min(2.40, p.w + step * SIZE_RATE);
-    if (verb === 'narrower') p.w = Math.max(0.25, p.w - step * SIZE_RATE);
-    if (verb === 'taller')   p.h = Math.min(2.40, p.h + step * SIZE_RATE);
-    if (verb === 'shorter')  p.h = Math.max(0.25, p.h - step * SIZE_RATE);
-    placeAll();
-    if (relayout && menu.open && menu.sel >= 0) layoutEdges('sel:panel:' + parseInt(arg, 10));
     scheduleSave();
   }
 
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
+    if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
     if (gazeHit) { activate(gazeHit.userData.id, 0.08); cooldown = COOLDOWN; return; }
     // button pressed while looking at nothing opens the menu at its parked spot
@@ -1694,8 +1693,10 @@ function bootPracticeSpace() {
         ((px - r.left) / r.width) * 2 - 1,
         -((py - r.top) / r.height) * 2 + 1
       );
-      if (movingRig || recentering) {
-        if (movingRig) drop(); else finishRecenter();
+      if (movingRig || sizingRig || recentering) {
+        if (movingRig) drop();
+        else if (sizingRig) endSizing();
+        else finishRecenter();
         return;
       }
       raycaster.setFromCamera(ndc, camera);
@@ -1731,7 +1732,7 @@ function bootPracticeSpace() {
     inScene = !!on;
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
-    if (!on) { movingRig = null; recentering = false; hintPlate.visible = false; }
+    if (!on) { movingRig = null; sizingRig = null; recentering = false; hintPlate.visible = false; }
     layoutMenu();
   }
 
@@ -1741,7 +1742,7 @@ function bootPracticeSpace() {
         mode = 'xr';
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; recentering = false; steady = 0; showChrome(false); });
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; recentering = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
@@ -1811,7 +1812,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; sizingRig = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
