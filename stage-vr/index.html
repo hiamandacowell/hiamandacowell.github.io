@@ -294,7 +294,15 @@ function bootPracticeSpace() {
     camera.position.set(0, EYE, 0);
     scene.add(camera);
 
-    var geo = new THREE.SphereGeometry(60, 64, 40);
+    // A unit sphere, sized per room in loadSky. It was a fixed 60 metres, and
+    // 60 metres is the whole of "the world feels too big" in a real headset.
+    // A 360 photo carries no depth: both eyes see the same picture, so the only
+    // thing telling you how far away the room is is the radius you drew it at.
+    // At 60 the disparity says everything is at infinity, and a chair that
+    // fills twenty degrees at infinity has to be twenty metres wide for that to
+    // add up, so that is the chair you see. On a phone in a Cardboard the cue
+    // is weak enough to ignore. A Quest is not fooled and reads it honestly.
+    var geo = new THREE.SphereGeometry(1, 64, 40);
     geo.scale(-1, 1, 1);
     sky = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x14110f }));
     scene.add(sky);
@@ -1233,11 +1241,19 @@ function bootPracticeSpace() {
   // sits at 23 degrees and the tag was already at 25.
   var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.506 };
 
+  // How far off to hang each room, in metres. There is no right answer: a flat
+  // photo on a sphere puts everything at one distance and a real room does not,
+  // so this is the distance the room mostly is. The green room is a small room
+  // you could cross in three paces; the stage has a house in front of it. Both
+  // are worth trying in the headset and moving.
+  var SKY_RADIUS = { 'img-stage': 12, 'img-green': 4 };
+
   function loadSky(id) {
     var img = document.getElementById(id);
     if (!img) { errEl.textContent = 'That panorama is missing.'; return; }
     var fwd = ENV_FORWARD.hasOwnProperty(id) ? ENV_FORWARD[id] : 0.75;
     sky.rotation.y = 2 * Math.PI * (fwd + 0.25);
+    sky.scale.setScalar(SKY_RADIUS.hasOwnProperty(id) ? SKY_RADIUS[id] : 12);
     function apply() {
       var t = new THREE.Texture(img);
       t.minFilter = THREE.LinearFilter;
@@ -2129,6 +2145,16 @@ function bootPracticeSpace() {
 
     if (mode === 'stereo' && orient) applyOrientation(camera);
     if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
+
+    // The panorama rides with your head rather than sitting at the origin.
+    // At 60 metres it made no difference: a metre of head either way is nothing
+    // against 60. Hung close enough to read as a room it matters, and it is
+    // also the only thing that keeps a small sphere honest, because a picture
+    // painted on a sphere is only undistorted from the centre of it. A photo
+    // has no parallax to give you, so not moving is the truthful answer.
+    var vcSky = viewCamera();
+    vcSky.updateMatrixWorld();
+    sky.position.setFromMatrixPosition(vcSky.matrixWorld);
 
     updateGaze(dt);
     updateWindowProjection();
