@@ -1922,6 +1922,11 @@ function bootPracticeSpace() {
         ? Math.min(1.10, piano.drop + step * DROP_RATE)
         : Math.max(0.10, piano.drop - step * DROP_RATE);
       placeAll();
+      // these two live on the piano now, so they have to travel with it: the
+      // piano rose and the buttons stayed where they were, which put the one
+      // you were holding somewhere other than the thing it was moving all over
+      // again, only worse for having looked right at the start
+      layoutHandles();
       scheduleSave();
       return;
     }
