@@ -708,6 +708,12 @@ function bootPracticeSpace() {
     var el = document.getElementById('env');
     el.value = (el.value === 'img-stage') ? 'img-green' : 'img-stage';
     goToRoom(el.value);
+    // You went through a door, so you are facing into the room you came out
+    // in. Carrying your compass heading across a teleport is the stranger of
+    // the two, and it left you looking at a side wall with both of that room's
+    // buttons behind your shoulder. This is the recenter the menu offers,
+    // taken for you, because arriving is exactly when you would ask for it.
+    doRecenter();
   }
 
   // ---------- menu ----------
