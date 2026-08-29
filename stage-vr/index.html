@@ -168,8 +168,8 @@
        all. The first time you go in, a note sits at eye level pointing up at it; once you have opened
        the menu that note never comes back. Open it by looking at the tag for a moment, or by
        <b>pressing the viewer button</b>. It folds itself away if you stop using it.</p>
-    <p>The choices appear <b>off to your right</b>, around eye level, rather than up where the tag is,
-       so nothing you actually pick is an awkward reach.</p>
+    <p>The choices unfurl <b>below the tag but still overhead</b>, so they never hang over the house
+       while you are looking at it, and never sit on top of your windows.</p>
     <p>Inside: <b>piano</b>, <b>windows</b> and <b>recenter</b>, never more than five rows on screen.
        Pick <b>move it</b> to pick something up; it then follows your head, so look where you want it and
        <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to drop it at
@@ -254,6 +254,7 @@ function bootPracticeSpace() {
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
+  var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
   // get before a recenter will commit. without it, picking recenter and then
   // simply not moving would set front to the menu you were staring at.
@@ -451,12 +452,15 @@ function bootPracticeSpace() {
     var c = document.createElement('canvas');
     c.width = 256; c.height = 128;
     var g = c.getContext('2d');
-    g.fillStyle = accent ? 'rgba(201,145,63,0.94)' : 'rgba(14,13,12,0.82)';
+    // brass is the dwell ring's colour and means "you are selecting this", so the
+    // tag is deliberately not brass: pale, like a physical tag, and readable
+    // against a dark ceiling without pretending to be a progress indicator
+    g.fillStyle = accent ? 'rgba(239,233,223,0.95)' : 'rgba(14,13,12,0.82)';
     roundRect(g, 5, 5, 246, 118, 24); g.fill();
-    g.strokeStyle = accent ? 'rgba(255,232,196,0.9)' : 'rgba(201,145,63,0.55)';
+    g.strokeStyle = accent ? 'rgba(48,41,37,0.85)' : 'rgba(201,145,63,0.55)';
     g.lineWidth = accent ? 5 : 3;
     roundRect(g, 5, 5, 246, 118, 24); g.stroke();
-    g.fillStyle = accent ? '#1A1206' : '#EFE9DF';
+    g.fillStyle = accent ? '#191614' : '#EFE9DF';
     // shrink to fit rather than run off the plate: "hold still to place" and
     // "music window" are both wider than the label at the nominal size
     var size = 40;
@@ -672,8 +676,8 @@ function bootPracticeSpace() {
   var MENU_REACH = 0.85, MENU_STEP = 0.105, MENU_IDLE = 8;
   var menu = {
     open: false, page: 'root', idle: 0,
-    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(32),
-    listYaw: THREE.MathUtils.degToRad(34), listTop: THREE.MathUtils.degToRad(12),
+    tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(36),
+    listYaw: 0, listTop: THREE.MathUtils.degToRad(27),
     tab: null, slots: []
   };
   var texCache = {};
@@ -1002,6 +1006,9 @@ function bootPracticeSpace() {
   function onOrient(e) {
     if (e.alpha === null || e.alpha === undefined) return;
     orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: (window.orientation || 0) };
+    // the first reading after entering is what "straight ahead" means, so the
+    // house lands where it was aimed instead of wherever the compass points
+    if (pendingRecenter) { pendingRecenter = false; doRecenter(); }
   }
 
   var zee = new THREE.Vector3(0, 0, 1);
@@ -1371,6 +1378,8 @@ function bootPracticeSpace() {
     enableOrientation().then(function (ok) {
       mode = 'stereo';
       yawOffset = 0;
+      pendingRecenter = true;
+      if (orient) doRecenter();
       showChrome(true);
       var el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
@@ -1412,7 +1421,7 @@ function bootPracticeSpace() {
   document.getElementById('exit').onclick = function () {
     var s = renderer.xr.getSession && renderer.xr.getSession();
     if (mode === 'xr' && s) s.end();
-    mode = 'flat'; movingRig = null; recentering = false; steady = 0; showChrome(false);
+    mode = 'flat'; movingRig = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   };
   document.getElementById('recenter').onclick = doRecenter;
