@@ -120,7 +120,7 @@
      <b>Google Cardboard viewer with any phone</b>.</p>
 
   <fieldset>
-    <legend>Where you are</legend>
+    <legend>Where you start</legend>
     <select id="env" aria-label="Environment">
       <option value="img-stage">On stage, facing the house</option>
       <option value="img-green">Green room, waiting to go on</option>
@@ -170,7 +170,8 @@
        <b>pressing the viewer button</b>. It folds itself away if you stop using it.</p>
     <p>The choices unfurl <b>below the tag but still overhead</b>, so they never hang over the house
        while you are looking at it, and never sit on top of your windows.</p>
-    <p>Inside: <b>piano</b>, <b>windows</b> and <b>recenter</b>, never more than five rows on screen.
+    <p>Inside: <b>piano</b>, <b>windows</b>, the other <b>room</b>, and <b>recenter</b>, never more than
+       five rows on screen.
        Pick <b>move it</b> to pick something up; it then follows your head, so look where you want it and
        <b>hold still for a moment</b> to set it down, or <b>press the viewer button</b> to drop it at
        once. Holding still means not turning your head, not being a statue: a wobble costs you a moment,
@@ -794,6 +795,12 @@ function bootPracticeSpace() {
     var items = [];
     if (piano.on) items.push({ id: 'page:piano', label: 'piano' });
     if (panelsOn) items.push({ id: 'page:windows', label: 'windows' });
+    // both panoramas are already in the page as img tags, so this is a texture
+    // swap with nothing to fetch: no reason to make you go back out for it
+    items.push({
+      id: 'room',
+      label: document.getElementById('env').value === 'img-stage' ? 'green room' : 'on stage'
+    });
     // the Recenter button on the page is unreachable with the phone shut in a
     // viewer, and the heading drifts, so it has to live in here as well
     items.push({ id: 'recenter', label: 'recenter' });
@@ -1217,6 +1224,15 @@ function bootPracticeSpace() {
     if (id === 'open')  { menu.open = true; menu.page = 'root'; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
+
+    if (id === 'room') {
+      var envEl = document.getElementById('env');
+      envEl.value = (envEl.value === 'img-stage') ? 'img-green' : 'img-stage';
+      loadSky(envEl.value);
+      scheduleSave();
+      layoutMenu();
+      return;
+    }
     if (id.indexOf('page:') === 0) { menu.page = id.slice(5); menu.idle = 0; layoutMenu(); return; }
 
     if (id === 'addpanel') {
