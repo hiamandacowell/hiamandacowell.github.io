@@ -1639,6 +1639,8 @@ function bootPracticeSpace() {
     steady = 0;
     hintPlate.visible = false;
     placeAll();
+    // as with drop: you came from the menu, so you go back to it
+    menu.open = true;
     layoutMenu();
     scheduleSave();
     cooldown = COOLDOWN;
@@ -1821,6 +1823,14 @@ function bootPracticeSpace() {
     steady = 0;
     hintPlate.visible = false;
     placeAll();
+    // Move and size both put the menu away on the way in, because a row of
+    // tiles across the thing you are placing is in the way of seeing it. They
+    // used to leave it away afterwards too, so finishing one adjustment meant
+    // looking up and opening the menu again before you could make the next,
+    // and you almost never make only one. It comes back as you left it, with
+    // the same item still picked and its options under it. The cooldown after
+    // an action covers the row landing where you happen to be looking.
+    menu.open = true;
     layoutMenu();
     scheduleSave();
     // do not let the stare that placed it fall straight onto the menu
