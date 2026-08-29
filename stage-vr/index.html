@@ -662,20 +662,26 @@ function bootPracticeSpace() {
   //
   // Measured off the same forward as ENV_FORWARD: azim runs round from dead
   // ahead, positive to your right, elev up from eye level. On the stage that is
-  // the pair of doors in the back wall over your right shoulder, on the join
-  // between the two leaves. In the green room it is the propped-open door to
-  // the corridor, and the marker sits in the opening itself against the brick
-  // across the hall, not on the leaf, because the leaf is standing open.
+  // the open doorway at stage right, where the grey wall meets the panelling,
+  // 95 degrees round. It is a long way off across the stage, so the opening is
+  // only about 4 degrees across against the marker's 7: it covers the doorway
+  // and a little of the jamb either side, which reads as a plate on the door
+  // rather than a thing hanging near it. The pair of closed doors further round
+  // at 122 was the first reading of "the door behind you" and the wrong one.
+  //
+  // In the green room it is the propped-open door to the corridor, and the
+  // marker sits in the opening itself against the brick across the hall, not on
+  // the leaf, because the leaf is standing open.
   //
   // The stage one cannot be reached without deliberately turning, which is what
   // makes it safe to leave a live button hanging in a room with nothing
-  // guarding it. The green room's is now straight in front of you instead, so
-  // it earns its safety the other way: 12 degrees down, with the menu tag 25
-  // up, and the reticle arriving on the brick in the gap between them. The
-  // opening runs from 23 above to 28 below, so both are inside the doorway and
-  // neither is anywhere your eyes rest.
+  // guarding it: 95 degrees is square to your side. The green room's is
+  // straight in front of you instead, so it earns its safety the other way: 12
+  // degrees down, with the menu tag 25 up, and the reticle arriving on the
+  // brick in the gap between them. That opening runs from 23 above to 28 below,
+  // so both are inside the doorway and neither is anywhere your eyes rest.
   var DOORS = {
-    'img-stage': { azim: 122, elev: -3, label: 'green room' },
+    'img-stage': { azim: 95, elev: -3, label: 'green room' },
     'img-green': { azim: 0, elev: -12, label: 'stage' }
   };
   // far enough out to read as hung on the wall rather than held in front of
