@@ -167,7 +167,9 @@
   </select>
 
   <button class="go" id="enter">Enter VR</button>
+  <button class="ghost" id="entervr">Enter VR without passthrough</button>
   <button class="ghost" id="cardboard">Google Cardboard viewer</button>
+  <button class="ghost" id="magic">Move the phone to look around</button>
   <button class="ghost" id="peek">Look around on this screen first</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
@@ -1975,7 +1977,7 @@ function bootPracticeSpace() {
   var framed = false;
 
   function doRecenter() {
-    if (mode === 'stereo' && orient) {
+    if ((mode === 'stereo' || mode === 'window') && orient) {
       var next = -THREE.MathUtils.degToRad(orient.alpha);
       // The panorama, the menu and the doors are meant to swing round and face
       // you: that is the whole of recentring. The piano and the window are not.
@@ -2189,7 +2191,7 @@ function bootPracticeSpace() {
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
     lastT = now;
 
-    if (mode === 'stereo' && orient) applyOrientation(camera);
+    if ((mode === 'stereo' || mode === 'window') && orient) applyOrientation(camera);
     if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
 
     // The panorama rides with your head rather than sitting at the origin.
@@ -2350,20 +2352,52 @@ function bootPracticeSpace() {
       });
   }
 
-  function enterStereo() {
+  // Two ways to be in the room holding a phone. The viewer splits the screen
+  // and the phone is strapped to your face; the window is the same room seen
+  // through the phone as if it were a pane of glass, held in your hand and
+  // moved about. They are not the same thing and neither is dragging a finger
+  // across a picture, which is the third.
+  function enterHeld(kind) {
     enableOrientation().then(function (ok) {
-      mode = 'stereo';
+      if (!ok) {
+        // there is no head tracking to run on, and neither of these can be
+        // dragged, so say so and leave them on the one that can
+        mode = 'flat';
+        errEl.textContent = 'This phone will not report which way it is pointed, ' +
+          'so this is drag to look. On iPhone: Settings, Apps, Safari, Motion & ' +
+          'Orientation Access.';
+        showChrome(true);
+        return;
+      }
+      mode = kind;
       yawOffset = 0;
       framed = false;
       pendingRecenter = true;
       if (orient) doRecenter();
       showChrome(true);
+
+      // The API existing is not the same as it reporting anything. A desktop
+      // has DeviceOrientationEvent and will never fire one, and neither of
+      // these modes can be dragged, so without this you sit in a view that
+      // cannot move at all. If nothing has arrived shortly after going in,
+      // there is nothing to track and dragging is the honest answer.
+      setTimeout(function () {
+        if (!orient && (mode === 'stereo' || mode === 'window')) {
+          mode = 'flat';
+          errEl.textContent = 'Nothing here reports which way it is pointed, so this is drag to look.';
+        }
+      }, 1200);
+
       var el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
-      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
-      if (!ok) errEl.textContent = 'Running without head tracking. Drag to look around.';
+      // only the viewer needs the phone held one particular way round
+      if (kind === 'stereo' && screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(function () {});
+      }
     });
   }
+
+  function enterStereo() { enterHeld('stereo'); }
 
   init();
   bindInput();
@@ -2407,7 +2441,9 @@ function bootPracticeSpace() {
   }
 
   var enterBtn = document.getElementById('enter');
+  var plainVrBtn = document.getElementById('entervr');
   var cardboardBtn = document.getElementById('cardboard');
+  plainVrBtn.style.display = 'none';
 
   // The split screen is its own button and always there. It used to be the
   // fallback the top button quietly turned into when nothing better was
@@ -2419,14 +2455,17 @@ function bootPracticeSpace() {
   cardboardBtn.onclick = function () {
     passthrough = false;
     applyOptions();
-    enterStereo();
+    enterHeld('stereo');
   };
 
-  function offerXR(kind) {
-    enterBtn.textContent = (kind === 'immersive-ar')
-      ? 'Enter with your room showing through'
-      : 'Enter VR';
-    enterBtn.onclick = function () {
+  document.getElementById('magic').onclick = function () {
+    passthrough = false;
+    applyOptions();
+    enterHeld('window');
+  };
+
+  function wireXR(btn, kind) {
+    btn.onclick = function () {
       // set before applyOptions, which would otherwise go and ask for a camera
       // on the way in to a session that does not need one
       passthrough = (kind === 'immersive-ar');
@@ -2435,10 +2474,18 @@ function bootPracticeSpace() {
     };
   }
 
+  function offerXR(kind) {
+    enterBtn.textContent = (kind === 'immersive-ar')
+      ? 'Enter with your room showing through'
+      : 'Enter VR';
+    wireXR(enterBtn, kind);
+  }
+
   // Nothing immersive on offer: the viewer is the only way in, so it takes the
   // top of the screen rather than sitting under a button that does nothing.
   function offerNothing() {
     enterBtn.style.display = 'none';
+    plainVrBtn.style.display = 'none';
     cardboardBtn.className = 'go';
   }
 
@@ -2452,9 +2499,18 @@ function bootPracticeSpace() {
       // window that is a hole beats a window that is a picture of a hole. If
       // this device means something else by it, the viewer button is right
       // there and unchanged.
-      if (r[0]) offerXR('immersive-ar');
-      else if (r[1]) offerXR('immersive-vr');
-      else offerNothing();
+      if (r[0]) {
+        offerXR('immersive-ar');
+        // A headset that can do both keeps both. Passthrough is the better one
+        // and gets the top of the screen, but if it is wrong on a given headset
+        // the plain session should not have become unreachable to say so.
+        if (r[1]) { plainVrBtn.style.display = ''; wireXR(plainVrBtn, 'immersive-vr'); }
+      } else if (r[1]) {
+        offerXR('immersive-vr');
+        plainVrBtn.style.display = 'none';
+      } else {
+        offerNothing();
+      }
     }).catch(offerNothing);
   } else { offerNothing(); }
 
