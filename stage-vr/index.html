@@ -167,10 +167,7 @@
   </select>
 
   <button class="go" id="enter">Enter VR</button>
-  <button class="ghost" id="entervr">Enter VR without passthrough</button>
-  <button class="ghost" id="cardboard">Google Cardboard viewer</button>
-  <button class="ghost" id="magic">Move the phone to look around</button>
-  <button class="ghost" id="peek">Look around on this screen first</button>
+  <button class="ghost" id="peek">Look around first, without a headset</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <ul class="note">
@@ -2246,10 +2243,6 @@ function bootPracticeSpace() {
     // was last told. Ask again rather than carry a stale one.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    // turning the phone to landscape is a resize, and the numbers you want to
-    // read are the landscape ones
-    var n = document.getElementById('modeNote');
-    if (n && n.textContent) n.textContent = deviceLine();
   }
 
   function bindInput() {
@@ -2388,11 +2381,15 @@ function bootPracticeSpace() {
         }
       }, 1200);
 
-      var el = document.documentElement;
-      if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
-      // only the viewer needs the phone held one particular way round
-      if (kind === 'stereo' && screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(function () {});
+      // Only the viewer wants the whole screen and one way up. Looking through
+      // the phone is something you do standing at the piano with the rest of
+      // the phone still being a phone.
+      if (kind === 'stereo') {
+        var el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(function () {});
+        }
       }
     });
   }
@@ -2424,95 +2421,53 @@ function bootPracticeSpace() {
 
   var note = document.getElementById('modeNote');
 
-  // TEMPORARY. The split screen can only be got wrong on a real device, and
-  // there is no console to read on a phone in a viewer, so put the numbers
-  // where you can read them before you go in. Take this back out once the
-  // stereo geometry has been confirmed right on the phone.
-  function deviceLine() {
-    renderer.getSize(_size);
-    return 'ratio ' + (window.devicePixelRatio || 1) +
-      ' · css ' + Math.round(_size.x) + 'x' + Math.round(_size.y) +
-      ' · buffer ' + renderer.domElement.width + 'x' + renderer.domElement.height +
-      ' · angle ' +
-      ((screen.orientation && typeof screen.orientation.angle === 'number')
-        ? screen.orientation.angle : '-') +
-      '/' + (typeof window.orientation === 'number' ? window.orientation : '-') +
-      ' · fov ' + eyeFov(_size.y).toFixed(1);
-  }
-
   var enterBtn = document.getElementById('enter');
-  var plainVrBtn = document.getElementById('entervr');
-  var cardboardBtn = document.getElementById('cardboard');
-  plainVrBtn.style.display = 'none';
 
-  // The split screen is its own button and always there. It used to be the
-  // fallback the top button quietly turned into when nothing better was
-  // offered, and that guessing is what went wrong: an Android phone answers
-  // yes to both kinds of immersive session, so it was taken for a headset and
-  // handed a session it holds up at arm's length, and the Cardboard it
-  // actually wanted was nowhere on the screen. Which device this is cannot be
-  // asked for and should not be inferred. It is two buttons.
-  cardboardBtn.onclick = function () {
-    passthrough = false;
-    applyOptions();
-    enterHeld('stereo');
-  };
-
-  document.getElementById('magic').onclick = function () {
-    passthrough = false;
-    applyOptions();
-    enterHeld('window');
-  };
-
-  function wireXR(btn, kind) {
-    btn.onclick = function () {
+  // Two buttons: the way in, and looking without going in. Everything else was
+  // the same two things under different names.
+  //
+  // There is only ever one way in worth offering, and which one it is follows
+  // from what the device can do rather than from asking. A headset that shows
+  // you your room gets that; one that cannot gets a plain immersive session; a
+  // phone, which has neither, gets the split screen for a viewer. The button
+  // says which so it is never a surprise, and no device is offered two ways of
+  // doing the same thing and left to work out the difference.
+  // Every way in is labelled "Enter VR" and then says how, so on any device the
+  // button you want is the one that starts with the same three words. Which
+  // device this is never becomes the reader's problem: there is one way in on
+  // offer, it is at the top, and the rest of the label tells you what will
+  // happen when you take it.
+  function wayIn(label, wantsPassthrough, go) {
+    enterBtn.textContent = label;
+    enterBtn.onclick = function () {
       // set before applyOptions, which would otherwise go and ask for a camera
       // on the way in to a session that does not need one
-      passthrough = (kind === 'immersive-ar');
+      passthrough = wantsPassthrough;
       applyOptions();
-      enterXR(kind);
+      go();
     };
   }
 
-  function offerXR(kind) {
-    enterBtn.textContent = (kind === 'immersive-ar')
-      ? 'Enter with your room showing through'
-      : 'Enter VR';
-    wireXR(enterBtn, kind);
+  function useAR() {
+    wayIn('Enter VR, with your room showing through', true,
+      function () { enterXR('immersive-ar'); });
+  }
+  function useVR() {
+    wayIn('Enter VR', false, function () { enterXR('immersive-vr'); });
+  }
+  function useCard() {
+    wayIn('Enter VR, with a Google Cardboard viewer', false,
+      function () { enterHeld('stereo'); });
   }
 
-  // Nothing immersive on offer: the viewer is the only way in, so it takes the
-  // top of the screen rather than sitting under a button that does nothing.
-  function offerNothing() {
-    enterBtn.style.display = 'none';
-    plainVrBtn.style.display = 'none';
-    cardboardBtn.className = 'go';
-  }
-
-  note.textContent = deviceLine();
   if (navigator.xr && navigator.xr.isSessionSupported) {
     Promise.all([
       navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
       navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
     ]).then(function (r) {
-      // Passthrough is the better of the two wherever it is offered, because a
-      // window that is a hole beats a window that is a picture of a hole. If
-      // this device means something else by it, the viewer button is right
-      // there and unchanged.
-      if (r[0]) {
-        offerXR('immersive-ar');
-        // A headset that can do both keeps both. Passthrough is the better one
-        // and gets the top of the screen, but if it is wrong on a given headset
-        // the plain session should not have become unreachable to say so.
-        if (r[1]) { plainVrBtn.style.display = ''; wireXR(plainVrBtn, 'immersive-vr'); }
-      } else if (r[1]) {
-        offerXR('immersive-vr');
-        plainVrBtn.style.display = 'none';
-      } else {
-        offerNothing();
-      }
-    }).catch(offerNothing);
-  } else { offerNothing(); }
+      if (r[0]) useAR(); else if (r[1]) useVR(); else useCard();
+    }).catch(useCard);
+  } else { useCard(); }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
@@ -2526,7 +2481,16 @@ function bootPracticeSpace() {
     } catch (e) {}
     location.reload();
   };
-  document.getElementById('peek').onclick = function () { applyOptions(); mode = 'flat'; showChrome(true); };
+  // Looking without going in. On a phone this is the room through the glass:
+  // move the phone and the view moves, which is a different thing to do than
+  // dragging a picture about and worth having. On anything that does not
+  // report which way it is pointed it falls back to the drag on its own, so it
+  // does not need to be two buttons and a decision. It was.
+  document.getElementById('peek').onclick = function () {
+    passthrough = false;
+    applyOptions();
+    enterHeld('window');
+  };
   document.getElementById('exit').onclick = leaveScene;
   document.getElementById('recenter').onclick = doRecenter;
 }
