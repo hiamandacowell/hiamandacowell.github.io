@@ -177,21 +177,20 @@
        renderer in. "Enter VR" told you nothing about whether it meant the
        headset on the desk or the viewer in the drawer. -->
   <p class="pick">How are you looking?</p>
+  <!-- Say what you physically do, not what the renderer calls it. "Move it to
+       look around" and "drag to look around" are the same eight words to
+       anyone who does not already know which is which. -->
   <button class="go" id="use360">
-    <b>Enter 360</b><span>A VR headset, or your phone: move it to look around</span>
+    <b>Enter 360</b><span>A VR headset, or hold up your phone and turn</span>
   </button>
   <button class="ghost" id="useStereo">
-    <b>Enter stereoscopic 3D</b><span>A phone in a Google Cardboard viewer</span>
+    <b>Enter stereoscopic 3D</b><span>Your phone in a Google Cardboard viewer</span>
   </button>
   <button class="ghost" id="useScreen">
-    <b>Browser</b><span>A laptop, drag to look around</span>
+    <b>Browser</b><span>A laptop, drag with the mouse to look around</span>
   </button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
-  <ul class="note">
-    <li>Hold the phone in <b>landscape</b> once you are in.</li>
-    <li>Move, resize or hide anything from the <b>menu above your head</b>.</li>
-  </ul>
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
 </div></div>
@@ -2484,7 +2483,7 @@ function bootPracticeSpace() {
   function useSession(kind) {
     var ar = (kind === 'immersive-ar');
     btn360.querySelector('span').textContent = ar
-      ? 'A VR headset, with your room showing through'
+      ? 'A VR headset, with your own room showing through'
       : 'A VR headset';
     btn360.onclick = start(ar, function () { enterXR(kind); });
   }
