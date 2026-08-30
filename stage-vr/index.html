@@ -96,17 +96,6 @@
     width:100%;padding:15px;font-size:16px;border:1px solid var(--line);border-radius:10px;
     background:transparent;color:var(--muted);cursor:pointer;margin-top:10px;
   }
-  /* a way in says what it is on the first line and what you need on the second,
-     because the name of a thing and the thing you are holding are not the same
-     question and both of them get asked */
-  /* not one of the ways in, so it does not sit in the row of them */
-  button.apart{margin-top:30px;}
-  button.go b, button.ghost b{display:block;font-weight:600;}
-  button.go span, button.ghost span{
-    display:block;margin-top:4px;font-size:13px;font-weight:400;letter-spacing:0;
-  }
-  button.go span{color:#4A4E55;}
-  button.ghost span{color:#6B7280;}
   button.ghost:hover{color:var(--text);border-color:var(--muted);}
   :focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
 
@@ -156,6 +145,8 @@
 <div id="ui" style="display:none"><div class="wrap">
   <h1>Stage VR Proof-of-Concept</h1>
   <div class="rule"></div>
+  <p class="sub">Hill Auditorium in 360, from stage right. For a
+     <b>Google Cardboard viewer and any phone</b>.</p>
 
   <p class="pick">Where do you want to start?</p>
   <!-- green room on the left, stage on the right, which is the order you do
@@ -175,24 +166,14 @@
     <option value="img-green">Green room</option>
   </select>
 
-  <!-- Named for the thing you are holding, not for the mode it puts the
-       renderer in. "Enter VR" told you nothing about whether it meant the
-       headset on the desk or the viewer in the drawer. -->
-  <p class="pick">How are you looking?</p>
-  <!-- Say what you physically do, not what the renderer calls it. "Move it to
-       look around" and "drag to look around" are the same eight words to
-       anyone who does not already know which is which. -->
-  <button class="go" id="use360">
-    <b>Enter 360</b><span>A VR headset, or hold up your phone and turn</span>
-  </button>
-  <button class="ghost" id="useStereo">
-    <b>Enter stereoscopic 3D</b><span>Your phone in a Google Cardboard viewer</span>
-  </button>
-  <button class="ghost" id="useScreen">
-    <b>Browser</b><span>A laptop, drag with the mouse to look around</span>
-  </button>
-  <button class="ghost apart" id="forget">Forget my setup and start fresh</button>
+  <button class="go" id="enter">Enter VR</button>
+  <button class="ghost" id="peek">Look around on this screen first</button>
+  <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
+  <ul class="note">
+    <li>Hold the phone in <b>landscape</b> once you are in.</li>
+    <li>Move, resize or hide anything from the <b>menu above your head</b>.</li>
+  </ul>
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
 </div></div>
@@ -227,16 +208,6 @@ function bootPracticeSpace() {
   var menuFound = false;
   var pickables = [];
   var mode = 'flat';
-  // a headset that shows you your own room behind the page
-  var passthrough = false;
-  // Every way in shows you the room you are really in except the browser, which
-  // is a laptop and has nothing to show: its camera points at your face and
-  // there are no keys under it. Asking anyway is a permission prompt for a
-  // picture nobody wants.
-  var noCamera = false;
-  // what the last way in asked for, so that a reading arriving late can put it
-  // back rather than leaving you on the fallback for the rest of the session
-  var heldMode = null;
   var inScene = false;
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
@@ -270,7 +241,7 @@ function bootPracticeSpace() {
 
   var raycaster = new THREE.Raycaster();
   var gazeHit = null, gazeHeld = 0, movingRig = null, sizingRig = null, grabbedEdge = null,
-      recentering = false, parking = false, lastT = 0;
+      recentering = false, lastT = 0;
   var steady = 0, lastDir = new THREE.Vector3(), swingAvg = 0, moveAge = 0;
   var pendingRecenter = false;
   // where you were looking when a hold was armed, and how far off that you must
@@ -312,9 +283,7 @@ function bootPracticeSpace() {
   var tmpQ = new THREE.Quaternion(), vDir = new THREE.Vector3(), vPos = new THREE.Vector3();
 
   function init() {
-    // alpha so that a passthrough session has something to show through:
-    // where nothing is drawn, the headset puts your own room there
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
@@ -325,15 +294,7 @@ function bootPracticeSpace() {
     camera.position.set(0, EYE, 0);
     scene.add(camera);
 
-    // A unit sphere, sized per room in loadSky. It was a fixed 60 metres, and
-    // 60 metres is the whole of "the world feels too big" in a real headset.
-    // A 360 photo carries no depth: both eyes see the same picture, so the only
-    // thing telling you how far away the room is is the radius you drew it at.
-    // At 60 the disparity says everything is at infinity, and a chair that
-    // fills twenty degrees at infinity has to be twenty metres wide for that to
-    // add up, so that is the chair you see. On a phone in a Cardboard the cue
-    // is weak enough to ignore. A Quest is not fooled and reads it honestly.
-    var geo = new THREE.SphereGeometry(1, 64, 40);
+    var geo = new THREE.SphereGeometry(60, 64, 40);
     geo.scale(-1, 1, 1);
     sky = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x14110f }));
     scene.add(sky);
@@ -635,42 +596,6 @@ function bootPracticeSpace() {
   }
 
   // when the camera arrives after the rigs are already built, hand it to both windows
-  // Passthrough turns the windows from pictures into holes.
-  //
-  // The trick is depth and nothing else. The window planes are drawn first and
-  // write only depth, no colour. The panorama is drawn after them and tested
-  // against that depth, so wherever a window is, the panorama is behind it and
-  // simply is not drawn. Nothing is left there at all, and what you see through
-  // the gap is what the headset is compositing behind the page: the room you
-  // are actually sitting in, at full resolution, in real depth, with no lag and
-  // no camera permission. It is what the camera window was always reaching for.
-  //
-  // The piano's drawn body goes too. It is furniture standing exactly where the
-  // real instrument is, and in passthrough the real one is the one you want.
-  function applyPassthrough() {
-    var on = passthrough, i;
-    renderer.setClearAlpha(on ? 0 : 1);
-    sky.renderOrder = on ? -5 : 0;
-    windowMaterial().colorWrite = !on;
-
-    if (piano.win) {
-      piano.win.renderOrder = on ? -10 : 0;
-      if (on) piano.win.visible = true;
-    }
-    if (piano.fallback && on) piano.fallback.visible = false;
-    if (piano.group) {
-      for (i = 0; i < piano.group.children.length; i++) {
-        var ch = piano.group.children[i];
-        if (ch === piano.win || ch === piano.fallback) continue;
-        ch.visible = !on;
-      }
-    }
-    for (i = 0; i < panels.length; i++) {
-      panels[i].win.renderOrder = on ? -10 : 0;
-      if (on) panels[i].win.visible = true;
-    }
-  }
-
   function attachVideo() {
     winMat.uniforms.uVideo.value = videoTex;
     winMat.uniforms.uHasVideo.value = 1;
@@ -783,7 +708,7 @@ function bootPracticeSpace() {
     if (!doorMark) return;
     var d = DOORS[currentEnv];
     // while you are placing or sizing something, the room is not the subject
-    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering && !parking);
+    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering);
     if (!doorMark.visible) return;
     doorMark.userData.id = 'door';
     doorMark.userData.repeat = false;
@@ -831,14 +756,10 @@ function bootPracticeSpace() {
   var HANDLE = 0.058;
   // how far above and below the piano its two height buttons sit
   var LIFT_REACH = 0.14;
-  // The two rows hang below the tag rather than sitting at heights of their
-  // own, so that moving the tag moves the whole menu and keeps its shape. These
-  // are the gaps that used to be the difference between 25, 14 and 5.
-  var ROW_DROP = THREE.MathUtils.degToRad(11);
-  var BLOOM_DROP = THREE.MathUtils.degToRad(20);
-  var TIP_DROP = THREE.MathUtils.degToRad(12);
+  var ROW_PITCH = THREE.MathUtils.degToRad(14);
   var ROW_STEP = THREE.MathUtils.degToRad(9);
   var GROUP_GAP = THREE.MathUtils.degToRad(5.5);
+  var BLOOM_PITCH = THREE.MathUtils.degToRad(5);
   var BLOOM_STEP = THREE.MathUtils.degToRad(8.2);
   var BLOOM_SHIFT = THREE.MathUtils.degToRad(6);
   var BLOOM_REACH = THREE.MathUtils.degToRad(26);   // furthest a row may sit off centre
@@ -846,6 +767,7 @@ function bootPracticeSpace() {
   var menu = {
     open: false, sel: -1, idle: 0,
     tabYaw: 0, tabPitch: THREE.MathUtils.degToRad(25),
+    ringYaw: 0,
     tab: null, ring: [], bloom: [], handles: []
   };
   var texCache = {};
@@ -895,16 +817,6 @@ function bootPracticeSpace() {
       g.lineTo(34, 44);
       g.stroke();
       g.beginPath(); g.arc(18, 6, 5, 0, 6.284); g.fill();
-      return;
-    }
-    if (name === 'exit') {
-      // a doorway standing open on its far side, and you going out through it.
-      // Deliberately nothing like the close cross: those two are next to each
-      // other and one of them ends the session.
-      g.beginPath();
-      g.moveTo(10, -42); g.lineTo(-34, -42); g.lineTo(-34, 42); g.lineTo(10, 42);
-      g.stroke();
-      arrow(0, 0, 42, 0);
       return;
     }
     if (name === 'recenter') {
@@ -1077,9 +989,7 @@ function bootPracticeSpace() {
     scene.add(menu.tab);
 
     var i;
-    // six items fit the row today; the spare two are so that raising
-    // PANEL_MAX cannot silently push close or the way out off the end
-    for (i = 0; i < 8; i++) menu.ring.push(makeTile());
+    for (i = 0; i < 6; i++) menu.ring.push(makeTile());
     for (i = 0; i < 5; i++) menu.bloom.push(makeTile());
     for (i = 0; i < 4; i++) {
       var hnd = plate(HANDLE, HANDLE, null);
@@ -1130,16 +1040,7 @@ function bootPracticeSpace() {
     }
     if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'addwindow', label: 'window', group: 0 });
     out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
-    out.push({ id: 'parkmenu', icon: 'move', label: 'move menu', group: 1 });
     out.push({ id: 'close', icon: 'close', label: 'close', group: 1 });
-    // In a real headset the page's own Exit button is not on screen at all,
-    // because there is no screen: the only way out was the headset's own
-    // gesture. This is the way out from inside. It sits next to close, which
-    // is the one it can be confused with, so it asks for the same long hold as
-    // a door rather than the ordinary dwell: ending the session by glancing at
-    // the wrong tile is not a thing that should be able to happen.
-    out.push({ id: 'exitvr', icon: 'exit', label: 'exit vr', group: 1,
-      dwell: DOOR_DWELL });
     return out.slice(0, menu.ring.length);
   }
 
@@ -1176,9 +1077,6 @@ function bootPracticeSpace() {
     tile.visible = true;
     tile.userData.id = item.id;
     tile.userData.repeat = !!item.repeat;
-    // tiles are reused as the row changes, so this has to be set every time
-    // rather than only when an item asks for it
-    tile.userData.dwell = item.dwell || 0;
     tile.material.map = cachedIcon(item.icon, item.label, active);
     tile.material.needsUpdate = true;
     tile.scale.setScalar(1);
@@ -1196,7 +1094,7 @@ function bootPracticeSpace() {
 
     layoutDoor();
 
-    if (!inScene || movingRig || recentering || parking) { refreshPickables(); return; }
+    if (!inScene || movingRig || recentering) { refreshPickables(); return; }
 
     // size mode: the edges of the thing, and the tag overhead to be done
     if (sizingRig) {
@@ -1221,7 +1119,7 @@ function bootPracticeSpace() {
       aimAt(menu.tab, menu.tabYaw, menu.tabPitch, MENU_REACH);
       if (!menuFound) {
         menuTip.visible = true;
-        aimAt(menuTip, menu.tabYaw, menu.tabPitch - TIP_DROP, MENU_REACH);
+        aimAt(menuTip, menu.tabYaw, THREE.MathUtils.degToRad(13), MENU_REACH);
       }
       refreshPickables();
       return;
@@ -1241,8 +1139,7 @@ function bootPracticeSpace() {
     }
     var mid = offs[n - 1] / 2;
     for (i = 0; i < n; i++) {
-      placeTile(menu.ring[i], items[i], menu.tabYaw + offs[i] - mid,
-        menu.tabPitch - ROW_DROP, i === menu.sel);
+      placeTile(menu.ring[i], items[i], menu.ringYaw + offs[i] - mid, ROW_PITCH, i === menu.sel);
     }
 
     if (menu.sel >= 0) {
@@ -1261,8 +1158,8 @@ function bootPracticeSpace() {
       shift = Math.max(-room, Math.min(room, shift));
       for (i = 0; i < bl.length && i < menu.bloom.length; i++) {
         placeTile(menu.bloom[i], bl[i],
-          menu.tabYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
-          menu.tabPitch - BLOOM_DROP);
+          menu.ringYaw + shift + (i - (bl.length - 1) / 2) * BLOOM_STEP,
+          BLOOM_PITCH);
       }
       menu.ring[menu.sel].scale.setScalar(1.12);
     }
@@ -1308,22 +1205,11 @@ function bootPracticeSpace() {
   // sits at 23 degrees and the tag was already at 25.
   var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.506 };
 
-  // How far off to hang each room, in metres.
-  //
-  // Hanging it at room distance is what gives a headset any sense of how big
-  // the room is, because a flat photo has no depth of its own and the radius is
-  // the only thing saying otherwise. 12 and 4 were tried for exactly that and
-  // are wrong in a viewer, so it is back to being far away, which reads as
-  // infinity and lets the picture simply be a picture. Worth another go only
-  // with something to test it on.
-  var SKY_RADIUS = { 'img-stage': 60, 'img-green': 60 };
-
   function loadSky(id) {
     var img = document.getElementById(id);
     if (!img) { errEl.textContent = 'That panorama is missing.'; return; }
     var fwd = ENV_FORWARD.hasOwnProperty(id) ? ENV_FORWARD[id] : 0.75;
     sky.rotation.y = 2 * Math.PI * (fwd + 0.25);
-    sky.scale.setScalar(SKY_RADIUS.hasOwnProperty(id) ? SKY_RADIUS[id] : 12);
     function apply() {
       var t = new THREE.Texture(img);
       t.minFilter = THREE.LinearFilter;
@@ -1341,11 +1227,6 @@ function bootPracticeSpace() {
   }
 
   function startPassthrough() {
-    // In a headset that shows you the room itself there is nothing to ask a
-    // camera for, and asking is worse than useless: the Quest has no camera to
-    // give a web page, so it offers something that is not one and the window
-    // fills with whatever that is. The window is a hole there, not a picture.
-    if (passthrough || noCamera) return;
     if (videoTex) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
@@ -1422,7 +1303,6 @@ function bootPracticeSpace() {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: currentEnv || document.getElementById('env').value,
         menuFound: !!menuFound,
-        menuAt: { pitch: menu.tabPitch },
         stagePianoOn: stagePiano(),
         piano: {
           yaw: piano.yaw, drop: piano.drop, dist: piano.dist, width: piano.width
@@ -1483,13 +1363,6 @@ function bootPracticeSpace() {
     menuFound = !!s.menuFound;
     stagePianoOn = !!s.stagePianoOn;
 
-    if (s.menuAt && typeof s.menuAt === 'object') {
-      // the height only. A yaw saved by an older build is ignored rather than
-      // restored, because that is exactly the menu nobody could find.
-      menu.tabPitch = num(s.menuAt.pitch, THREE.MathUtils.degToRad(25),
-        PARK_MIN, PARK_MAX);
-    }
-
     if (s.piano && typeof s.piano === 'object') {
       piano.yaw   = num(s.piano.yaw,   RIG_YAW, -Math.PI, Math.PI);
       piano.drop  = num(s.piano.drop,  0.46, 0.10, 1.10);
@@ -1532,26 +1405,9 @@ function bootPracticeSpace() {
     });
   }
 
-  // Which way up the screen is being held. window.orientation is the old name
-  // for this and Chrome has removed it, so on Android it read as undefined,
-  // fell through to 0, and the app believed the phone was upright while it was
-  // held sideways in the viewer: the whole frame turns a quarter for that, and
-  // the tag that should be above you ends up beside you. screen.orientation is
-  // the live one. Keep the old name behind it for iOS Safari, where it is still
-  // what there is. The two agree where both exist, and where they differ it is
-  // -90 against 270, which is the same rotation.
-  function screenAngle() {
-    if (screen.orientation && typeof screen.orientation.angle === 'number') {
-      return screen.orientation.angle;
-    }
-    return window.orientation || 0;
-  }
-
   function onOrient(e) {
     if (e.alpha === null || e.alpha === undefined) return;
-    orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: screenAngle() };
-    // whatever gave up waiting for this, it has arrived
-    if (heldMode && mode === 'flat') { mode = heldMode; pendingRecenter = true; }
+    orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: (window.orientation || 0) };
     // the first reading after entering is what "straight ahead" means, so the
     // house lands where it was aimed instead of wherever the compass points
     if (pendingRecenter) { pendingRecenter = false; doRecenter(); }
@@ -1627,7 +1483,7 @@ function bootPracticeSpace() {
     vc.getWorldQuaternion(tmpQ);
     vDir.set(0, 0, -1).applyQuaternion(tmpQ);
 
-    if (movingRig || grabbedEdge || recentering || parking) {
+    if (movingRig || grabbedEdge || recentering) {
       if (movingRig) updateMovingRig(vDir);
       if (grabbedEdge) { dragEdge(vPos, vDir); layoutHandles(); }
       if (armDir.lengthSq() === 0) armDir.copy(vDir);
@@ -1658,8 +1514,7 @@ function bootPracticeSpace() {
       // because forward would otherwise land on the menu you picked it from.
       // Hold the ring at nothing until that is true, rather than letting it
       // sit full while nothing happens, which reads as a thing that is broken.
-      var needTurn = grabbedEdge ? EDGE_TURN
-        : (recentering ? MIN_TURN : (parking ? PARK_TURN : 0));
+      var needTurn = grabbedEdge ? EDGE_TURN : (recentering ? MIN_TURN : 0);
       if (turned <= needTurn) steady = 0;
 
       var hold = grabbedEdge ? EDGE_DWELL : PLACE_DWELL;
@@ -1667,7 +1522,6 @@ function bootPracticeSpace() {
       if (steady >= hold && moveAge > MIN_MOVE) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
-        else if (parking) finishParking();
         else finishRecenter();
       }
       return;
@@ -1964,45 +1818,6 @@ function bootPracticeSpace() {
     cooldown = COOLDOWN;
   }
 
-  // Where the menu hangs was 25 degrees above you, and 25 was a number picked
-  // on a screen. Through a viewer's lenses it is not the same glance: the
-  // comfortable band is narrower, where it sits depends on the viewer and on
-  // the neck of whoever is wearing it, and no constant is right for all of
-  // them. The same objection as the field of view being a flat 78. So it is
-  // not a constant any more; you put it where you want it and it stays there.
-  //
-  // Only the height is yours to set. It was the height that was wrong through a
-  // viewer, and it is the height that has no good constant.
-  //
-  // Which way round it sits is not offered, and that is deliberate rather than
-  // lazy: a menu parked off to one side is a menu you can lose, and losing it
-  // loses every way of getting it back, because the way back is in it. It stays
-  // at forward, which is what world yaw 0 means, which is where a recenter and
-  // every door already bring you. Look up or down for it; never round.
-  var PARK_TURN = 8;
-  var PARK_MIN = THREE.MathUtils.degToRad(-10);
-  var PARK_MAX = THREE.MathUtils.degToRad(60);
-
-  function startParking() {
-    menu.open = false;
-    parking = true;
-    setHint('look where you want the menu, hold still');
-    armHold();
-    layoutMenu();
-  }
-
-  function finishParking() {
-    parking = false;
-    steady = 0;
-    hintPlate.visible = false;
-    menu.tabPitch = Math.max(PARK_MIN, Math.min(PARK_MAX,
-      Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1))));
-    menu.open = true;
-    layoutMenu();
-    scheduleSave();
-    cooldown = COOLDOWN;
-  }
-
   // Whether yawOffset yet means anything. Until the first orientation reading
   // lands there is no relation at all between a world bearing and the real
   // room, so the first recenter of a session establishes that frame rather than
@@ -2010,7 +1825,7 @@ function bootPracticeSpace() {
   var framed = false;
 
   function doRecenter() {
-    if ((mode === 'stereo' || mode === 'window') && orient) {
+    if (mode === 'stereo' && orient) {
       var next = -THREE.MathUtils.degToRad(orient.alpha);
       // The panorama, the menu and the doors are meant to swing round and face
       // you: that is the whole of recentring. The piano and the window are not.
@@ -2051,25 +1866,9 @@ function bootPracticeSpace() {
     cooldown = COOLDOWN;
   }
 
-  // Leaving, from the HUD button on a screen or from the menu inside a
-  // headset. Ending an XR session also fires its own end handler, which puts
-  // the mode back and shows the chrome; doing both is harmless and doing
-  // neither is not an option, because in stereo there is no session to end.
-  function leaveScene() {
-    var s = renderer.xr.getSession && renderer.xr.getSession();
-    if (mode === 'xr' && s) s.end();
-    mode = 'flat';
-    movingRig = null; sizingRig = null; grabbedEdge = null;
-    recentering = false; parking = false; pendingRecenter = false; steady = 0;
-    heldMode = null;
-    showChrome(false);
-    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
-  }
-
   function activate(id, dt) {
     var step = dt || 0.016;
     if (!id) return;
-    if (id === 'exitvr') { leaveScene(); return; }
 
     if (id === 'endsize') { endSizing(); return; }
     if (id.indexOf('edge:') === 0) {
@@ -2082,7 +1881,6 @@ function bootPracticeSpace() {
     if (id === 'open')  { menu.open = true; menu.sel = -1; menu.idle = 0; menuFound = true; scheduleSave(); layoutMenu(); return; }
     if (id === 'close') { menu.open = false; menu.idle = 0; layoutMenu(); return; }
     if (id === 'recenter') { startRecenter(); return; }
-    if (id === 'parkmenu') { startParking(); return; }
 
     if (id === 'door') { switchRoom(); return; }
     // picking a ring item does not replace anything: it blooms beside it
@@ -2177,7 +1975,6 @@ function bootPracticeSpace() {
   function onTrigger() {
     if (!inScene) return;
     if (movingRig) { drop(); return; }
-    if (parking) { finishParking(); return; }
     if (grabbedEdge) { releaseEdge(); return; }
     if (sizingRig) { endSizing(); return; }
     if (recentering) { finishRecenter(); return; }
@@ -2190,53 +1987,22 @@ function bootPracticeSpace() {
 
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
-  var _size = new THREE.Vector2();
-
-  // Each eye's field, in degrees.
-  //
-  // This was worked out from the screen once: half the screen in millimetres
-  // against a Cardboard's 39mm screen-to-lens distance, which for a large phone
-  // comes to about 91 and scales itself to any handset. The arithmetic is
-  // sound and it is wrong in the viewer. Tried, worn, and reverted, so do not
-  // derive it again without a headset on: whatever the geometry says, 78 is
-  // what looks right through the lenses, and the lenses are the only opinion
-  // that counts here.
-  var EYE_FOV = 78;
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
     lastT = now;
 
-    if ((mode === 'stereo' || mode === 'window') && orient) applyOrientation(camera);
+    if (mode === 'stereo' && orient) applyOrientation(camera);
     if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
-
-    // The panorama rides with your head rather than sitting at the origin.
-    // At 60 metres it made no difference: a metre of head either way is nothing
-    // against 60. Hung close enough to read as a room it matters, and it is
-    // also the only thing that keeps a small sphere honest, because a picture
-    // painted on a sphere is only undistorted from the centre of it. A photo
-    // has no parallax to give you, so not moving is the truthful answer.
-    var vcSky = viewCamera();
-    vcSky.updateMatrixWorld();
-    sky.position.setFromMatrixPosition(vcSky.matrixWorld);
 
     updateGaze(dt);
     updateWindowProjection();
 
     if (mode === 'stereo') {
-      // CSS pixels, not the drawing buffer. setViewport and setScissor multiply
-      // by the pixel ratio themselves, so handing them domElement.width counted
-      // the ratio twice: on a phone at ratio 2 the left eye was drawn across the
-      // whole width and twice the height, anchored at the bottom, so the centre
-      // of the view sat off the top of the screen and everything you could see
-      // was the bottom half of the frame. That is why the menu tag read as way
-      // below where it is. On this desktop the ratio happens to be 1 and the bug
-      // is invisible, which is how it survived.
-      renderer.getSize(_size);
-      var w = _size.x, h = _size.y;
+      var w = renderer.domElement.width, h = renderer.domElement.height;
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
-        c.fov = EYE_FOV; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
+        c.fov = 78; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
         c.updateProjectionMatrix();
         c.position.setFromMatrixPosition(camera.matrixWorld);
         c.quaternion.setFromRotationMatrix(camera.matrixWorld);
@@ -2250,15 +2016,6 @@ function bootPracticeSpace() {
       renderer.render(scene, rc);
       renderer.setScissorTest(false);
     } else {
-      // Put the viewport back. The split screen sets a half-width one and
-      // nothing else ever does: render() only touches the viewport when it is
-      // handed a render target, and a plain render is not. So after leaving
-      // stereo, the flat picture was drawn into the left half of the screen and
-      // stayed there. An XR session sets its own per eye and overrides this.
-      if (mode !== 'xr') {
-        renderer.getSize(_size);
-        renderer.setViewport(0, 0, _size.x, _size.y);
-      }
       renderer.render(scene, camera);
     }
   }
@@ -2266,10 +2023,6 @@ function bootPracticeSpace() {
   function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    // the ratio is not fixed for the life of a page: turning the phone can
-    // change it, and so can a browser zoom, and setSize only reads whatever it
-    // was last told. Ask again rather than carry a stale one.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
@@ -2301,10 +2054,9 @@ function bootPracticeSpace() {
         ((px - r.left) / r.width) * 2 - 1,
         -((py - r.top) / r.height) * 2 + 1
       );
-      if (movingRig || grabbedEdge || recentering || parking) {
+      if (movingRig || grabbedEdge || recentering) {
         if (movingRig) drop();
         else if (grabbedEdge) releaseEdge();
-        else if (parking) finishParking();
         else finishRecenter();
         return;
       }
@@ -2342,103 +2094,40 @@ function bootPracticeSpace() {
     hud.style.display = on ? 'flex' : 'none';
     if (!on) {
       movingRig = null; sizingRig = null; grabbedEdge = null;
-      recentering = false; parking = false; hintPlate.visible = false;
+      recentering = false; hintPlate.visible = false;
     }
     layoutMenu();
   }
 
-  function enterXR(kind) {
-    navigator.xr.requestSession(kind, { optionalFeatures: ['local-floor'] })
+  function enterVR() {
+    navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] })
       .then(function (session) {
-        applyOptions();
         mode = 'xr';
-        passthrough = (kind === 'immersive-ar');
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
-        session.addEventListener('end', function () {
-          passthrough = false;
-          applyPassthrough();
-          mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null;
-          recentering = false; parking = false; steady = 0;
-          showChrome(false);
-        });
-        applyPassthrough();
+        session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; steady = 0; showChrome(false); });
         showChrome(true);
       })
       .catch(function (e) {
         errEl.textContent = 'VR would not start here (' + e.message + '). Falling back to split screen.';
-        passthrough = false;
-        applyPassthrough();
-        applyOptions();
-        if (piano.on || panels.some(function (q) { return q.on; })) startPassthrough();
         enterStereo();
       });
   }
 
-  // Two ways to be in the room holding a phone. The viewer splits the screen
-  // and the phone is strapped to your face; the window is the same room seen
-  // through the phone as if it were a pane of glass, held in your hand and
-  // moved about. They are not the same thing and neither is dragging a finger
-  // across a picture, which is the third.
-  // Motion is asked for first, before anything asks for a camera.
-  //
-  // On iOS both are permission prompts and both need the tap that opened them
-  // to still count as a user gesture. Laying out the room came first and that
-  // asks for the camera, which spends the gesture, so by the time the motion
-  // request went out there was no gesture left to authorise it: it was refused
-  // without ever showing you the dialog, and head tracking silently never
-  // started. Two side by side pictures that do not move when you do is what
-  // that looks like from the outside.
-  function enterHeld(kind) {
-    heldMode = kind;
+  function enterStereo() {
     enableOrientation().then(function (ok) {
-      applyOptions();
-      if (!ok) {
-        // there is no head tracking to run on, and neither of these can be
-        // dragged, so say so and leave them on the one that can
-        heldMode = null;
-        mode = 'flat';
-        errEl.textContent = 'This phone will not report which way it is pointed, ' +
-          'so this is drag to look. On iPhone: Settings, Apps, Safari, Motion & ' +
-          'Orientation Access.';
-        showChrome(true);
-        return;
-      }
-      mode = kind;
+      mode = 'stereo';
       yawOffset = 0;
       framed = false;
       pendingRecenter = true;
       if (orient) doRecenter();
       showChrome(true);
-
-      // The API existing is not the same as it reporting anything: a desktop
-      // has DeviceOrientationEvent and will never fire one, and neither of
-      // these modes can be dragged, so without this you sit in a view that
-      // cannot move at all. It is a fallback and not a verdict, though. The
-      // first reading to arrive puts the mode back, however long it took, so a
-      // phone that is merely slow to start reporting is not left on the drag
-      // for the rest of the session.
-      setTimeout(function () {
-        if (!orient && mode === kind) {
-          mode = 'flat';
-          errEl.textContent = 'Nothing here reports which way it is pointed yet, so this is drag to look.';
-        }
-      }, 2500);
-
-      // Only the viewer wants the whole screen and one way up. Looking through
-      // the phone is something you do standing at the piano with the rest of
-      // the phone still being a phone.
-      if (kind === 'stereo') {
-        var el = document.documentElement;
-        if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
-        if (screen.orientation && screen.orientation.lock) {
-          screen.orientation.lock('landscape').catch(function () {});
-        }
-      }
+      var el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
+      if (!ok) errEl.textContent = 'Running without head tracking. Drag to look around.';
     });
   }
-
-  function enterStereo() { enterHeld('stereo'); }
 
   init();
   bindInput();
@@ -2464,65 +2153,18 @@ function bootPracticeSpace() {
   showEnv(envEl.value);
 
   var note = document.getElementById('modeNote');
-
-  // Three ways in, and none of them can be missing.
-  //
-  // 360 is the one where the device is the window and you move it to look:
-  // a headset does that by being on your face, a phone by being held up and
-  // turned, and they are the same thing to want even though they are not the
-  // same thing to build. So the button asks for the best the device has and
-  // does not make anyone choose between them. Stereoscopic is the split screen
-  // a viewer needs, which is a different thing to want. The browser is the
-  // drag, for a laptop.
-  //
-  // Every one of them works everywhere, which is why none of them is hidden.
-  // 360 on a laptop lands on the drag, because that is what a laptop can do,
-  // and stereoscopic on a laptop is a split screen you have no viewer for but
-  // can still see. Nothing is offered that then refuses.
-  var btn360 = document.getElementById('use360');
-  var btnStereo = document.getElementById('useStereo');
-  var btnScreen = document.getElementById('useScreen');
-
-  // These are set first because laying the room out asks for a camera and both
-  // of them decide whether it should. Laying it out is now the job of whatever
-  // is being entered, once that has asked for what it needs: see enterHeld.
-  function start(opts, go) {
-    return function () {
-      passthrough = !!opts.passthrough;
-      noCamera = !!opts.noCamera;
-      heldMode = null;
-      go();
-    };
+  function useStereo() {
+    note.textContent = '';
+    document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
   }
-
-  // until we know better, 360 means the phone held up
-  btn360.onclick = start({}, function () { enterHeld('window'); });
-  btnStereo.onclick = start({}, function () { enterHeld('stereo'); });
-  btnScreen.onclick = start({ noCamera: true }, function () {
-    applyOptions();
-    mode = 'flat';
-    showChrome(true);
-  });
-
-  // Showing you the room you are really in is not a headset feature worth
-  // naming in a subtitle: it is what all of these do except the browser. A
-  // headset composites it behind the page and the windows become holes; a phone
-  // points its rear camera through them. Same idea, different plumbing, and the
-  // plumbing is not the reader's business.
-  function useSession(kind) {
-    btn360.onclick = start({ passthrough: kind === 'immersive-ar' },
-      function () { enterXR(kind); });
-  }
-
   if (navigator.xr && navigator.xr.isSessionSupported) {
-    Promise.all([
-      navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
-      navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
-    ]).then(function (r) {
-      if (r[0]) useSession('immersive-ar');
-      else if (r[1]) useSession('immersive-vr');
-    }).catch(function () {});
-  }
+    navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
+      if (ok) {
+        note.textContent = '';
+        document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
+      } else { useStereo(); }
+    }).catch(useStereo);
+  } else { useStereo(); }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
@@ -2536,7 +2178,13 @@ function bootPracticeSpace() {
     } catch (e) {}
     location.reload();
   };
-  document.getElementById('exit').onclick = leaveScene;
+  document.getElementById('peek').onclick = function () { applyOptions(); mode = 'flat'; showChrome(true); };
+  document.getElementById('exit').onclick = function () {
+    var s = renderer.xr.getSession && renderer.xr.getSession();
+    if (mode === 'xr' && s) s.end();
+    mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; pendingRecenter = false; steady = 0; showChrome(false);
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  };
   document.getElementById('recenter').onclick = doRecenter;
 }
 
