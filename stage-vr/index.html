@@ -96,6 +96,15 @@
     width:100%;padding:15px;font-size:16px;border:1px solid var(--line);border-radius:10px;
     background:transparent;color:var(--muted);cursor:pointer;margin-top:10px;
   }
+  /* a way in says what it is on the first line and what you need on the second,
+     because the name of a thing and the thing you are holding are two questions
+     and both of them get asked */
+  button.go b, button.ghost b{display:block;font-weight:600;}
+  button.go span, button.ghost span{
+    display:block;margin-top:4px;font-size:13px;font-weight:400;letter-spacing:0;
+  }
+  button.go span{color:#4A4E55;}
+  button.ghost span{color:#6B7280;}
   button.ghost:hover{color:var(--text);border-color:var(--muted);}
   :focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
 
@@ -166,8 +175,18 @@
     <option value="img-green">Green room</option>
   </select>
 
-  <button class="go" id="enter">Enter VR</button>
-  <button class="ghost" id="peek">Look around on this screen first</button>
+  <!-- Named for the thing you are holding rather than for what the renderer
+       does about it. "Enter VR" was true of all three of these at once and so
+       named none of them. -->
+  <button class="go" id="enter">
+    <b>Enter stereoscopic 3D</b><span>Your phone in a Google Cardboard viewer</span>
+  </button>
+  <button class="ghost" id="use360">
+    <b>Enter 360</b><span>A VR headset, or hold up your phone and turn</span>
+  </button>
+  <button class="ghost" id="peek">
+    <b>Browser</b><span>A laptop, drag with the mouse to look around</span>
+  </button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <ul class="note">
@@ -1825,7 +1844,7 @@ function bootPracticeSpace() {
   var framed = false;
 
   function doRecenter() {
-    if (mode === 'stereo' && orient) {
+    if ((mode === 'stereo' || mode === 'window') && orient) {
       var next = -THREE.MathUtils.degToRad(orient.alpha);
       // The panorama, the menu and the doors are meant to swing round and face
       // you: that is the whole of recentring. The piano and the window are not.
@@ -1992,7 +2011,7 @@ function bootPracticeSpace() {
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
     lastT = now;
 
-    if (mode === 'stereo' && orient) applyOrientation(camera);
+    if ((mode === 'stereo' || mode === 'window') && orient) applyOrientation(camera);
     if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
 
     updateGaze(dt);
@@ -2114,6 +2133,23 @@ function bootPracticeSpace() {
       });
   }
 
+  // The phone held up as a window on the room, moved about to look, rather
+  // than strapped to your face with the screen split. Same head tracking, same
+  // everything: only the screen is not divided and it does not want the phone
+  // held one way round, so it neither goes fullscreen nor locks the rotation.
+  // Nothing about how the stereo picture is drawn is touched by this.
+  function enterWindow() {
+    enableOrientation().then(function (ok) {
+      mode = 'window';
+      yawOffset = 0;
+      framed = false;
+      pendingRecenter = true;
+      if (orient) doRecenter();
+      showChrome(true);
+      if (!ok) { mode = 'flat'; errEl.textContent = 'Running without head tracking. Drag to look around.'; }
+    });
+  }
+
   function enterStereo() {
     enableOrientation().then(function (ok) {
       mode = 'stereo';
@@ -2153,18 +2189,27 @@ function bootPracticeSpace() {
   showEnv(envEl.value);
 
   var note = document.getElementById('modeNote');
-  function useStereo() {
-    note.textContent = '';
-    document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
-  }
+  note.textContent = '';
+
+  // The viewer is always the viewer, whatever the device claims it can do.
+  document.getElementById('enter').onclick = function () {
+    applyOptions();
+    enterStereo();
+  };
+
+  // 360 is the one where the device is the window and you move it to look. A
+  // headset does that by being on your face and a phone by being held up and
+  // turned: the same thing to want, so the button takes whichever the device
+  // has rather than making anyone choose. It starts as the phone and becomes
+  // the headset if one answers.
+  var btn360 = document.getElementById('use360');
+  btn360.onclick = function () { applyOptions(); enterWindow(); };
+
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
-      if (ok) {
-        note.textContent = '';
-        document.getElementById('enter').onclick = function () { applyOptions(); enterVR(); };
-      } else { useStereo(); }
-    }).catch(useStereo);
-  } else { useStereo(); }
+      if (ok) btn360.onclick = function () { applyOptions(); enterVR(); };
+    }).catch(function () {});
+  }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
