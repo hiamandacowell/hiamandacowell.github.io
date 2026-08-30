@@ -202,12 +202,8 @@
   <img id="img-green" alt="" src="hill-greenroom.jpg">
 </div>
 
-<!-- The menu is a tag you look up at, which is right inside a viewer and a
-     treasure hunt on a screen you are holding. On anything with a HUD there is
-     a button for it as well: same menu, no hunting. -->
 <div id="hud">
   <button id="exit">Exit</button>
-  <button id="menubtn">Menu</button>
   <button id="recenter">Recenter</button>
 </div>
 
@@ -1459,8 +1455,6 @@ function bootPracticeSpace() {
   window.addEventListener('pagehide', flushSave);
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) flushSave();
-    // a wake lock does not survive the page being hidden, so take it again
-    else if (inScene) keepAwake(true);
   });
 
   // stored numbers are only trusted inside the range the control itself allows,
@@ -2208,108 +2202,6 @@ function bootPracticeSpace() {
   // what looks right through the lenses, and the lenses are the only opinion
   // that counts here.
   var EYE_FOV = 78;
-
-  // ---------- the lenses ----------
-  //
-  // A Cardboard lens magnifies unevenly: the further from the middle you look
-  // the more it stretches, so straight lines bow and the edges smear. Nothing
-  // in the picture is wrong; the glass is. The fix is to bend the picture the
-  // opposite way before it is shown, so that the lens bends it back straight.
-  //
-  // That is why a proper Cardboard render is two rounded shapes rather than two
-  // rectangles. The corners of the frame get pulled in hardest and there is
-  // simply nothing left to draw out there, so the black around the edges is the
-  // correction working rather than something missing.
-  //
-  // Each eye is rendered into its own texture and then drawn through a grid
-  // whose points have been moved inward by how far out they are. Only the
-  // forward polynomial is needed that way round: the grid carries the bend and
-  // the card interpolates the rest.
-  //
-  // These are the Google Cardboard v2 coefficients. A v1 viewer is 0.441 and
-  // 0.156, and a viewer that ships its own profile will differ again. Set both
-  // to zero to turn the correction off and get the flat rectangles back.
-  var DIST_K1 = 0.34, DIST_K2 = 0.55, DIST_SEGMENTS = 24;
-
-  var rtL = null, rtR = null, warpScene = null, warpCam = null;
-  var warpL = null, warpR = null, warpW = 0, warpH = 0;
-
-  function warpGeometry(aspect) {
-    var g = new THREE.PlaneGeometry(2, 2, DIST_SEGMENTS, DIST_SEGMENTS);
-    var a = g.attributes.position;
-    // The coefficients are defined against the tangent of the angle off centre,
-    // not against a corner-is-one square, so the edge of the picture is at
-    // tan(half the field) and not at 1. Feeding it the square directly bends
-    // everything about half again too hard, which shows up as a smaller blob
-    // with more black round it than a viewer wants.
-    var tanHalf = Math.tan(THREE.MathUtils.degToRad(EYE_FOV) / 2);
-    for (var i = 0; i < a.count; i++) {
-      var x = a.getX(i), y = a.getY(i);
-      // measured on the physical screen, so the bend comes out round rather
-      // than oval on a half that is not square
-      var ax = x * aspect * tanHalf, ay = y * tanHalf;
-      var r2 = ax * ax + ay * ay;
-      var f = 1 + DIST_K1 * r2 + DIST_K2 * r2 * r2;
-      a.setXY(i, x / f, y / f);
-    }
-    a.needsUpdate = true;
-    return g;
-  }
-
-  function ensureWarp(w, h) {
-    var pr = renderer.getPixelRatio();
-    var tw = Math.max(1, Math.floor(w / 2 * pr));
-    var th = Math.max(1, Math.floor(h * pr));
-    if (rtL && warpW === tw && warpH === th) return;
-    warpW = tw; warpH = th;
-
-    if (rtL) { rtL.dispose(); rtR.dispose(); }
-    var opt = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-    rtL = new THREE.WebGLRenderTarget(tw, th, opt);
-    rtR = new THREE.WebGLRenderTarget(tw, th, opt);
-
-    if (!warpScene) {
-      warpScene = new THREE.Scene();
-      warpCam = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
-    }
-    if (warpL) {
-      warpScene.remove(warpL); warpL.geometry.dispose(); warpL.material.dispose();
-      warpScene.remove(warpR); warpR.geometry.dispose(); warpR.material.dispose();
-    }
-    var aspect = (w / 2) / h;
-    warpL = new THREE.Mesh(warpGeometry(aspect),
-      new THREE.MeshBasicMaterial({ map: rtL.texture, depthTest: false }));
-    warpR = new THREE.Mesh(warpGeometry(aspect),
-      new THREE.MeshBasicMaterial({ map: rtR.texture, depthTest: false }));
-    warpL.scale.x = 0.5; warpL.position.x = -0.5;
-    warpR.scale.x = 0.5; warpR.position.x = 0.5;
-    warpScene.add(warpL); warpScene.add(warpR);
-  }
-
-  // A phone in a viewer puts itself to sleep in the middle of a piece, because
-  // you are not touching it: it is strapped to your face. This asks the browser
-  // to keep the screen on for as long as you are in there.
-  //
-  // It cannot touch brightness. No web page can, on any phone. A viewer covers
-  // the light sensor, so the phone decides it is in the dark and dims itself,
-  // and the only cure is to turn auto-brightness off and set it by hand before
-  // the phone goes in the box.
-  var wakeLock = null;
-  function keepAwake(on) {
-    try {
-      if (on) {
-        if (!wakeLock && navigator.wakeLock && navigator.wakeLock.request) {
-          navigator.wakeLock.request('screen').then(function (lock) {
-            wakeLock = lock;
-          }).catch(function () {});
-        }
-      } else if (wakeLock) {
-        wakeLock.release().catch(function () {});
-        wakeLock = null;
-      }
-    } catch (e) { /* not offered here, and nothing to be done about it */ }
-  }
-
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -2351,17 +2243,12 @@ function bootPracticeSpace() {
         c.translateX((i === 0 ? -1 : 1) * IPD / 2);
         c.updateMatrixWorld(true);
       });
-      // Each eye into its own texture, then both drawn through the lens grid.
-      // No viewport or scissor juggling: a render target is already exactly one
-      // eye's worth of picture, and the split happens where the two grids sit.
-      ensureWarp(w, h);
-      renderer.setRenderTarget(rtL);
+      renderer.setScissorTest(true);
+      renderer.setViewport(0, 0, w / 2, h); renderer.setScissor(0, 0, w / 2, h);
       renderer.render(scene, lc);
-      renderer.setRenderTarget(rtR);
+      renderer.setViewport(w / 2, 0, w / 2, h); renderer.setScissor(w / 2, 0, w / 2, h);
       renderer.render(scene, rc);
-      renderer.setRenderTarget(null);
-      renderer.setViewport(0, 0, w, h);
-      renderer.render(warpScene, warpCam);
+      renderer.setScissorTest(false);
     } else {
       // Put the viewport back. The split screen sets a half-width one and
       // nothing else ever does: render() only touches the viewport when it is
@@ -2451,7 +2338,6 @@ function bootPracticeSpace() {
 
   function showChrome(on) {
     inScene = !!on;
-    keepAwake(!!on);
     ui.style.display = on ? 'none' : 'block';
     hud.style.display = on ? 'flex' : 'none';
     if (!on) {
@@ -2652,9 +2538,6 @@ function bootPracticeSpace() {
   };
   document.getElementById('exit').onclick = leaveScene;
   document.getElementById('recenter').onclick = doRecenter;
-  document.getElementById('menubtn').onclick = function () {
-    activate(menu.open ? 'close' : 'open');
-  };
 }
 
 function startPracticeSpace() {
