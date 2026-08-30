@@ -262,7 +262,17 @@ function bootPracticeSpace() {
   // where you were looking when a hold was armed, and how far off that you must
   // get before a recenter will commit. without it, picking recenter and then
   // simply not moving would set front to the menu you were staring at.
-  var armDir = new THREE.Vector3(), MIN_TURN = 15;
+  var armDir = new THREE.Vector3();
+  // How far you must have looked away from the tile you picked before holding
+  // still can commit. It is only there so that the gaze which picked the tile
+  // cannot immediately commit on the same spot; being off the tile is the whole
+  // requirement, and a tile crosses about 7 degrees.
+  //
+  // It was 15, which is more than the distance from the recenter tile to
+  // straight ahead. Recentring to roughly where you are already facing is the
+  // ordinary case, and it could never complete: the ring sat at nothing and
+  // held there. With the menu parked low it was impossible at any bearing.
+  var MIN_TURN = 6;
   // Letting go of an edge is not the same act as putting a whole rig down. You
   // took the edge in order to move it, so releasing before you have moved it is
   // never what you meant — and the release could fire on the stillness you were
@@ -302,6 +312,10 @@ function bootPracticeSpace() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
+    // local puts the origin where your head was when the session opened.
+    // local-floor puts it on the floor, which means the app has to know how
+    // tall you are to place anything at eye level, and it does not. See head().
+    renderer.xr.setReferenceSpaceType('local');
     document.body.appendChild(renderer.domElement);
 
     scene = new THREE.Scene();
@@ -621,7 +635,25 @@ function bootPracticeSpace() {
 
   // ---------- placement ----------
 
-  function head() { return new THREE.Vector3(0, EYE, 0); }
+  // Where your eyes actually are. Everything in here is placed by angle on a
+  // sphere around this point: the menu, the doors, the piano, the windows.
+  //
+  // On a screen or a phone held up, the camera is put at eye height above the
+  // origin and a constant was right. In a real headset session it was not. The
+  // headset owns the pose, local-floor puts the origin on the floor with your
+  // eyes about 1.6 metres above it, and everything stayed hung around a point
+  // 45 centimetres below them. On a reach of 0.85 metres that is not a small
+  // error: ask for the menu 32 degrees above your eyeline and it arrived on
+  // your eyeline, and the whole 15-to-45 band you can park it in squashed into
+  // -16 to +14. It is also why the room read as the wrong size and the stage
+  // felt like it was somewhere under your feet.
+  //
+  // The session asks for local rather than local-floor now, which puts the
+  // origin at your head instead of on the floor. So in a session the head is
+  // the origin, and every angle is measured from where you actually are.
+  function head() {
+    return new THREE.Vector3(0, mode === 'xr' ? 0 : EYE, 0);
+  }
 
   function placePanel(r) {
     var d = new THREE.Vector3(
@@ -639,7 +671,7 @@ function bootPracticeSpace() {
     var r = piano;
     var p = new THREE.Vector3(
       Math.sin(r.yaw) * r.dist,
-      EYE - r.drop,
+      head().y - r.drop,
       -Math.cos(r.yaw) * r.dist
     );
     r.group.position.copy(p);
@@ -706,8 +738,19 @@ function bootPracticeSpace() {
   // degrees down, with the menu tag 25 up, and the reticle arriving on the
   // brick in the gap between them. That opening runs from 23 above to 28 below,
   // so both are inside the doorway and neither is anywhere your eyes rest.
+  //
+  // viaMenu means the way out of that room is a tile in the menu rather than a
+  // marker on the door itself. The stage one is 95 degrees round, which is what
+  // made it safe to leave hanging in a room with nothing guarding it, and is
+  // also a long way to turn every time you want to leave. In the menu it is
+  // three tiles from where you are already looking. Its azimuth is kept because
+  // it is still where the door is; nothing draws it any more.
+  //
+  // The green room keeps its marker. It is straight ahead in the propped-open
+  // doorway, under the menu tag on the head of the same frame, and everything
+  // that room can do reads in one glance. There is nothing to fix there.
   var DOORS = {
-    'img-stage': { azim: 95, elev: -3, label: 'green room' },
+    'img-stage': { azim: 95, elev: -3, label: 'green room', viaMenu: true },
     'img-green': { azim: 0, elev: -12, label: 'stage' }
   };
   // far enough out to read as hung on the wall rather than held in front of
@@ -723,7 +766,7 @@ function bootPracticeSpace() {
     if (!doorMark) return;
     var d = DOORS[currentEnv];
     // while you are placing or sizing something, the room is not the subject
-    doorMark.visible = !!(d && inScene && !movingRig && !sizingRig && !recentering && !parking);
+    doorMark.visible = !!(d && !d.viaMenu && inScene && !movingRig && !sizingRig && !recentering && !parking);
     if (!doorMark.visible) return;
     doorMark.userData.id = 'door';
     doorMark.userData.repeat = false;
@@ -1089,6 +1132,17 @@ function bootPracticeSpace() {
     }
     if (panels.length < PANEL_MAX) out.push({ id: 'addpanel', icon: 'addwindow', label: 'window', group: 0 });
     out.push({ id: 'recenter', icon: 'recenter', label: 'recenter', group: 0 });
+    // The way out of this room, where this room's way out lives in the menu.
+    // It goes at the end of the group about this room and what is in it, so
+    // that piano, window and recenter stay where your eye already knows to
+    // find them. Same long hold as the door marker it replaces: a whole room
+    // on the 0.85 seconds that hides a window is something that would happen
+    // to you rather than something you did.
+    var way = DOORS[currentEnv];
+    if (way && way.viaMenu) {
+      out.push({ id: 'door', icon: 'room', label: way.label, group: 0,
+        dwell: DOOR_DWELL });
+    }
     out.push({ id: 'movemenu', icon: 'movemenu', label: 'move menu', group: 1 });
     out.push({ id: 'close', icon: 'close', label: 'close', group: 1 });
     // With it on your face the page's own Exit button is not on screen, because
@@ -1749,7 +1803,7 @@ function bootPracticeSpace() {
     } else {
       r.dist = Math.max(0.20, Math.min(1.20, Math.sqrt(c.x * c.x + c.z * c.z)));
       r.yaw = Math.atan2(c.x, -c.z);
-      r.drop = Math.max(0.10, Math.min(1.10, EYE - c.y));
+      r.drop = Math.max(0.10, Math.min(1.10, head().y - c.y));
     }
   }
 
@@ -1889,7 +1943,9 @@ function bootPracticeSpace() {
   function startParking() {
     menu.open = false;
     parking = true;
-    setHint('look where the menu should sit, hold still');
+    // the plate shrinks text to fit and gives up at 17px; longer than about
+    // "look ahead, hold still" and the ends run off the edge
+    setHint('menu here, hold still');
     armHold();
     layoutMenu();
   }
@@ -2218,7 +2274,7 @@ function bootPracticeSpace() {
   }
 
   function enterVR() {
-    navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] })
+    navigator.xr.requestSession('immersive-vr')
       .then(function (session) {
         mode = 'xr';
         renderer.xr.setSession(session);
