@@ -145,8 +145,6 @@
 <div id="ui" style="display:none"><div class="wrap">
   <h1>Stage VR Proof-of-Concept</h1>
   <div class="rule"></div>
-  <p class="sub">Hill Auditorium in 360, from stage right. For a
-     <b>Google Cardboard viewer and any phone</b>.</p>
 
   <p class="pick">Where do you want to start?</p>
   <!-- green room on the left, stage on the right, which is the order you do
@@ -166,8 +164,14 @@
     <option value="img-green">Green room</option>
   </select>
 
-  <button class="go" id="enter">Enter VR</button>
-  <button class="ghost" id="peek">Look around first, without a headset</button>
+  <!-- Named for the thing you are holding, not for the mode it puts the
+       renderer in. "Enter VR" told you nothing about whether it meant the
+       headset on the desk or the viewer in the drawer. -->
+  <p class="pick">What are you watching on?</p>
+  <button class="ghost" id="useHeadset">A VR headset</button>
+  <button class="ghost" id="useCardboard">A phone in a Google Cardboard viewer</button>
+  <button class="ghost" id="usePhone">A phone in your hand</button>
+  <button class="ghost" id="useScreen">This screen, dragging to look</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <ul class="note">
@@ -2421,25 +2425,24 @@ function bootPracticeSpace() {
 
   var note = document.getElementById('modeNote');
 
-  var enterBtn = document.getElementById('enter');
-
-  // Two buttons: the way in, and looking without going in. Everything else was
-  // the same two things under different names.
+  // One button per thing you might be holding, said in those words. What the
+  // renderer does about it is not the reader's problem: "Enter VR" was true of
+  // a headset, a viewer and a phone at arm's length, so it told you nothing
+  // about which of them it meant, and the answer changed by device without
+  // saying so.
   //
-  // There is only ever one way in worth offering, and which one it is follows
-  // from what the device can do rather than from asking. A headset that shows
-  // you your room gets that; one that cannot gets a plain immersive session; a
-  // phone, which has neither, gets the split screen for a viewer. The button
-  // says which so it is never a surprise, and no device is offered two ways of
-  // doing the same thing and left to work out the difference.
-  // Every way in is labelled "Enter VR" and then says how, so on any device the
-  // button you want is the one that starts with the same three words. Which
-  // device this is never becomes the reader's problem: there is one way in on
-  // offer, it is at the top, and the rest of the label tells you what will
-  // happen when you take it.
-  function wayIn(label, wantsPassthrough, go) {
-    enterBtn.textContent = label;
-    enterBtn.onclick = function () {
+  // The headset one is the only one that can be unavailable, because a session
+  // either exists or does not. It is hidden rather than shown dead, and made
+  // the obvious one where it is there.
+  var headsetBtn = document.getElementById('useHeadset');
+  var cardboardBtn = document.getElementById('useCardboard');
+  var phoneBtn = document.getElementById('usePhone');
+  var screenBtn = document.getElementById('useScreen');
+
+  headsetBtn.style.display = 'none';
+
+  function start(wantsPassthrough, go) {
+    return function () {
       // set before applyOptions, which would otherwise go and ask for a camera
       // on the way in to a session that does not need one
       passthrough = wantsPassthrough;
@@ -2448,26 +2451,33 @@ function bootPracticeSpace() {
     };
   }
 
-  function useAR() {
-    wayIn('Enter VR, with your room showing through', true,
-      function () { enterXR('immersive-ar'); });
+  cardboardBtn.onclick = start(false, function () { enterHeld('stereo'); });
+  phoneBtn.onclick     = start(false, function () { enterHeld('window'); });
+  screenBtn.onclick    = start(false, function () { mode = 'flat'; showChrome(true); });
+
+  function offerHeadset(kind) {
+    headsetBtn.style.display = '';
+    headsetBtn.className = 'go';
+    cardboardBtn.className = 'ghost';
+    headsetBtn.textContent = (kind === 'immersive-ar')
+      ? 'A VR headset, with your room showing through'
+      : 'A VR headset';
+    headsetBtn.onclick = start(kind === 'immersive-ar', function () { enterXR(kind); });
   }
-  function useVR() {
-    wayIn('Enter VR', false, function () { enterXR('immersive-vr'); });
-  }
-  function useCard() {
-    wayIn('Enter VR, with a Google Cardboard viewer', false,
-      function () { enterHeld('stereo'); });
-  }
+
+  // no headset on this device, so the viewer is the likeliest thing being held
+  function noHeadset() { cardboardBtn.className = 'go'; }
 
   if (navigator.xr && navigator.xr.isSessionSupported) {
     Promise.all([
       navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
       navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
     ]).then(function (r) {
-      if (r[0]) useAR(); else if (r[1]) useVR(); else useCard();
-    }).catch(useCard);
-  } else { useCard(); }
+      if (r[0]) offerHeadset('immersive-ar');
+      else if (r[1]) offerHeadset('immersive-vr');
+      else noHeadset();
+    }).catch(noHeadset);
+  } else { noHeadset(); }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
@@ -2480,16 +2490,6 @@ function bootPracticeSpace() {
       localStorage.removeItem('hill-practice-space-v1');
     } catch (e) {}
     location.reload();
-  };
-  // Looking without going in. On a phone this is the room through the glass:
-  // move the phone and the view moves, which is a different thing to do than
-  // dragging a picture about and worth having. On anything that does not
-  // report which way it is pointed it falls back to the drag on its own, so it
-  // does not need to be two buttons and a decision. It was.
-  document.getElementById('peek').onclick = function () {
-    passthrough = false;
-    applyOptions();
-    enterHeld('window');
   };
   document.getElementById('exit').onclick = leaveScene;
   document.getElementById('recenter').onclick = doRecenter;
