@@ -234,6 +234,9 @@ function bootPracticeSpace() {
   // there are no keys under it. Asking anyway is a permission prompt for a
   // picture nobody wants.
   var noCamera = false;
+  // what the last way in asked for, so that a reading arriving late can put it
+  // back rather than leaving you on the fallback for the rest of the session
+  var heldMode = null;
   var inScene = false;
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
@@ -1543,6 +1546,8 @@ function bootPracticeSpace() {
   function onOrient(e) {
     if (e.alpha === null || e.alpha === undefined) return;
     orient = { alpha: e.alpha, beta: e.beta, gamma: e.gamma, orient: screenAngle() };
+    // whatever gave up waiting for this, it has arrived
+    if (heldMode && mode === 'flat') { mode = heldMode; pendingRecenter = true; }
     // the first reading after entering is what "straight ahead" means, so the
     // house lands where it was aimed instead of wherever the compass points
     if (pendingRecenter) { pendingRecenter = false; doRecenter(); }
@@ -2049,6 +2054,7 @@ function bootPracticeSpace() {
     mode = 'flat';
     movingRig = null; sizingRig = null; grabbedEdge = null;
     recentering = false; parking = false; pendingRecenter = false; steady = 0;
+    heldMode = null;
     showChrome(false);
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   }
@@ -2355,6 +2361,7 @@ function bootPracticeSpace() {
   function enterXR(kind) {
     navigator.xr.requestSession(kind, { optionalFeatures: ['local-floor'] })
       .then(function (session) {
+        applyOptions();
         mode = 'xr';
         passthrough = (kind === 'immersive-ar');
         renderer.xr.setSession(session);
@@ -2373,6 +2380,7 @@ function bootPracticeSpace() {
         errEl.textContent = 'VR would not start here (' + e.message + '). Falling back to split screen.';
         passthrough = false;
         applyPassthrough();
+        applyOptions();
         if (piano.on || panels.some(function (q) { return q.on; })) startPassthrough();
         enterStereo();
       });
@@ -2383,11 +2391,23 @@ function bootPracticeSpace() {
   // through the phone as if it were a pane of glass, held in your hand and
   // moved about. They are not the same thing and neither is dragging a finger
   // across a picture, which is the third.
+  // Motion is asked for first, before anything asks for a camera.
+  //
+  // On iOS both are permission prompts and both need the tap that opened them
+  // to still count as a user gesture. Laying out the room came first and that
+  // asks for the camera, which spends the gesture, so by the time the motion
+  // request went out there was no gesture left to authorise it: it was refused
+  // without ever showing you the dialog, and head tracking silently never
+  // started. Two side by side pictures that do not move when you do is what
+  // that looks like from the outside.
   function enterHeld(kind) {
+    heldMode = kind;
     enableOrientation().then(function (ok) {
+      applyOptions();
       if (!ok) {
         // there is no head tracking to run on, and neither of these can be
         // dragged, so say so and leave them on the one that can
+        heldMode = null;
         mode = 'flat';
         errEl.textContent = 'This phone will not report which way it is pointed, ' +
           'so this is drag to look. On iPhone: Settings, Apps, Safari, Motion & ' +
@@ -2402,17 +2422,19 @@ function bootPracticeSpace() {
       if (orient) doRecenter();
       showChrome(true);
 
-      // The API existing is not the same as it reporting anything. A desktop
+      // The API existing is not the same as it reporting anything: a desktop
       // has DeviceOrientationEvent and will never fire one, and neither of
       // these modes can be dragged, so without this you sit in a view that
-      // cannot move at all. If nothing has arrived shortly after going in,
-      // there is nothing to track and dragging is the honest answer.
+      // cannot move at all. It is a fallback and not a verdict, though. The
+      // first reading to arrive puts the mode back, however long it took, so a
+      // phone that is merely slow to start reporting is not left on the drag
+      // for the rest of the session.
       setTimeout(function () {
-        if (!orient && (mode === 'stereo' || mode === 'window')) {
+        if (!orient && mode === kind) {
           mode = 'flat';
-          errEl.textContent = 'Nothing here reports which way it is pointed, so this is drag to look.';
+          errEl.textContent = 'Nothing here reports which way it is pointed yet, so this is drag to look.';
         }
-      }, 1200);
+      }, 2500);
 
       // Only the viewer wants the whole screen and one way up. Looking through
       // the phone is something you do standing at the piano with the rest of
@@ -2472,13 +2494,14 @@ function bootPracticeSpace() {
   var btnStereo = document.getElementById('useStereo');
   var btnScreen = document.getElementById('useScreen');
 
-  // Both of these are set before applyOptions, which would otherwise go and ask
-  // for a camera on the way in to something that does not want one.
+  // These are set first because laying the room out asks for a camera and both
+  // of them decide whether it should. Laying it out is now the job of whatever
+  // is being entered, once that has asked for what it needs: see enterHeld.
   function start(opts, go) {
     return function () {
       passthrough = !!opts.passthrough;
       noCamera = !!opts.noCamera;
-      applyOptions();
+      heldMode = null;
       go();
     };
   }
@@ -2486,7 +2509,11 @@ function bootPracticeSpace() {
   // until we know better, 360 means the phone held up
   btn360.onclick = start({}, function () { enterHeld('window'); });
   btnStereo.onclick = start({}, function () { enterHeld('stereo'); });
-  btnScreen.onclick = start({ noCamera: true }, function () { mode = 'flat'; showChrome(true); });
+  btnScreen.onclick = start({ noCamera: true }, function () {
+    applyOptions();
+    mode = 'flat';
+    showChrome(true);
+  });
 
   // Showing you the room you are really in is not a headset feature worth
   // naming in a subtitle: it is what all of these do except the browser. A
