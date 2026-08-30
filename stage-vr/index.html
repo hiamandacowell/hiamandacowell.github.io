@@ -1308,12 +1308,15 @@ function bootPracticeSpace() {
   // sits at 23 degrees and the tag was already at 25.
   var ENV_FORWARD = { 'img-stage': 0.556, 'img-green': 0.506 };
 
-  // How far off to hang each room, in metres. There is no right answer: a flat
-  // photo on a sphere puts everything at one distance and a real room does not,
-  // so this is the distance the room mostly is. The green room is a small room
-  // you could cross in three paces; the stage has a house in front of it. Both
-  // are worth trying in the headset and moving.
-  var SKY_RADIUS = { 'img-stage': 12, 'img-green': 4 };
+  // How far off to hang each room, in metres.
+  //
+  // Hanging it at room distance is what gives a headset any sense of how big
+  // the room is, because a flat photo has no depth of its own and the radius is
+  // the only thing saying otherwise. 12 and 4 were tried for exactly that and
+  // are wrong in a viewer, so it is back to being far away, which reads as
+  // infinity and lets the picture simply be a picture. Worth another go only
+  // with something to test it on.
+  var SKY_RADIUS = { 'img-stage': 60, 'img-green': 60 };
 
   function loadSky(id) {
     var img = document.getElementById(id);
@@ -2185,34 +2188,16 @@ function bootPracticeSpace() {
   var IPD = 0.062;
   var _size = new THREE.Vector2();
 
-  // A Cardboard gives each eye half the screen, seen through a lens sitting
-  // about this far from it, so the field that eye actually has is set by how
-  // big that half is in millimetres. It was a flat 78 degrees, picked once. On
-  // a screen whose true figure is nearer 90 that renders the world narrower
-  // than it appears, and you turn your head thirty degrees while the room moves
-  // twenty-five: the mismatch is most of what makes cheap VR swim.
+  // Each eye's field, in degrees.
   //
-  // Only the vertical is set here. The horizontal follows from the aspect of
-  // the half-screen, and the pixels are square, so it comes out at the true
-  // physical width on its own.
-  //
-  // Millimetres per CSS pixel is an approximation and cannot be anything else,
-  // because the web has no way to ask how big a screen is. Phones sit between
-  // about 0.155 and 0.166, so 0.16 is never far wrong, and being within a few
-  // percent everywhere beats being exact on one handset.
-  //
-  // SCREEN_TO_LENS is the Cardboard v2 figure; v1 viewers were 42. If a viewer
-  // reads as consistently too wide or too narrow, that is the number to move.
-  // The clamp is only so that an odd screen size cannot produce nonsense.
-  var MM_PER_CSS_PX = 0.16;
-  var SCREEN_TO_LENS = 39.3;
-  var FOV_MIN = 60, FOV_MAX = 110;
-
-  function eyeFov(cssHeight) {
-    var halfMm = (cssHeight * MM_PER_CSS_PX) / 2;
-    var deg = 2 * THREE.MathUtils.radToDeg(Math.atan(halfMm / SCREEN_TO_LENS));
-    return Math.max(FOV_MIN, Math.min(FOV_MAX, deg));
-  }
+  // This was worked out from the screen once: half the screen in millimetres
+  // against a Cardboard's 39mm screen-to-lens distance, which for a large phone
+  // comes to about 91 and scales itself to any handset. The arithmetic is
+  // sound and it is wrong in the viewer. Tried, worn, and reverted, so do not
+  // derive it again without a headset on: whatever the geometry says, 78 is
+  // what looks right through the lenses, and the lenses are the only opinion
+  // that counts here.
+  var EYE_FOV = 78;
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -2247,7 +2232,7 @@ function bootPracticeSpace() {
       var w = _size.x, h = _size.y;
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
-        c.fov = eyeFov(h); c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
+        c.fov = EYE_FOV; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
         c.updateProjectionMatrix();
         c.position.setFromMatrixPosition(camera.matrixWorld);
         c.quaternion.setFromRotationMatrix(camera.matrixWorld);
