@@ -96,6 +96,15 @@
     width:100%;padding:15px;font-size:16px;border:1px solid var(--line);border-radius:10px;
     background:transparent;color:var(--muted);cursor:pointer;margin-top:10px;
   }
+  /* a way in says what it is on the first line and what you need on the second,
+     because the name of a thing and the thing you are holding are not the same
+     question and both of them get asked */
+  button.go b, button.ghost b{display:block;font-weight:600;}
+  button.go span, button.ghost span{
+    display:block;margin-top:4px;font-size:13px;font-weight:400;letter-spacing:0;
+  }
+  button.go span{color:#4A4E55;}
+  button.ghost span{color:#6B7280;}
   button.ghost:hover{color:var(--text);border-color:var(--muted);}
   :focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
 
@@ -167,11 +176,16 @@
   <!-- Named for the thing you are holding, not for the mode it puts the
        renderer in. "Enter VR" told you nothing about whether it meant the
        headset on the desk or the viewer in the drawer. -->
-  <p class="pick">What are you watching on?</p>
-  <button class="ghost" id="useHeadset">A VR headset</button>
-  <button class="ghost" id="useCardboard">A phone in a Google Cardboard viewer</button>
-  <button class="ghost" id="usePhone">A phone in your hand</button>
-  <button class="ghost" id="useScreen">This screen, dragging to look</button>
+  <p class="pick">How are you looking?</p>
+  <button class="go" id="use360">
+    <b>Enter 360</b><span>A VR headset, or your phone: move it to look around</span>
+  </button>
+  <button class="ghost" id="useStereo">
+    <b>Enter stereoscopic 3D</b><span>A phone in a Google Cardboard viewer</span>
+  </button>
+  <button class="ghost" id="useScreen">
+    <b>Browser</b><span>A laptop, drag to look around</span>
+  </button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <ul class="note">
@@ -2235,6 +2249,15 @@ function bootPracticeSpace() {
       renderer.render(scene, rc);
       renderer.setScissorTest(false);
     } else {
+      // Put the viewport back. The split screen sets a half-width one and
+      // nothing else ever does: render() only touches the viewport when it is
+      // handed a render target, and a plain render is not. So after leaving
+      // stereo, the flat picture was drawn into the left half of the screen and
+      // stayed there. An XR session sets its own per eye and overrides this.
+      if (mode !== 'xr') {
+        renderer.getSize(_size);
+        renderer.setViewport(0, 0, _size.x, _size.y);
+      }
       renderer.render(scene, camera);
     }
   }
@@ -2425,21 +2448,23 @@ function bootPracticeSpace() {
 
   var note = document.getElementById('modeNote');
 
-  // One button per thing you might be holding, said in those words. What the
-  // renderer does about it is not the reader's problem: "Enter VR" was true of
-  // a headset, a viewer and a phone at arm's length, so it told you nothing
-  // about which of them it meant, and the answer changed by device without
-  // saying so.
+  // Three ways in, and none of them can be missing.
   //
-  // The headset one is the only one that can be unavailable, because a session
-  // either exists or does not. It is hidden rather than shown dead, and made
-  // the obvious one where it is there.
-  var headsetBtn = document.getElementById('useHeadset');
-  var cardboardBtn = document.getElementById('useCardboard');
-  var phoneBtn = document.getElementById('usePhone');
-  var screenBtn = document.getElementById('useScreen');
-
-  headsetBtn.style.display = 'none';
+  // 360 is the one where the device is the window and you move it to look:
+  // a headset does that by being on your face, a phone by being held up and
+  // turned, and they are the same thing to want even though they are not the
+  // same thing to build. So the button asks for the best the device has and
+  // does not make anyone choose between them. Stereoscopic is the split screen
+  // a viewer needs, which is a different thing to want. The browser is the
+  // drag, for a laptop.
+  //
+  // Every one of them works everywhere, which is why none of them is hidden.
+  // 360 on a laptop lands on the drag, because that is what a laptop can do,
+  // and stereoscopic on a laptop is a split screen you have no viewer for but
+  // can still see. Nothing is offered that then refuses.
+  var btn360 = document.getElementById('use360');
+  var btnStereo = document.getElementById('useStereo');
+  var btnScreen = document.getElementById('useScreen');
 
   function start(wantsPassthrough, go) {
     return function () {
@@ -2451,33 +2476,28 @@ function bootPracticeSpace() {
     };
   }
 
-  cardboardBtn.onclick = start(false, function () { enterHeld('stereo'); });
-  phoneBtn.onclick     = start(false, function () { enterHeld('window'); });
-  screenBtn.onclick    = start(false, function () { mode = 'flat'; showChrome(true); });
+  // until we know better, 360 means the phone held up
+  btn360.onclick = start(false, function () { enterHeld('window'); });
+  btnStereo.onclick = start(false, function () { enterHeld('stereo'); });
+  btnScreen.onclick = start(false, function () { mode = 'flat'; showChrome(true); });
 
-  function offerHeadset(kind) {
-    headsetBtn.style.display = '';
-    headsetBtn.className = 'go';
-    cardboardBtn.className = 'ghost';
-    headsetBtn.textContent = (kind === 'immersive-ar')
+  function useSession(kind) {
+    var ar = (kind === 'immersive-ar');
+    btn360.querySelector('span').textContent = ar
       ? 'A VR headset, with your room showing through'
       : 'A VR headset';
-    headsetBtn.onclick = start(kind === 'immersive-ar', function () { enterXR(kind); });
+    btn360.onclick = start(ar, function () { enterXR(kind); });
   }
-
-  // no headset on this device, so the viewer is the likeliest thing being held
-  function noHeadset() { cardboardBtn.className = 'go'; }
 
   if (navigator.xr && navigator.xr.isSessionSupported) {
     Promise.all([
       navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
       navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
     ]).then(function (r) {
-      if (r[0]) offerHeadset('immersive-ar');
-      else if (r[1]) offerHeadset('immersive-vr');
-      else noHeadset();
-    }).catch(noHeadset);
-  } else { noHeadset(); }
+      if (r[0]) useSession('immersive-ar');
+      else if (r[1]) useSession('immersive-vr');
+    }).catch(function () {});
+  }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
