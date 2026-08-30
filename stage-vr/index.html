@@ -167,6 +167,7 @@
   </select>
 
   <button class="go" id="enter">Enter VR</button>
+  <button class="ghost" id="cardboard">Google Cardboard viewer</button>
   <button class="ghost" id="peek">Look around on this screen first</button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
@@ -2405,17 +2406,27 @@ function bootPracticeSpace() {
       ' · fov ' + eyeFov(_size.y).toFixed(1);
   }
 
-  function useStereo() {
-    note.textContent = deviceLine();
-    document.getElementById('enter').onclick = function () { applyOptions(); enterStereo(); };
-  }
-  // Ask for passthrough first. A headset that can show you your own room is a
-  // headset where the windows should be holes rather than a camera picture, and
-  // the ones that can are the ones this is worth doing on. Fall back to a plain
-  // immersive session, then to the split screen a phone gets.
-  function useXR(kind) {
-    note.textContent = deviceLine();
-    document.getElementById('enter').onclick = function () {
+  var enterBtn = document.getElementById('enter');
+  var cardboardBtn = document.getElementById('cardboard');
+
+  // The split screen is its own button and always there. It used to be the
+  // fallback the top button quietly turned into when nothing better was
+  // offered, and that guessing is what went wrong: an Android phone answers
+  // yes to both kinds of immersive session, so it was taken for a headset and
+  // handed a session it holds up at arm's length, and the Cardboard it
+  // actually wanted was nowhere on the screen. Which device this is cannot be
+  // asked for and should not be inferred. It is two buttons.
+  cardboardBtn.onclick = function () {
+    passthrough = false;
+    applyOptions();
+    enterStereo();
+  };
+
+  function offerXR(kind) {
+    enterBtn.textContent = (kind === 'immersive-ar')
+      ? 'Enter with your room showing through'
+      : 'Enter VR';
+    enterBtn.onclick = function () {
       // set before applyOptions, which would otherwise go and ask for a camera
       // on the way in to a session that does not need one
       passthrough = (kind === 'immersive-ar');
@@ -2424,23 +2435,28 @@ function bootPracticeSpace() {
     };
   }
 
+  // Nothing immersive on offer: the viewer is the only way in, so it takes the
+  // top of the screen rather than sitting under a button that does nothing.
+  function offerNothing() {
+    enterBtn.style.display = 'none';
+    cardboardBtn.className = 'go';
+  }
+
+  note.textContent = deviceLine();
   if (navigator.xr && navigator.xr.isSessionSupported) {
     Promise.all([
       navigator.xr.isSessionSupported('immersive-ar').catch(function () { return false; }),
       navigator.xr.isSessionSupported('immersive-vr').catch(function () { return false; })
     ]).then(function (r) {
-      var ar = r[0], vr = r[1];
-      // Passthrough only where the headset can also do a plain immersive
-      // session, which is how you tell a headset from a phone. An Android
-      // phone with ARCore says yes to immersive-ar and means something else
-      // entirely by it: a session you hold up and look through at arm's
-      // length. That is not this, and it would take the phone away from the
-      // Cardboard path it actually wants.
-      if (ar && vr) useXR('immersive-ar');
-      else if (vr) useXR('immersive-vr');
-      else useStereo();
-    }).catch(useStereo);
-  } else { useStereo(); }
+      // Passthrough is the better of the two wherever it is offered, because a
+      // window that is a hole beats a window that is a picture of a hole. If
+      // this device means something else by it, the viewer button is right
+      // there and unchanged.
+      if (r[0]) offerXR('immersive-ar');
+      else if (r[1]) offerXR('immersive-vr');
+      else offerNothing();
+    }).catch(offerNothing);
+  } else { offerNothing(); }
 
   document.getElementById('forget').onclick = function () {
     forgetting = true;
