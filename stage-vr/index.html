@@ -1422,7 +1422,7 @@ function bootPracticeSpace() {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         env: currentEnv || document.getElementById('env').value,
         menuFound: !!menuFound,
-        menuAt: { yaw: menu.tabYaw, pitch: menu.tabPitch },
+        menuAt: { pitch: menu.tabPitch },
         stagePianoOn: stagePiano(),
         piano: {
           yaw: piano.yaw, drop: piano.drop, dist: piano.dist, width: piano.width
@@ -1484,7 +1484,8 @@ function bootPracticeSpace() {
     stagePianoOn = !!s.stagePianoOn;
 
     if (s.menuAt && typeof s.menuAt === 'object') {
-      menu.tabYaw = num(s.menuAt.yaw, 0, -Math.PI, Math.PI);
+      // the height only. A yaw saved by an older build is ignored rather than
+      // restored, because that is exactly the menu nobody could find.
       menu.tabPitch = num(s.menuAt.pitch, THREE.MathUtils.degToRad(25),
         PARK_MIN, PARK_MAX);
     }
@@ -1970,10 +1971,14 @@ function bootPracticeSpace() {
   // them. The same objection as the field of view being a flat 78. So it is
   // not a constant any more; you put it where you want it and it stays there.
   //
-  // Only the tag is placed. Both rows hang below it by fixed gaps, so the menu
-  // moves as one piece and keeps the shape you have learned. The yaw is held
-  // against forward rather than the compass, which is what world yaw 0 already
-  // means, so a recenter brings the menu round with everything else.
+  // Only the height is yours to set. It was the height that was wrong through a
+  // viewer, and it is the height that has no good constant.
+  //
+  // Which way round it sits is not offered, and that is deliberate rather than
+  // lazy: a menu parked off to one side is a menu you can lose, and losing it
+  // loses every way of getting it back, because the way back is in it. It stays
+  // at forward, which is what world yaw 0 means, which is where a recenter and
+  // every door already bring you. Look up or down for it; never round.
   var PARK_TURN = 8;
   var PARK_MIN = THREE.MathUtils.degToRad(-10);
   var PARK_MAX = THREE.MathUtils.degToRad(60);
@@ -1990,7 +1995,6 @@ function bootPracticeSpace() {
     parking = false;
     steady = 0;
     hintPlate.visible = false;
-    menu.tabYaw = Math.atan2(vDir.x, -vDir.z);
     menu.tabPitch = Math.max(PARK_MIN, Math.min(PARK_MAX,
       Math.asin(THREE.MathUtils.clamp(vDir.y, -1, 1))));
     menu.open = true;
