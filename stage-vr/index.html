@@ -154,8 +154,6 @@
 <div id="ui" style="display:none"><div class="wrap">
   <h1>Stage VR Proof-of-Concept</h1>
   <div class="rule"></div>
-  <p class="sub">Hill Auditorium in 360, from stage right. For a
-     <b>Google Cardboard viewer and any phone</b>.</p>
 
   <p class="pick">Where do you want to start?</p>
   <!-- green room on the left, stage on the right, which is the order you do
@@ -189,10 +187,6 @@
   </button>
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
-  <ul class="note">
-    <li>Hold the phone in <b>landscape</b> once you are in.</li>
-    <li>Move, resize or hide anything from the <b>menu above your head</b>.</li>
-  </ul>
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
 </div></div>
@@ -2191,23 +2185,32 @@ function bootPracticeSpace() {
   var note = document.getElementById('modeNote');
   note.textContent = '';
 
-  // The viewer is always the viewer, whatever the device claims it can do.
-  document.getElementById('enter').onclick = function () {
-    applyOptions();
-    enterStereo();
-  };
+  // Take the real session wherever there is one, for both of these.
+  //
+  // A browser that offers immersive-vr has its own Cardboard support behind it:
+  // it does the lens correction, it draws the divider, it knows the viewer's
+  // profile. Ours does none of that and never has. Routing the viewer button to
+  // our own split screen on a phone that had the real thing available is what
+  // took away the picture that worked, and "the viewer is always the viewer"
+  // was a principle I invented to justify it.
+  //
+  // Our split screen is the fallback for a phone with no session to give, which
+  // is what it always was.
+  var btnStereo = document.getElementById('enter');
+  btnStereo.onclick = function () { applyOptions(); enterStereo(); };
 
-  // 360 is the one where the device is the window and you move it to look. A
-  // headset does that by being on your face and a phone by being held up and
-  // turned: the same thing to want, so the button takes whichever the device
-  // has rather than making anyone choose. It starts as the phone and becomes
-  // the headset if one answers.
+  // 360 is the phone held up and turned. It does not take the immersive session
+  // even where there is one, because on a phone that session IS the viewer, and
+  // the viewer is the button above. On a headset this wants to be the session
+  // and is not yet: a headset does not report which way it is pointed the way a
+  // phone does, so this lands on the drag there. Open question rather than a
+  // decision.
   var btn360 = document.getElementById('use360');
   btn360.onclick = function () { applyOptions(); enterWindow(); };
 
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
-      if (ok) btn360.onclick = function () { applyOptions(); enterVR(); };
+      if (ok) btnStereo.onclick = function () { applyOptions(); enterVR(); };
     }).catch(function () {});
   }
 
