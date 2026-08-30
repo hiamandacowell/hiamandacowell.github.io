@@ -1980,25 +1980,96 @@ function bootPracticeSpace() {
   // turning it, and nothing should be taken out of the rigs for it.
   var framed = false;
 
+  // Which way you are actually facing, as a bearing in the room.
+  //
+  // Not alpha. Alpha is the compass heading of the phone's own yaw axis, and
+  // the direction you are looking is that turned by the tilt and by the roll as
+  // well. Recentring on alpha assumed a phone held perfectly upright and
+  // perfectly level, and missed by roughly your roll angle otherwise: rolled 20
+  // degrees it put forward 20 degrees out, and tilted up 30 and rolled 25 it
+  // was out by 28. You are always rolled a little holding a phone up, and in a
+  // viewer you are rolled by however the viewer sits on your face. That is the
+  // whole of "it moves things, but not to where I am looking".
+  //
+  // On a phone this runs the same maths applyOrientation does, on a spare
+  // object, and takes the bearing of the result. It is read off the current
+  // reading rather than off the camera because the first recenter of a session
+  // happens on the first reading to arrive, before any frame has been drawn.
+  var _look = new THREE.Object3D(), _lookDir = new THREE.Vector3();
+  var _lookQ = new THREE.Quaternion(), UP = new THREE.Vector3(0, 1, 0);
+
+  function lookAzimuth() {
+    if (mode === 'xr') {
+      var c = viewCamera();
+      c.updateMatrixWorld();
+      c.getWorldQuaternion(_lookQ);
+      _lookDir.set(0, 0, -1).applyQuaternion(_lookQ);
+    } else {
+      if (!orient) return 0;
+      applyOrientation(_look);
+      _lookDir.set(0, 0, -1).applyQuaternion(_look.quaternion);
+    }
+    return Math.atan2(_lookDir.x, -_lookDir.z);
+  }
+
   function doRecenter() {
-    if ((mode === 'stereo' || mode === 'window') && orient) {
-      var next = -THREE.MathUtils.degToRad(orient.alpha);
-      // The panorama, the menu and the doors are meant to swing round and face
-      // you: that is the whole of recentring. The piano and the window are not.
-      // They are aimed at real things that have not moved — your keys, your
-      // stand — but they are held as world bearings, so moving yawOffset slid
-      // them off by exactly the angle you turned through, and a room change
-      // does this now too. Take that angle back out of them and they stay on
-      // the real thing while everything else comes to you.
-      if (framed) {
-        var delta = next - yawOffset;
-        piano.yaw -= delta;
-        for (var i = 0; i < panels.length; i++) panels[i].azim -= delta;
+    var can = (mode === 'xr')
+      ? renderer.xr.isPresenting
+      : ((mode === 'stereo' || mode === 'window') && !!orient);
+
+    if (can) {
+      // The bearing you are facing has to become zero, so everything the room
+      // owns swings round to you. That is a turn of minus that bearing, and
+      // each mode has its own way of being turned.
+      // Three.js rotates about +Y in the direction that *decreases* a bearing
+      // read as atan2(x, -z), and applyOrientation folds yawOffset in the same
+      // way: adding d to yawOffset moves the view bearing by minus d, measured.
+      // So the turn that brings the bearing you are facing to zero is plus it,
+      // not minus it, and the first version of this doubled the error instead
+      // of cancelling it.
+      var delta = lookAzimuth();
+      var applied = false;
+
+      if (mode === 'xr') {
+        // A session owns the camera, so there is no yawOffset to move: what
+        // turns is the frame the headset reports poses in. Offsetting that
+        // frame the other way brings every pose back turned the way we want,
+        // which is the same turn the other modes get out of yawOffset.
+        //
+        // This is why the tile did nothing at all in a headset. There was no
+        // branch for it here, so it armed, asked you to hold still, committed,
+        // and moved nothing.
+        var ref = renderer.xr.getReferenceSpace();
+        if (ref && ref.getOffsetReferenceSpace && typeof XRRigidTransform === 'function') {
+          // poses come back through the inverse of the offset, so the offset is
+          // the opposite way round from the turn we want the view to make
+          var q = new THREE.Quaternion().setFromAxisAngle(UP, -delta);
+          renderer.xr.setReferenceSpace(ref.getOffsetReferenceSpace(
+            new XRRigidTransform({ x: 0, y: 0, z: 0, w: 1 },
+                                 { x: q.x, y: q.y, z: q.z, w: q.w })));
+          applied = true;
+        }
+      } else {
+        yawOffset += delta;
+        applied = true;
       }
-      yawOffset = next;
-      framed = true;
-      placeAll();
-      scheduleSave();
+
+      if (applied) {
+        // The panorama, the menu and the doors are meant to swing round and
+        // face you: that is the whole of recentring. The piano and the window
+        // are not. They are aimed at real things that have not moved — your
+        // keys, your stand — but they are held as bearings in the room, so the
+        // turn slides them off by exactly the angle you turned through, and a
+        // room change does this too. Take that angle back out of them and they
+        // stay on the real thing while everything else comes to you.
+        if (framed) {
+          piano.yaw -= delta;
+          for (var i = 0; i < panels.length; i++) panels[i].azim -= delta;
+        }
+        framed = true;
+        placeAll();
+        scheduleSave();
+      }
     }
     yaw = 0; pitch = 0;
   }
@@ -2277,6 +2348,7 @@ function bootPracticeSpace() {
     navigator.xr.requestSession('immersive-vr')
       .then(function (session) {
         mode = 'xr';
+        framed = true;
         renderer.xr.setSession(session);
         session.addEventListener('select', onTrigger);
         session.addEventListener('end', function () { mode = 'flat'; movingRig = null; sizingRig = null; grabbedEdge = null; recentering = false; parking = false; steady = 0; showChrome(false); });
