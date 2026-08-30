@@ -99,6 +99,8 @@
   /* a way in says what it is on the first line and what you need on the second,
      because the name of a thing and the thing you are holding are not the same
      question and both of them get asked */
+  /* not one of the ways in, so it does not sit in the row of them */
+  button.apart{margin-top:30px;}
   button.go b, button.ghost b{display:block;font-weight:600;}
   button.go span, button.ghost span{
     display:block;margin-top:4px;font-size:13px;font-weight:400;letter-spacing:0;
@@ -189,7 +191,7 @@
   <button class="ghost" id="useScreen">
     <b>Browser</b><span>A laptop, drag with the mouse to look around</span>
   </button>
-  <button class="ghost" id="forget">Forget my setup and start fresh</button>
+  <button class="ghost apart" id="forget">Forget my setup and start fresh</button>
 
   <p class="note" id="modeNote"></p>
   <p id="err" role="status"></p>
@@ -227,6 +229,11 @@ function bootPracticeSpace() {
   var mode = 'flat';
   // a headset that shows you your own room behind the page
   var passthrough = false;
+  // Every way in shows you the room you are really in except the browser, which
+  // is a laptop and has nothing to show: its camera points at your face and
+  // there are no keys under it. Asking anyway is a permission prompt for a
+  // picture nobody wants.
+  var noCamera = false;
   var inScene = false;
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
@@ -1332,7 +1339,7 @@ function bootPracticeSpace() {
     // camera for, and asking is worse than useless: the Quest has no camera to
     // give a web page, so it offers something that is not one and the window
     // fills with whatever that is. The window is a hole there, not a picture.
-    if (passthrough) return;
+    if (passthrough || noCamera) return;
     if (videoTex) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
@@ -2465,27 +2472,30 @@ function bootPracticeSpace() {
   var btnStereo = document.getElementById('useStereo');
   var btnScreen = document.getElementById('useScreen');
 
-  function start(wantsPassthrough, go) {
+  // Both of these are set before applyOptions, which would otherwise go and ask
+  // for a camera on the way in to something that does not want one.
+  function start(opts, go) {
     return function () {
-      // set before applyOptions, which would otherwise go and ask for a camera
-      // on the way in to a session that does not need one
-      passthrough = wantsPassthrough;
+      passthrough = !!opts.passthrough;
+      noCamera = !!opts.noCamera;
       applyOptions();
       go();
     };
   }
 
   // until we know better, 360 means the phone held up
-  btn360.onclick = start(false, function () { enterHeld('window'); });
-  btnStereo.onclick = start(false, function () { enterHeld('stereo'); });
-  btnScreen.onclick = start(false, function () { mode = 'flat'; showChrome(true); });
+  btn360.onclick = start({}, function () { enterHeld('window'); });
+  btnStereo.onclick = start({}, function () { enterHeld('stereo'); });
+  btnScreen.onclick = start({ noCamera: true }, function () { mode = 'flat'; showChrome(true); });
 
+  // Showing you the room you are really in is not a headset feature worth
+  // naming in a subtitle: it is what all of these do except the browser. A
+  // headset composites it behind the page and the windows become holes; a phone
+  // points its rear camera through them. Same idea, different plumbing, and the
+  // plumbing is not the reader's business.
   function useSession(kind) {
-    var ar = (kind === 'immersive-ar');
-    btn360.querySelector('span').textContent = ar
-      ? 'A VR headset, with your own room showing through'
-      : 'A VR headset';
-    btn360.onclick = start(ar, function () { enterXR(kind); });
+    btn360.onclick = start({ passthrough: kind === 'immersive-ar' },
+      function () { enterXR(kind); });
   }
 
   if (navigator.xr && navigator.xr.isSessionSupported) {
