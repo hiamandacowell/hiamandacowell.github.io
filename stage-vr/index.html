@@ -116,7 +116,18 @@
     border-radius:50%;background:var(--brass);
   }
   .note b{color:var(--text);font-weight:600;}
-  #err{color:var(--warn);font-size:12.8px;line-height:1.6;margin-top:12px;}
+  /* This used to live inside the start screen, which is hidden the moment you
+     go in, so everything it had to say about why something was not working was
+     written where nobody could read it. It sits over the scene now, and takes
+     no room at all until it has something to say. */
+  #err{
+    color:var(--warn);font-size:12.8px;line-height:1.6;
+    position:fixed;left:0;right:0;top:0;z-index:5;
+    margin:0;padding:10px 16px;text-align:center;
+    background:rgba(14,13,12,0.82);
+    pointer-events:none;
+  }
+  #err:empty{display:none;}
 
   #gate{
     position:relative; z-index:3; min-height:100vh; min-height:100dvh;
@@ -190,8 +201,8 @@
   <button class="ghost" id="forget">Forget my setup and start fresh</button>
 
   <p class="note" id="modeNote"></p>
-  <p id="err" role="status"></p>
 </div></div>
+<p id="err" role="status"></p>
 
 <div style="display:none" aria-hidden="true">
   <img id="img-stage" alt="" src="hill-stage.jpg">
@@ -226,6 +237,19 @@ function bootPracticeSpace() {
   var inScene = false;
   var orient = null;
   var dragging = false, dragX = 0, dragY = 0, yaw = 0, pitch = 0, yawOffset = 0;
+
+  // Whether looking around is done by dragging rather than by moving the thing
+  // you are holding. That is the browser always, and it is any of the others
+  // that turned out to have no head tracking to run on.
+  //
+  // Choosing the viewer and being handed one flat picture is the wrong answer:
+  // the two eyes are the thing you asked for, and they are drawn whether or not
+  // anything is reporting which way you are pointed. It also fixes itself the
+  // moment a reading does arrive, so a device that is merely slow to start
+  // reporting is not left on the drag for the rest of the session.
+  function dragLook() {
+    return mode === 'flat' || ((mode === 'stereo' || mode === 'window') && !orient);
+  }
 
   var EYE = 1.15;
 
@@ -1346,7 +1370,9 @@ function bootPracticeSpace() {
   function startPassthrough() {
     if (videoTex) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
+      // A dark window is a smaller problem than no head tracking, and there is
+      // one line to say it in, so it does not talk over anything already there.
+      if (!errEl.textContent) errEl.textContent = 'This page cannot open the camera here. The keys window stays dark; the physical cutout still works.';
       return;
     }
     navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
@@ -1361,7 +1387,7 @@ function bootPracticeSpace() {
         attachVideo();
       })
       .catch(function () {
-        errEl.textContent = 'Camera access was refused. The keys window stays dark; the physical cutout still works.';
+        if (!errEl.textContent) errEl.textContent = 'Camera access was refused. The keys window stays dark; the physical cutout still works.';
       });
   }
 
@@ -2236,8 +2262,8 @@ function bootPracticeSpace() {
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
     lastT = now;
 
-    if ((mode === 'stereo' || mode === 'window') && orient) applyOrientation(camera);
-    if (mode === 'flat') camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    if (dragLook()) camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    else if ((mode === 'stereo' || mode === 'window') && orient) applyOrientation(camera);
 
     updateGaze(dt);
     updateWindowProjection();
@@ -2275,12 +2301,12 @@ function bootPracticeSpace() {
     function pt(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
     var downX = 0, downY = 0, moved = 0;
     function down(e) {
-      if (mode !== 'flat') { onTrigger(); return; }
+      if (!dragLook()) { onTrigger(); return; }
       dragging = true; var p = pt(e); dragX = p.x; dragY = p.y;
       downX = p.x; downY = p.y; moved = 0;
     }
     function move(e) {
-      if (!dragging || mode !== 'flat') return;
+      if (!dragging || !dragLook()) return;
       var p = pt(e);
       yaw -= (p.x - dragX) * 0.005;
       pitch = Math.max(-1.5, Math.min(1.5, pitch - (p.y - dragY) * 0.005));
@@ -2288,7 +2314,10 @@ function bootPracticeSpace() {
       moved = Math.max(moved, Math.abs(p.x - downX) + Math.abs(p.y - downY));
     }
     function up(e) {
-      if (dragging && inScene && moved < 8) tapAt(downX, downY);
+      if (dragging && inScene && moved < 8) {
+        if (mode === 'flat') tapAt(downX, downY);
+        else onTrigger();
+      }
       dragging = false;
     }
 
@@ -2378,6 +2407,13 @@ function bootPracticeSpace() {
   //
   // Android never asked permission for motion at all, which is why this was
   // only ever wrong in Safari, and only once you had something placed.
+  // Say it once, and say where the switch is. It is off by default on both,
+  // and it is the first thing to check on anything Apple made.
+  function noTracking() {
+    errEl.textContent = 'No head tracking here, so drag to look around. ' +
+      'On iPhone and iPad: Settings, Apps, Safari, Motion & Orientation Access.';
+  }
+
   function enterWindow() {
     enableOrientation().then(function (ok) {
       applyOptions();
@@ -2387,11 +2423,7 @@ function bootPracticeSpace() {
       pendingRecenter = true;
       if (orient) doRecenter();
       showChrome(true);
-      if (!ok) {
-        mode = 'flat';
-        errEl.textContent = 'No head tracking here, so this is drag to look. ' +
-          'On iPhone: Settings, Apps, Safari, Motion & Orientation Access.';
-      }
+      if (!ok) noTracking();
     });
   }
 
@@ -2407,14 +2439,7 @@ function bootPracticeSpace() {
       var el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
       if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
-      // dragging only answers in flat, so saying "drag to look" while leaving
-      // you in the split screen left you in a picture that could not be moved
-      // at all, by the head or by the hand
-      if (!ok) {
-        mode = 'flat';
-        errEl.textContent = 'No head tracking here, so this is drag to look. ' +
-          'On iPhone: Settings, Apps, Safari, Motion & Orientation Access.';
-      }
+      if (!ok) noTracking();
     });
   }
 
