@@ -2257,6 +2257,7 @@ function bootPracticeSpace() {
 
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
+  var _screen = new THREE.Vector2();
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -2269,7 +2270,18 @@ function bootPracticeSpace() {
     updateWindowProjection();
 
     if (mode === 'stereo') {
-      var w = renderer.domElement.width, h = renderer.domElement.height;
+      // CSS pixels, not the canvas backing store. setViewport and setScissor
+      // multiply by the pixel ratio themselves, so handing them domElement.width
+      // counted the ratio twice: on a 2x screen the left eye's viewport covered
+      // the whole canvas and the right eye's started one full width off the edge
+      // of it and drew nothing at all. One picture filling the screen is what
+      // that looks like, which is not a split screen and is not two eyes.
+      //
+      // Every phone and every iPad is 2x or better. The one place it looked
+      // right was a plain 1x desktop, which is the only place it ever got
+      // tested, which is the whole lesson.
+      renderer.getSize(_screen);
+      var w = _screen.x, h = _screen.y;
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
         c.fov = 78; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
@@ -2293,6 +2305,9 @@ function bootPracticeSpace() {
   function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    // a tab moved between screens changes this, and it decides how the two eyes
+    // are laid out, so it is re-read rather than fixed at startup
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
