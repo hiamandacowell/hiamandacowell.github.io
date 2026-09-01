@@ -2297,6 +2297,23 @@ function bootPracticeSpace() {
   // Measuring to the corner keeps r inside 0 to 1 however the thing is held.
   // Raise this above 1 for less correction, lower it for more.
   var DIST_FIELD = 1.0;
+
+  // THE TWO CIRCLES. A Cardboard lens is round and sits in a round hole, so the
+  // corners of each half screen are behind the housing and were never going to
+  // reach your eye. Blacking them is what the viewer does physically, and
+  // showing them is a lie about how much you can see.
+  //
+  // It is drawn on purpose here rather than left over. Getting the shape by
+  // building the warp the other way round, so that the edges of the screen fall
+  // off the edge of the rendered texture, throws away real picture to do it and
+  // leaves a ragged edge. This masks a correct, complete, screen-filling image,
+  // so there is as much inside the circle as there is anything to show.
+  //
+  // 1 makes each circle as wide as its half of the screen, which is the usual
+  // fit. Lower it if your viewer's hole is smaller than that. 0 turns the mask
+  // off and gives back the full rectangles.
+  var LENS_MASK = 1.0;
+  var LENS_FEATHER = 0.03;
   var EYE_FOV = 78;
 
   function distort(r) {
@@ -2359,6 +2376,48 @@ function bootPracticeSpace() {
     return geo;
   }
 
+  // The mask is measured on the vertex's own position, which is where it ends
+  // up on the screen after the warp has moved it, so the hole stays round
+  // rather than following the bend in the picture.
+  function lensMaterial(tex, yScale) {
+    return new THREE.ShaderMaterial({
+      depthTest: false,
+      uniforms: {
+        map: { value: tex },
+        yScale: { value: yScale },
+        maskR: { value: LENS_MASK },
+        feather: { value: LENS_FEATHER }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'varying vec2 vLocal;',
+        'void main() {',
+        '  vUv = uv;',
+        '  vLocal = position.xy;',
+        '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D map;',
+        'uniform float yScale;',
+        'uniform float maskR;',
+        'uniform float feather;',
+        'varying vec2 vUv;',
+        'varying vec2 vLocal;',
+        'void main() {',
+        '  vec4 c = texture2D(map, vUv);',
+        '  if (maskR > 0.0) {',
+        // round on the glass, not round in the picture: the half screen is
+        // taller than it is wide, so y is measured in the same units as x
+        '    float r = length(vec2(vLocal.x, vLocal.y * yScale));',
+        '    c.rgb *= 1.0 - smoothstep(maskR - feather, maskR, r);',
+        '  }',
+        '  gl_FragColor = vec4(c.rgb, 1.0);',
+        '}'
+      ].join('\n')
+    });
+  }
+
   function ensureWarp(w, h) {
     var pr = renderer.getPixelRatio();
     var tw = Math.max(1, Math.floor(w / 2 * pr));
@@ -2389,8 +2448,8 @@ function bootPracticeSpace() {
       warpScene.remove(warpR); warpR.geometry.dispose(); warpR.material.dispose();
     }
     var geo = buildWarp(w / 2, h);
-    warpL = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: rtL.texture, depthTest: false }));
-    warpR = new THREE.Mesh(geo.clone(), new THREE.MeshBasicMaterial({ map: rtR.texture, depthTest: false }));
+    warpL = new THREE.Mesh(geo, lensMaterial(rtL.texture, h / (w / 2)));
+    warpR = new THREE.Mesh(geo.clone(), lensMaterial(rtR.texture, h / (w / 2)));
     warpL.scale.x = 0.5; warpL.position.x = -0.5;
     warpR.scale.x = 0.5; warpR.position.x = 0.5;
     warpScene.add(warpL); warpScene.add(warpR);
