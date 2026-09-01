@@ -2347,6 +2347,7 @@ function bootPracticeSpace() {
   function enterVR() {
     navigator.xr.requestSession('immersive-vr')
       .then(function (session) {
+        applyOptions();
         mode = 'xr';
         framed = true;
         renderer.xr.setSession(session);
@@ -2365,20 +2366,38 @@ function bootPracticeSpace() {
   // everything: only the screen is not divided and it does not want the phone
   // held one way round, so it neither goes fullscreen nor locks the rotation.
   // Nothing about how the stereo picture is drawn is touched by this.
+  // MOTION IS ASKED FOR FIRST, BEFORE ANYTHING ASKS FOR A CAMERA.
+  //
+  // On iOS both are permission prompts and both need the tap that opened them
+  // to still count as a user gesture. Laying the room out came first, and that
+  // asks for the camera as soon as a piano or a window is showing, which spends
+  // the gesture: by the time the motion request went out there was nothing left
+  // to authorise it, so it was refused without ever showing you the dialog and
+  // head tracking silently never started. Two pictures side by side that do not
+  // move when you do is what that looks like from the outside.
+  //
+  // Android never asked permission for motion at all, which is why this was
+  // only ever wrong in Safari, and only once you had something placed.
   function enterWindow() {
     enableOrientation().then(function (ok) {
+      applyOptions();
       mode = 'window';
       yawOffset = 0;
       framed = false;
       pendingRecenter = true;
       if (orient) doRecenter();
       showChrome(true);
-      if (!ok) { mode = 'flat'; errEl.textContent = 'Running without head tracking. Drag to look around.'; }
+      if (!ok) {
+        mode = 'flat';
+        errEl.textContent = 'No head tracking here, so this is drag to look. ' +
+          'On iPhone: Settings, Apps, Safari, Motion & Orientation Access.';
+      }
     });
   }
 
   function enterStereo() {
     enableOrientation().then(function (ok) {
+      applyOptions();
       mode = 'stereo';
       yawOffset = 0;
       framed = false;
@@ -2388,7 +2407,14 @@ function bootPracticeSpace() {
       var el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
       if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
-      if (!ok) errEl.textContent = 'Running without head tracking. Drag to look around.';
+      // dragging only answers in flat, so saying "drag to look" while leaving
+      // you in the split screen left you in a picture that could not be moved
+      // at all, by the head or by the hand
+      if (!ok) {
+        mode = 'flat';
+        errEl.textContent = 'No head tracking here, so this is drag to look. ' +
+          'On iPhone: Settings, Apps, Safari, Motion & Orientation Access.';
+      }
     });
   }
 
@@ -2430,18 +2456,18 @@ function bootPracticeSpace() {
   // right answer, and routing every phone to it is what took away the picture
   // that worked.
   var btnStereo = document.getElementById('enter');
-  btnStereo.onclick = function () { applyOptions(); enterStereo(); };
+  btnStereo.onclick = function () { enterStereo(); };
 
   // The phone as a window in your hand, which is the one way in with no session
   // behind it on any device. It does not take immersive-vr even where there is
   // one: that is the button above, whichever kind of face-mounted thing it turns
   // out to mean.
   var btn360 = document.getElementById('use360');
-  btn360.onclick = function () { applyOptions(); enterWindow(); };
+  btn360.onclick = function () { enterWindow(); };
 
   if (navigator.xr && navigator.xr.isSessionSupported) {
     navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
-      if (ok) btnStereo.onclick = function () { applyOptions(); enterVR(); };
+      if (ok) btnStereo.onclick = function () { enterVR(); };
     }).catch(function () {});
   }
 
