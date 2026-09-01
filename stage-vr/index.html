@@ -2258,6 +2258,144 @@ function bootPracticeSpace() {
   var lc = new THREE.PerspectiveCamera(), rc = new THREE.PerspectiveCamera();
   var IPD = 0.062;
   var _screen = new THREE.Vector2();
+
+  // ---------- the lenses ----------
+  //
+  // A Cardboard lens magnifies unevenly: the further off its axis a thing sits,
+  // the more it stretches. Straight lines bow and the edges smear. Nothing in
+  // the picture is wrong, the glass is, and the cure is to bend the picture the
+  // opposite way first so that the lens bends it back straight.
+  //
+  // K1 and K2 are Google's Cardboard v2 profile. They say where a ray lands: one
+  // leaving the eye at tangent r from the lens axis meets the screen at
+  // r * (1 + K1 r^2 + K2 r^4). A v1 viewer is 0.441 and 0.156, and a viewer that
+  // carries its own QR profile will differ again.
+  //
+  // SET BOTH TO ZERO TO TURN THE WHOLE THING OFF. Everything below collapses to
+  // the flat rectangles that were here before, because the grid comes out
+  // straight and the render frustum comes out unchanged. That is the lever if
+  // this looks worse rather than better.
+  //
+  // It cannot be exactly right. A Cardboard QR code carries the physical width
+  // of the screen, the distance from the lens to it, and the gap between the
+  // lenses, and a web page can read none of them. This is the right shape with
+  // a stock profile, which is worth more than nothing and less than a fitted
+  // one.
+  var DIST_K1 = 0.34, DIST_K2 = 0.55;
+  var DIST_SEGMENTS = 32;
+
+  // Where r = 1 sits, as a fraction of the distance from the middle of a half
+  // screen to its corner.
+  //
+  // The profile's r is a fraction of the lens's own field, and a page cannot
+  // know how much of the glass a given phone fills. Measuring it across half
+  // the screen's WIDTH instead looked reasonable and was not: a half screen is
+  // not square, so on an iPad held upright the polynomial was being asked for
+  // r = 3, where these two numbers mean nothing at all and claim eleven times
+  // the stretch. The render frustum collapsed from 78 degrees to 36 chasing it.
+  //
+  // Measuring to the corner keeps r inside 0 to 1 however the thing is held.
+  // Raise this above 1 for less correction, lower it for more.
+  var DIST_FIELD = 1.0;
+  var EYE_FOV = 78;
+
+  function distort(r) {
+    var r2 = r * r;
+    return r * (1 + DIST_K1 * r2 + DIST_K2 * r2 * r2);
+  }
+
+  // the r that distort() would send to target. Newton from the target itself,
+  // which is already close because the polynomial is gentle and monotonic.
+  function undistort(target) {
+    var r = target, i, r2, f, d;
+    for (i = 0; i < 8; i++) {
+      r2 = r * r;
+      f = r * (1 + DIST_K1 * r2 + DIST_K2 * r2 * r2) - target;
+      d = 1 + 3 * DIST_K1 * r2 + 5 * DIST_K2 * r2 * r2;
+      r -= f / d;
+    }
+    return r;
+  }
+
+  var rtL = null, rtR = null, warpScene = null, warpCam = null;
+  var warpL = null, warpR = null, warpW = 0, warpH = 0;
+  var warpTanX = 1, warpTanY = 1;
+
+  // The grid is laid out in SCREEN space and carries texture coordinates found
+  // by running the lens backwards. So every point of the half screen is filled,
+  // nothing is clipped, and no part of the rendered texture is wasted: the
+  // frustum is then chosen to be exactly the piece the grid actually asks for.
+  // Building it the other way round, by pushing the texture's own grid outwards,
+  // is what leaves the black rounded surround, and there is no need for it.
+  function buildWarp(halfW, halfH) {
+    var geo = new THREE.PlaneGeometry(2, 2, DIST_SEGMENTS, DIST_SEGMENTS);
+    var pos = geo.attributes.position, uv = geo.attributes.uv;
+    var yScale = halfH / halfW;          // round units: measured across the half screen
+    var R = Math.sqrt(1 + yScale * yScale) * DIST_FIELD;   // r = 1 at the corner
+    var n = pos.count, i;
+    var ux = new Float32Array(n), uy = new Float32Array(n), mx = 0, my = 0;
+
+    for (i = 0; i < n; i++) {
+      var qx = pos.getX(i), qy = pos.getY(i) * yScale;
+      var rs = Math.sqrt(qx * qx + qy * qy);
+      var k = rs > 1e-6 ? undistort(rs / R) * R / rs : 1;
+      ux[i] = qx * k; uy[i] = qy * k;
+      if (Math.abs(ux[i]) > mx) mx = Math.abs(ux[i]);
+      if (Math.abs(uy[i]) > my) my = Math.abs(uy[i]);
+    }
+    if (mx < 1e-6) mx = 1;
+    if (my < 1e-6) my = 1;
+    for (i = 0; i < n; i++) {
+      uv.setXY(i, 0.5 + 0.5 * ux[i] / mx, 0.5 + 0.5 * uy[i] / my);
+    }
+    uv.needsUpdate = true;
+
+    // Round units and tangents differ by one constant, the tangent at the
+    // horizontal edge of the half screen, so the frustum the texture wants is
+    // just the grid's own reach in those units.
+    var tanEdgeX = Math.tan(THREE.MathUtils.degToRad(EYE_FOV) / 2) * (halfW / halfH);
+    warpTanX = mx * tanEdgeX;
+    warpTanY = my * tanEdgeX;
+    return geo;
+  }
+
+  function ensureWarp(w, h) {
+    var pr = renderer.getPixelRatio();
+    var tw = Math.max(1, Math.floor(w / 2 * pr));
+    var th = Math.max(1, Math.floor(h * pr));
+    if (rtL && warpW === tw && warpH === th) return;
+    warpW = tw; warpH = th;
+
+    if (rtL) { rtL.dispose(); rtR.dispose(); }
+    var opt = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+    rtL = new THREE.WebGLRenderTarget(tw, th, opt);
+    rtR = new THREE.WebGLRenderTarget(tw, th, opt);
+
+    if (!warpScene) {
+      warpScene = new THREE.Scene();
+      warpCam = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
+
+      // The line down the middle. It is what you line the viewer's septum up
+      // with, and losing it made the thing harder to put on straight.
+      var bar = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.006, 2),
+        new THREE.MeshBasicMaterial({ color: 0x6B6560, depthTest: false })
+      );
+      bar.renderOrder = 2;
+      warpScene.add(bar);
+    }
+    if (warpL) {
+      warpScene.remove(warpL); warpL.geometry.dispose(); warpL.material.dispose();
+      warpScene.remove(warpR); warpR.geometry.dispose(); warpR.material.dispose();
+    }
+    var geo = buildWarp(w / 2, h);
+    warpL = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: rtL.texture, depthTest: false }));
+    warpR = new THREE.Mesh(geo.clone(), new THREE.MeshBasicMaterial({ map: rtR.texture, depthTest: false }));
+    warpL.scale.x = 0.5; warpL.position.x = -0.5;
+    warpR.scale.x = 0.5; warpR.position.x = 0.5;
+    warpScene.add(warpL); warpScene.add(warpR);
+  }
+
   function render(t) {
     var now = (t || 0) / 1000;
     var dt = lastT ? Math.min(now - lastT, 0.1) : 0.016;
@@ -2282,21 +2420,28 @@ function bootPracticeSpace() {
       // tested, which is the whole lesson.
       renderer.getSize(_screen);
       var w = _screen.x, h = _screen.y;
+      ensureWarp(w, h);
       camera.updateMatrixWorld();
       [lc, rc].forEach(function (c, i) {
-        c.fov = 78; c.aspect = (w / 2) / h; c.near = 0.05; c.far = 1000;
+        // the frustum the grid asked for, rather than a round number, so the
+        // texture holds exactly the piece of the world the lens will show
+        c.fov = THREE.MathUtils.radToDeg(2 * Math.atan(warpTanY));
+        c.aspect = warpTanX / warpTanY;
+        c.near = 0.05; c.far = 1000;
         c.updateProjectionMatrix();
         c.position.setFromMatrixPosition(camera.matrixWorld);
         c.quaternion.setFromRotationMatrix(camera.matrixWorld);
         c.translateX((i === 0 ? -1 : 1) * IPD / 2);
         c.updateMatrixWorld(true);
       });
-      renderer.setScissorTest(true);
-      renderer.setViewport(0, 0, w / 2, h); renderer.setScissor(0, 0, w / 2, h);
+      // an eye apiece into its own texture, then both of them through the glass
+      renderer.setRenderTarget(rtL);
       renderer.render(scene, lc);
-      renderer.setViewport(w / 2, 0, w / 2, h); renderer.setScissor(w / 2, 0, w / 2, h);
+      renderer.setRenderTarget(rtR);
       renderer.render(scene, rc);
-      renderer.setScissorTest(false);
+      renderer.setRenderTarget(null);
+      renderer.setViewport(0, 0, w, h);
+      renderer.render(warpScene, warpCam);
     } else {
       renderer.render(scene, camera);
     }
